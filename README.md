@@ -1,5 +1,43 @@
 # INDEX
 
+- [NodeJS Course](#nodejs-course)
+  - [by Maximillian Academind (Udemy)](#by-maximillian-academind--udemy-)
+- [Introducción](#introducci-n)
+  - [Cómo funciona la web](#c-mo-funciona-la-web)
+  - [Que es NodeJS](#que-es-nodejs)
+  - [Que podemos hacer cono node](#que-podemos-hacer-cono-node)
+- [T-0 JavaScript Refresh](#t-0-javascript-refresh)
+  - [Sintaxi de arrow function](#sintaxi-de-arrow-function)
+  - [Uso de la keyword this y el uso de () en funciones.](#uso-de-la-keyword-this-y-el-uso-de----en-funciones)
+  - [Objects properties methods](#objects-properties-methods)
+  - [Arrays y sus métodos](#arrays-y-sus-m-todos)
+    - [Métodos](#m-todos)
+      - [map()](#map--)
+      - [slice()](#slice--)
+      - [splice()](#splice--)
+      - [foreach()](#foreach--)
+      - [push() / pop() / shift() / unshift()](#push-----pop-----shift-----unshift--)
+  - [new Operators](#new-operators)
+    - [spread "..."](#spread---)
+    - [rest "..."](#rest---)
+  - [Destructuring "{}"](#destructuring-----)
+  - [Async code & Promises](#async-code---promises)
+    - [Código síncrono vs asíncrono](#c-digo-s-ncrono-vs-as-ncrono)
+    - [Promises](#promises)
+- [T-1 NodeJs Basics](#t-1-nodejs-basics)
+  - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
+    - [Creación del servidor:](#creaci-n-del-servidor-)
+      - [**request object**](#--request-object--)
+      - [**response object**](#--response-object--)
+      - [Routing request](#routing-request)
+      - [Redirectign request & creating a file](#redirectign-request---creating-a-file)
+      - [Obtener los datos del body de una request **Streams & Buffers**](#obtener-los-datos-del-body-de-una-request---streams---buffers--)
+    - [Lifecycle de un programa NodeJS](#lifecycle-de-un-programa-nodejs)
+      - [The Event loop deeper](#the-event-loop-deeper)
+  - [Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-m-dulos-de-nodejs)
+
+Index made by: https://ecotrust-canada.github.io/markdown-toc/
+
 # NodeJS Course
 
 ### by Maximillian Academind (Udemy)
