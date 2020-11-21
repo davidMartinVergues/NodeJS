@@ -182,75 +182,75 @@
     }
     ```
 
-  - ### Métodos
+    - ### Métodos
 
-    - #### map()
+      - #### map()
 
-      Convierte cada elemento del array, conservando el array original y devolviendo otro con los cambios efectuados. Por ejempo añadir a cada item un texto
+        Convierte cada elemento del array, conservando el array original y devolviendo otro con los cambios efectuados. Por ejempo añadir a cada item un texto
 
-      ```
+        ```
 
-      //1 línea
-      let newArray = miArray.map((item, x) => `ìtem ${x}: ${item}`);
-      //
-      let newArray2 = miArray.map((item, x) => {
-        return `ìtem ${x}: ${item}`;
-      });
+        //1 línea
+        let newArray = miArray.map((item, x) => `ìtem ${x}: ${item}`);
+        //
+        let newArray2 = miArray.map((item, x) => {
+          return `ìtem ${x}: ${item}`;
+        });
 
-      console.log(newArray);//
-      output: [ 'ìtem 0: david', 'ìtem 1: martin', 'ìtem 2: 36' ]
-      ```
+        console.log(newArray);//
+        output: [ 'ìtem 0: david', 'ìtem 1: martin', 'ìtem 2: 36' ]
+        ```
 
-    - #### slice()
+      - #### slice()
 
-      para copiar arrays su contenido no la referencia así q los arryas serán independientes
+        para copiar arrays su contenido no la referencia así q los arryas serán independientes
 
-      ```
-      let shallowCopy = fruits.slice() // this is how to make a copy
-      ```
+        ```
+        let shallowCopy = fruits.slice() // this is how to make a copy
+        ```
 
-    - #### splice()
+      - #### splice()
 
-      Eliminar items
+        Eliminar items
 
-      ```
-      let vegetables = ['Cabbage', 'Turnip', 'Radish', 'Carrot']
-      console.log(vegetables)
-      // ["Cabbage", "Turnip", "Radish", "Carrot"]
+        ```
+        let vegetables = ['Cabbage', 'Turnip', 'Radish', 'Carrot']
+        console.log(vegetables)
+        // ["Cabbage", "Turnip", "Radish", "Carrot"]
 
-      let pos = 1
-      let n = 2
+        let pos = 1
+        let n = 2
 
-      let removedItems = vegetables.splice(pos, n)
-      // this is how to remove items, n defines the number of items to be removed,
-      // starting at the index position specified by pos and progressing toward the end of array.
-      ```
+        let removedItems = vegetables.splice(pos, n)
+        // this is how to remove items, n defines the number of items to be removed,
+        // starting at the index position specified by pos and progressing toward the end of array.
+        ```
 
-    - #### foreach()
-      looping arrays
-      ```
-      fruits.forEach(function(item, index, miArray) {
-        console.log(item, index)
-      })
-      ```
-    - #### push() / pop() / shift() / unshift()
+      - #### foreach()
+        looping arrays
+        ```
+        fruits.forEach(function(item, index, miArray) {
+          console.log(item, index)
+        })
+        ```
+      - #### push() / pop() / shift() / unshift()
 
-      ```
-      let fruits = ['Apple', 'Banana']
+        ```
+        let fruits = ['Apple', 'Banana']
 
-      let newLength = fruits.push('Orange')
-      // ["Apple", "Banana", "Orange"]
+        let newLength = fruits.push('Orange')
+        // ["Apple", "Banana", "Orange"]
 
-      let last = fruits.pop() // remove Orange (from the end)
-      // ["Apple", "Banana"]
+        let last = fruits.pop() // remove Orange (from the end)
+        // ["Apple", "Banana"]
 
-      let first = fruits.shift() // remove Apple from the front
-      // ["Banana"]
+        let first = fruits.shift() // remove Apple from the front
+        // ["Banana"]
 
-      let newLength = fruits.unshift('Strawberry') // add to the front
-      // ["Strawberry", "Banana"]
+        let newLength = fruits.unshift('Strawberry') // add to the front
+        // ["Strawberry", "Banana"]
 
-      ```
+        ```
 
   - ## new Operators
 
