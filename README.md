@@ -1,54 +1,54 @@
 # INDEX
 
 - [NodeJS Course](#nodejs-course)
-  - [by Maximillian Academind (Udemy)](#by-maximillian-academind--udemy-)
-- [Introducción](#introducci-n)
-  - [Cómo funciona la web](#c-mo-funciona-la-web)
+  - [by Maximillian Academind (Udemy)](#by-maximillian-academind)
+- [Introducción](#introducción)
+  - [Cómo funciona la web](#como-funciona-la-web)
   - [Que es NodeJS](#que-es-nodejs)
   - [Que podemos hacer cono node](#que-podemos-hacer-cono-node)
 - [T-0 JavaScript Refresh](#t-0-javascript-refresh)
   - [Sintaxi de arrow function](#sintaxi-de-arrow-function)
-  - [Uso de la keyword this y el uso de () en funciones.](#uso-de-la-keyword-this-y-el-uso-de----en-funciones)
+  - [Uso de la keyword this y utilidad de () en las funciones](#Uso-de-la-keyword-this-y-utilidad-de)
   - [Objects properties methods](#objects-properties-methods)
-  - [Arrays y sus métodos](#arrays-y-sus-m-todos)
-    - [Métodos](#m-todos)
-      - [map()](#map--)
-      - [slice()](#slice--)
-      - [splice()](#splice--)
-      - [foreach()](#foreach--)
-      - [push() / pop() / shift() / unshift()](#push-----pop-----shift-----unshift--)
+  - [Arrays y sus métodos](#arrays-y-sus-métodos)
+    - [Métodos](#métodos)
+      - [map()](#map)
+      - [slice()](#slice)
+      - [splice()](#splice)
+      - [foreach()](#foreach)
+      - [push() / pop() / shift() / unshift()](#push--pop--shift--unshift)
   - [new Operators](#new-operators)
-    - [spread "..."](#spread---)
-    - [rest "..."](#rest---)
-  - [Destructuring "{}"](#destructuring-----)
-  - [Async code & Promises](#async-code---promises)
-    - [Código síncrono vs asíncrono](#c-digo-s-ncrono-vs-as-ncrono)
+    - [spread "..."](#spread)
+    - [rest "..."](#rest)
+  - [Destructuring "{}"](#destructuring)
+  - [Async code & Promises](#async-code-&-promises)
+    - [Código síncrono vs asíncrono](#código-síncrono-vs-asíncrono)
     - [Promises](#promises)
 - [T-1 NodeJs Basics](#t-1-nodejs-basics)
   - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
-    - [Creación del servidor:](#creaci-n-del-servidor-)
+    - [Creación del servidor:](#creación-del-servidor-)
       - [**request object**](#--request-object--)
       - [**response object**](#--response-object--)
       - [Routing request](#routing-request)
-      - [Redirectign request & creating a file](#redirectign-request---creating-a-file)
-      - [Obtener los datos del body de una request **Streams & Buffers**](#obtener-los-datos-del-body-de-una-request---streams---buffers--)
+      - [Redirectign request & creating a file](#redirectign-request-&-creating-a-file)
+      - [Obtener los datos del body de una request **Streams & Buffers**](#obtener-los-datos-del-body-de-una-request-streams-&-buffers)
     - [Lifecycle de un programa NodeJS](#lifecycle-de-un-programa-nodejs)
       - [The Event loop deeper](#the-event-loop-deeper)
   - [Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-m-dulos-de-nodejs)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 Index made by: https://ecotrust-canada.github.io/markdown-toc/
 
 # NodeJS Course
 
-### by Maximillian Academind (Udemy)
+## by Maximillian Academind
 
-> <span style="font-size:1.5em;"> [_link del video_](https://www.udemy.com/course/nodejs-the-complete-guide/) </span>
-
----
+> <span style="font-size:1.5em;"> [_link del curso_](https://www.udemy.com/course/nodejs-the-complete-guide/) </span>
 
 - # Introducción
 
-  - ## Cómo funciona la web
+  - ## Como funciona la web
     ![not found!](img/img-4.png)
     Esta comunicación con el servidor se realiza utilizando unos protocolos, standarización de las rglas que tienen que seguir este tipo de comunicación. Hay varios protocolos pero los más utilizados son HTTP y HTTPs
     ![not found!](img/img-5.png)
@@ -92,7 +92,7 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
     const addRandom = () => 1+2;
     ```
 
-  - ## Uso de la keyword this y el uso de () en funciones.
+  - ## Uso de la keyword this y utilidad de ()
 
     - This se usa para referirnos a variables o métodos dentro de la misma clase. Si definimos una variable con this dentro de la clase ésta será accesible desde un objeto de esa clase.
       Aquí JS tiene algo curioso y es que no solo "this" hace referencia a elementos dentro de la clase si no que también hace referencia al elemento que llama a la función.
@@ -292,7 +292,7 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
 
   - ## new Operators
 
-    - ### spread "..."
+    - ### spread
 
       Permite sacar el contenido(propiedades/métodos/items) de un objeto/array y crear otro objeto/array según rodeemos el spread operator.
       Atención no hace un deep copy, es decir si copiamos un array/objeto que contiene otro valor por referencia no crea un nuevo objeto si no q copia la referencia (los métodos no son referencias, se mantiene independientes).
@@ -324,7 +324,7 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
           }
       ```
 
-    - ### rest "..."
+    - ### rest
 
       Tiene el efecto opuesto a spread, lo que hace es mergear / combinar los argumentos que le pasamos a una función en un array. También son 3 puntitos XD
 
@@ -334,7 +334,7 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
 
       ```
 
-  - ## Destructuring "{}"
+  - ## Destructuring
 
     Nos permite obtener los datos de un objeto / array de una manera sencilla. Se puede aplicar tanto a un objeto como a un array.
 
