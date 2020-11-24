@@ -727,3 +727,383 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
     ```
       const routes = require("./routes");
     ```
+
+- # T2 work flow y debugging
+
+  - ## Entendiendo NPM (node package manager) scripts
+
+    Es un gestor de paquetes para NodeJS que se instala automáticamente cuando instalamos NodeJS. Este nos permitirá instalar paquetes de terceros no incluidos en el core de NodeJS.
+    Podemos usar npm para empezar un nuevo proyecto de NodeJS. En el directorio del proyecto otecleamos en la terminal:
+
+    ```
+      npm init
+    ```
+
+    Esto nos guiará por un asistente para que completemos información sobre nuestro proyecto. Esto generará un archivo **package.json** (archivo de configuración de nuestro proyecto).
+
+    ```
+      {
+        "name": "2.1-node_server",
+        "version": "1.0.0",
+        "description": "",
+        "main": "app.js",
+        "scripts": {
+          "test": "echo \"Error: no test specified\" && exit 1"
+        },
+        "author": "David Martin",
+        "license": "ISC"
+      }
+    ```
+
+    Gracias a este archivo de configuración nos podemos llevar nuestro proyecto a otro pc y para instalarlo (dependencias) podemos hacer
+
+    ```
+    npm install
+    ```
+
+    Y tendremos nuestro proyecto listo
+
+    En este archivo hay una sección de scripts, en la cual podemos definir scripts propios.
+
+    1. start
+
+       Este es el nombre de un script predefinido así que se ejecuta directamente **npm start** Nos permite ejecutar un comando para inicializar nuestro proyecto. Esto se utiliza cuando alguien externo quiere ejecutar nuestro proyecto y no sabe el punto de partida se suele poner "npm start" para que se ejecute.
+
+       ```
+         {
+           "name": "2.1-node_server",
+           "version": "1.0.0",
+           "description": "",
+           "main": "app.js",
+           "scripts": {
+             "test": "echo \"Error: no test specified\" && exit 1",
+             "start": "node app.js"
+           },
+           "author": "David Martin",
+           "license": "ISC"
+         }
+       ```
+
+    2. custom name
+       Para ejecutar un scrip con un nombre puesto por nosotros debemos teclear:
+       ```
+         npm run nombreScript
+       ```
+
+    - ### Instalando paquetes de terceros
+
+      ![not found](img/img-13.png)  
+      NPM repository es donde se almacenan los paquetes de terceros y mediante comandos de npm podemos instalarlos en nuestro proyecto y utilizarlos como dependencias del mismo lo que llamamos **paquetes de producción** o también hay paquetes que nos ayudan durante el desarrollo **paquetes de desarrollo**.
+      Así cuando instalamos un paquete hay que decidir de que tipo es, si es dependencia de desarrollo lo instalamos como
+
+      ```
+      npm install nombrePackage --save-dev
+      ```
+
+      Si queremos instalarlo como dependencia de producción es
+
+      ```
+      npm install nombrePackage --save
+      ```
+
+      De ambas maneras solo lo instala en nuestro proyecto, si queremos instalar un paquete de manero global usamos -g
+
+      ```
+      npm install -g nombrePackage
+      ```
+
+      - #### Paquetes útiles
+        1. ##### nodemon
+           Nos permite reiniciar nuestro servidor cuando modificamos el código. Para instalarlo
+        ```
+          npm install nodemon --save-dev
+        ```
+        Así solo lo instalamos de manera local (solo nuestro proyecto). Nos crea en nuestro proyecto una carpeta **node_modules** donde se instalan estos paquetes.
+        Para usarlo tenemos que ejecutar el proyecto mediante nodemon no usando node
+        ```
+          {
+            "name": "2.1-node_server",
+            "version": "1.0.0",
+            "description": "",
+            "main": "app.js",
+            "scripts": {
+              "test": "echo \"Error: no test specified\" && exit 1",
+        /*=>*/  "start": "nodemon app.js" // <==
+            },
+            "author": "David Martin",
+            "license": "ISC",
+            "devDependencies": {
+              "nodemon": "^2.0.6"
+            }
+          }
+        ```
+
+  - ## Errors and debugging
+
+    Hay tres categorias de errores:
+
+    sintaxis  
+    Tiempo de ejecución => nuestro programa tiene algún error que impide que se ejecute  
+    Errores de lógica => el programa se ejecuta pero no funciona como se esperaría.
+
+- # T3 ExpressJS
+
+  - ## Que es expressJS y para qué se utiliza
+
+    ![not found](img/img-14.png)
+
+    Express es un framework que nos permitirá despreocuparnos de tareas tediosas, como extraer el body de la request, crear servidor, routing,... y centrarnos en la lógica.
+    Por ejemplo para extraer el body de la request teníamos q escuchar el event data recorrer el buffer, detectar el event end y parsear la info a string si la info era un string... con express todo eso se simplifica.
+
+  - ## Usando express
+
+    1. Instalamos express
+
+       ```
+         npm install express --save
+       ```
+
+       2. importamos en nuestro app.js
+
+       ```
+         const express = require('express');
+       ```
+
+       3. creamos una app cn express y arrancamos el server
+
+       ```
+         const app = express();
+
+         const server = http.createServer(app);
+
+         server.listen(3000);
+       ```
+
+       - ### Middleware
+
+         ![not found](img/img-15.png)
+         Express funciona con middlewares, es un conjunto de funciones a través de las cuales es conducida una request al servidor. Estos middlewares son requestHandlers mediante los cuales podemos agregar funcionalidades a nuestro servidor, son funciones que establecemos entre la entrada de la request y el envío de la respuesta.
+
+         1. #### .use()
+
+            Es un método sobrecargado por lo que tenemos varias implementaciones del mismo.
+            Para cada request entrante se ejecutará el método use(), a éste le pasamos tres argumentos request,response y **next**.
+
+            - Next()
+              es una función que debemos ejecutar al final de nuestro código para permitir el avance hacia el siguiente middleware. Excepto cuando enviemos una respuesta.
+            - send()
+              Nos permite enviar una respuesta y de manera automática exprees detecta qué tipo de respuesta es y le completa el header.
+              ![not found](img/img-16.png)
+
+         2. #### listen()
+
+            esta función sustituye a la creación del servidor.
+
+            ```
+            const server = http.createServer(app);
+            server.listen(3000, "localhost");
+            ```
+
+            podemos escribir directamente
+
+            ```
+              app.listen(3000);
+            ```
+
+       - ### Manejando rutas
+
+         Podemos usar el middleware use() para especificar la url. Si solo especificamos en la ruta "/" como todas las url empiezan por '/', si queremos acceder a una url q no existe en nuestro servidor pej
+         /random como el único elemento que coincide es / se dirigirá ahí. Las diferentes rutas siempre tienen que ir por encima de la principal "/". Para evitar esto podemos utilizar get(), post(),... ya que con estos métodos sólo se dirigirá si la url es exactamente igual.
+
+         ```
+         app.use("/add-product", (req, res, next) => {
+           console.log("in the middleware");
+           res.send("<h1>Add-product page</h1>");
+         }); //middleware
+
+         app.use("/", (req, res, next) => {
+           console.log("in the other middleware");
+           res.send("<h1>Hello from express</h1>");
+         }); //middleware
+
+         ```
+
+       - ### Parsing incoming request
+
+         Para gestionar los request usamos el middeware use() de la siguiente manera.
+
+         1. body-parser y urlencoded()
+            Es una paquete externo que instalamos en desarrollo que nos ayudará a parsear el contenido del body. Funciona solo para parsear datos codificados en la url por lo tanto tipo string, datos que vienen de un formulario, si enviamos tipo json o archivos usaremos otro tipo de **body-parser**.
+            Como hemos dicho antes use() se ejecuta para cada request así q body-parser se ejecutará en cada conexión y si hay datos en la url los decodificará, lleva implícito un next() por lo que permitirá ejecutar el código que le sigue.
+
+            ```
+             npm install body-parser --save
+
+            ```
+
+            Una vez instalado lo importamos y especificamos que queremos decodificar las url usando el método urlencoded()
+            tenemos que añadirle la opción extended en:
+
+            - false si los datos codificados en la url serán de tipo string o array
+            - true si serán de cualquier tipo
+
+            ```
+             const bodyParser = require("body-parser");
+
+             const app = express();
+             //parsear el request body
+             app.use(bodyParser.urlencoded({ extended: true }));
+
+            ```
+
+            Para hacer que la ruta (/product) solo sea accesible mediante una petición tipo POST
+            el método use() es genérico, reacciona a cualquier request si queremos filtrar r get o post debemos usar
+            app.get()
+            app.post()
+            app.delete()
+            app.push()
+            app.put()
+
+            ```
+             app.post("/product", (req, res, next) => {
+               console.log(req.body);
+               res.redirect("/");
+             });
+            ```
+
+       - ### usando el router de express
+
+         La función Router() crea como una mini app de express asociada a nuestra app que nos ayuda a gestionar las rutas. Creamos una carpeta Routes y dentro ponemos nuestroas archivos para las rutas, normalmente se pone uno para las rutas a las q puede acceder el admin y otro genérico.
+
+         ![not found](img/img-17.png)
+
+         ```
+           const express = require("express");
+
+           const router = express.Router();
+
+           router.get("/add-product", (req, res, next) => {
+
+             res.send(
+               "
+               <body>
+                 <h1>Add-product</h1>
+                   <form action='/product' method='POST'>
+                     <input name='title' type='text'></input>
+                     <button type='submit'>add produc t!</button>
+                   </form>
+               </body>
+               "
+             );
+           });
+
+           router.post("/product", (req, res, next) => {
+             console.log(req.body);
+             res.redirect("/");
+           });
+
+           router.module.exports = router;
+         ```
+
+         después importamos nuestro archivo a la app.js.
+
+         ```
+           const express = require("express");
+           const bodyParser = require("body-parser");
+
+           const app = express();
+
+           const adminRoutes = require("./routes/admin");
+
+           app.use(adminRoutes);
+         ```
+
+       - ### generar 404 error page
+
+         Para generar una respuesta ante una url que no existe samos
+
+         ```
+           //------------ FIN IMPORTS ----------------
+           app.use(adminRoutes);
+           app.use(shopRoutes);
+
+           app.use((req, res, next) => {
+             res.status(404).send("<h1>Page not found</h1>");
+           });
+
+           app.listen(3000);
+
+         ```
+
+       - ### Filtrar los PATHS
+
+         Es habitual en las apps que las url se filtren por usuario, por ejemplo "/admin/add-product" o "/admin/products" y así. Si tenemos configurado nuestros paths de esa manera podemos añadirlo a use() de la siguiente manera:
+
+         ```
+           app.use("/admin", adminRoutes);
+
+         ```
+
+         de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes. Pero una vez dentro del archivo no debemos volver a chequear la ruta entera "/admin/add-product" solo mira a partir de
+         "/admin/"
+
+         ```
+           // /admin/add-product => GET
+
+           router.get("/add-product", (req, res, next) => {
+
+             res.send(
+               "<body><h1>Add-product</h1> <form action='/admin/add-product' method='POST'> <input name='title' type='text'></input> <button type='submit'>add produc t!</button></form></body>"
+             );
+           });
+
+           // /admin/add-product => POST
+
+           router.post("/add-product", (req, res, next) => {
+
+             console.log(req.body);
+             res.redirect("/");
+           });
+         ```
+
+       - ### Servir páginas HTML
+
+         Creamos un directorio llamado views dnd guardaremos nuestras págias HTML.
+         Para poderlas devolver en la respuesta usamos el método sendFile() y especificamos la ruta a nuestras vistas. Para especificar el PATH tenemos un core module que nos ayuda con eso.
+
+         ```
+          const path = require("path");
+
+          router.get("/", (req, res, next) => {
+
+              res.sendFile(path.join(__dirname,"..", "views", "shop.html"));
+
+           });
+         ```
+
+         usamos el método join() para ir encadenando porciones de la ruta hasta llegar a nuestro archivo. la variable global **\_\_dirname** hace referncia a la ruta desde la raíz de nuestro SSOO hasta el archivo donde escribimos \_\_dirname, una vez ahí vamos completando la ruta. En nuestro caso tenemos q entrar en una carpeta hermana de la q ejecutamos el código así q tenemos q concatenar
+         "..".
+
+       - ### Servir archivos estáticos
+
+         Servir archivos estáticos significa poder servir archivos que no esté gestionado por el sistema de router de express u otro middleware si no que se accede directamente por el sistema de archivos.
+         En principio NodeJS bloquea el acceso al sistema de archivos pero para que el html puede acceder a una hoja CSS necesitamos hacer una excepción.
+         Para ello necesitamos otro middleware usando el propio objeto de express
+
+         ```
+         app.use(express.static(path.join(__dirname, "public")));
+         ```
+
+         De este manera hará que todo el contenido del directorio **public** sea accesible.
+         Cuando intentemos acceder desde el HTML para cargar el css el sistema ya situa la ruta en el directorio especificado "public" así que en el tag link ponemos
+
+         ```
+         <link rel="stylesheet" href="/css/main.css" />
+         ```
+
+         **No hay que dejarse la "/" antes de css IMPORTANTE!!!**
+         Lo que hace express es que cualquier request que solicite un archivo terminado en .css, .js, imágenes, etc.. lo edirigirá al directorio especificado como archivos státicos, en nuestro caso el diretorio public.
+
+         Mediante el mismo método podemos registrar varios directorios como fuentes de archivos estáticos.
+
+- # Trabajando con contenido dinámico y motor de plantillas
