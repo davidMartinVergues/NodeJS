@@ -1,14 +1,14 @@
 # INDEX
 
 - [NodeJS Course](#nodejs-course)
-  - [by Maximillian Academind (Udemy)](#by-maximillian-academind)
+  - [by Maximillian Academind](#by-maximillian-academind)
 - [Introducción](#introducción)
-  - [Cómo funciona la web](#como-funciona-la-web)
+  - [Como funciona la web](#como-funciona-la-web)
   - [Que es NodeJS](#que-es-nodejs)
   - [Que podemos hacer cono node](#que-podemos-hacer-cono-node)
 - [T-0 JavaScript Refresh](#t-0-javascript-refresh)
   - [Sintaxi de arrow function](#sintaxi-de-arrow-function)
-  - [Uso de la keyword this y utilidad de () en las funciones](#Uso-de-la-keyword-this-y-utilidad-de)
+  - [Uso de la keyword this y utilidad de ()](#uso-de-la-keyword-this-y-utilidad-de)
   - [Objects properties methods](#objects-properties-methods)
   - [Arrays y sus métodos](#arrays-y-sus-métodos)
     - [Métodos](#métodos)
@@ -16,29 +16,59 @@
       - [slice()](#slice)
       - [splice()](#splice)
       - [foreach()](#foreach)
-      - [push() / pop() / shift() / unshift()](#push--pop--shift--unshift)
+      - [push() / pop() / shift() / unshift()](#push-pop-shift-unshift)
   - [new Operators](#new-operators)
-    - [spread "..."](#spread)
-    - [rest "..."](#rest)
-  - [Destructuring "{}"](#destructuring)
+    - [spread](#spread)
+    - [rest](#rest)
+  - [Destructuring](#destructuring)
   - [Async code & Promises](#async-code-&-promises)
     - [Código síncrono vs asíncrono](#código-síncrono-vs-asíncrono)
     - [Promises](#promises)
 - [T-1 NodeJs Basics](#t-1-nodejs-basics)
   - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
-    - [Creación del servidor:](#creación-del-servidor-)
+    - [Creación del servidor:](#creación-del-servidor:)
       - [**request object**](#--request-object--)
       - [**response object**](#--response-object--)
       - [Routing request](#routing-request)
       - [Redirectign request & creating a file](#redirectign-request-&-creating-a-file)
-      - [Obtener los datos del body de una request **Streams & Buffers**](#obtener-los-datos-del-body-de-una-request-streams-&-buffers)
+      - [Obtener los datos del body de una request **Streams & Buffers**](#obtener-los-datos-del-body-de-una-request-**streams-&-buffers**)
     - [Lifecycle de un programa NodeJS](#lifecycle-de-un-programa-nodejs)
       - [The Event loop deeper](#the-event-loop-deeper)
-  - [Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-m-dulos-de-nodejs)
+  - [Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-módulos-de-nodejs)
+- [T2 work flow y debugging](#t2-work-flow-y-debugging)
+  - [Entendiendo NPM (node package manager) scripts](#entendiendo-npm-node-package-manager-scripts)
+    - [Instalando paquetes de terceros](#instalando-paquetes-de-terceros)
+      - [Paquetes útiles](#paquetes-útiles)
+        - [nodemon](#nodemon)
+  - [Errors and debugging](#errors-and-debugging)
+- [T3 ExpressJS](#t3-expressjs)
+  - [Que es expressJS y para qué se utiliza](#que-es-expressjs-y-para-qué-se-utiliza)
+  - [Usando express](#usando-express)
+    - [Middleware](#middleware)
+      - [use](#use)
+      - [listen()](#listen)
+    - [Manejando rutas](#manejando-rutas)
+    - [Parsing incoming request](#parsing-incoming-request)
+    - [usando el router de express](#usando-el-router-de-express)
+    - [generar 404 error page](#generar-404-error-page)
+    - [Filtrar los PATHS](#filtrar-los-paths)
+    - [Servir páginas HTML](#servir-páginas-html)
+      - [process.cwd()](#processcwd--)
+    - [Servir archivos estáticos](#servir-archivos-estáticos)
+- [Trabajando con contenido dinámico y motor de plantillas](#trabajando-con-contenido-dinámico-y-motor-de-plantillas)
+  - [Motor de plantillas](#motor-de-plantillas)
+    - [Instalación de las plantillas](#instalación-de-las-plantillas)
+      - [view engine](#view-engine)
+      - [views](#views)
+    - [PUG](#pug)
+      - [Añadiendo contenido dinámico a la plantilla de pug](#añadiendo-contenido-dinámico-a-la-plantilla-de-pug)
+      - [Añadiendo Layouts](#añadiendo-layouts)
+      - [Añadir clases css de manera dinámica](#añadir-clases-css-de-manera-dinámica)
+    - [HandleBars](#handlebars)
+      - [Usando layouts con handlebars](#usando-layouts-con-handlebars)
+    - [EJS](#ejs)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
-Index made by: https://ecotrust-canada.github.io/markdown-toc/
 
 # NodeJS Course
 
@@ -271,7 +301,7 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
           console.log(item, index)
         })
         ```
-      - #### push() / pop() / shift() / unshift()
+      - #### push pop shift unshift
 
         ```
         let fruits = ['Apple', 'Banana']
@@ -730,7 +760,7 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
 
 - # T2 work flow y debugging
 
-  - ## Entendiendo NPM (node package manager) scripts
+  - ## Entendiendo NPM node package manager scripts
 
     Es un gestor de paquetes para NodeJS que se instala automáticamente cuando instalamos NodeJS. Este nos permitirá instalar paquetes de terceros no incluidos en el core de NodeJS.
     Podemos usar npm para empezar un nuevo proyecto de NodeJS. En el directorio del proyecto otecleamos en la terminal:
@@ -884,31 +914,31 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
          ![not found](img/img-15.png)
          Express funciona con middlewares, es un conjunto de funciones a través de las cuales es conducida una request al servidor. Estos middlewares son requestHandlers mediante los cuales podemos agregar funcionalidades a nuestro servidor, son funciones que establecemos entre la entrada de la request y el envío de la respuesta.
 
-         1. #### .use()
+         - #### use
 
-            Es un método sobrecargado por lo que tenemos varias implementaciones del mismo.
-            Para cada request entrante se ejecutará el método use(), a éste le pasamos tres argumentos request,response y **next**.
+           Es un método sobrecargado por lo que tenemos varias implementaciones del mismo.
+           Para cada request entrante se ejecutará el método use(), a éste le pasamos tres argumentos request,response y **next**.
 
-            - Next()
-              es una función que debemos ejecutar al final de nuestro código para permitir el avance hacia el siguiente middleware. Excepto cuando enviemos una respuesta.
-            - send()
-              Nos permite enviar una respuesta y de manera automática exprees detecta qué tipo de respuesta es y le completa el header.
-              ![not found](img/img-16.png)
+           - Next()
+             es una función que debemos ejecutar al final de nuestro código para permitir el avance hacia el siguiente middleware. Excepto cuando enviemos una respuesta.
+           - send()
+             Nos permite enviar una respuesta y de manera automática exprees detecta qué tipo de respuesta es y le completa el header.
+             ![not found](img/img-16.png)
 
-         2. #### listen()
+         - #### listen()
 
-            esta función sustituye a la creación del servidor.
+           esta función sustituye a la creación del servidor.
 
-            ```
-            const server = http.createServer(app);
-            server.listen(3000, "localhost");
-            ```
+           ```
+           const server = http.createServer(app);
+           server.listen(3000, "localhost");
+           ```
 
-            podemos escribir directamente
+           podemos escribir directamente
 
-            ```
-              app.listen(3000);
-            ```
+           ```
+             app.listen(3000);
+           ```
 
        - ### Manejando rutas
 
