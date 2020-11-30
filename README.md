@@ -26,7 +26,7 @@
     - [Promises](#promises)
 - [T-1 NodeJs Basics](#t-1-nodejs-basics)
   - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
-    - [Creación del servidor:](#creación-del-servidor:)
+    - [Creación del servidor](#creación-del-servidor)
       - [**request object**](#--request-object--)
       - [**response object**](#--response-object--)
       - [Routing request](#routing-request)
@@ -483,7 +483,7 @@
         - absoluto (empezamos x la raíz del sistema de archivos "/")
         - relativo (empezamos x donde se encuentra el archivo "./")
       - importar un **global module** para ello no especificamos ningún path, sólo el nombre del módulo.
-    - ### Creación del servidor:
+    - ### Creación del servidor
 
       1. importamos el global module **http**
          ```
