@@ -1068,15 +1068,23 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
 
        - ### Servir páginas HTML
 
+         - #### process.cwd()
+
+           Una manera de conocer la ruta absoluta donde se encuntra nuestro proyecto es utilizar la función:
+
+           ```
+           console.log(process.cwd())
+           ```
+
          Creamos un directorio llamado views dnd guardaremos nuestras págias HTML.
          Para poderlas devolver en la respuesta usamos el método sendFile() y especificamos la ruta a nuestras vistas. Para especificar el PATH tenemos un core module que nos ayuda con eso.
 
          ```
-          const path = require("path");
+           const path = require("path");
 
-          router.get("/", (req, res, next) => {
+           router.get("/", (req, res, next) => {
 
-              res.sendFile(path.join(__dirname,"..", "views", "shop.html"));
+               res.sendFile(path.join(__dirname,"..", "views", "shop.html"));
 
            });
          ```
@@ -1107,3 +1115,393 @@ Index made by: https://ecotrust-canada.github.io/markdown-toc/
          Mediante el mismo método podemos registrar varios directorios como fuentes de archivos estáticos.
 
 - # Trabajando con contenido dinámico y motor de plantillas
+
+  Hasta ahora hemos parendido a servir contenido estático lo que no es muy usual, lo habitual es que podamos modificar el contenido de nuestros HTML de manera dinámica, por ejemplo recuperando info de nuestra BBDD.
+  Para simular una bbdd usaremos una array, el problema de esto es que el array es "heredado" en node para todos los usuarios que se conecten al servidor, lo que ocasiona que si un usuario modifica la info el otro tb verá esas modificaciones, lo que no es una implementación que se deba hacer, pero xa aprender a usar el motor de plantillas está bien.
+  Entonces en adimin creamos el array y lo exportamos:
+
+  ```
+    const express = require("express"),
+    path = require("path");
+
+    const router = express.Router();
+
+    //----variable donde guardaremos info a modo de bbdd
+    const products = [];
+
+   // /admin/add-product => GET
+    router.get("/add-product", (req, res, next) => {
+         res.sendFile(path.join(__dirname, "..", "views", "add-product.html"));
+    });
+    // /admin/add-product => POST
+    router.post("/add-product", (req, res, next) => {
+      products.push({ title: req.body.title });
+      res.redirect("/");
+    });
+
+    module.exports.routes = router;
+    module.exports.products = products;
+  ```
+
+  - ## Motor de plantillas
+
+    ![not found](img/img-18.png)
+    Motores de platillas hay muchos pero veremos los 3 más usados. Todos ellos se integran a la perfección con express, es más es más fácil usarlos con express, solo necesitamos "decirle" a express que usaremos un motor de plantillas
+
+    ![not found](img/img-19.png)
+
+    - ### Instalación de las plantillas
+
+      1. Instalamos con npm los paquetes
+
+         ```
+             npm install ejs pug express-handlebars --save
+         ```
+
+      2. Coonfiguramos express para que use el motor de plantillas, para ello usamos método set() para establecer una configuración global. También podemos usar set() para establecer datos de manera global (accesible en toda la app), estos datos siempre son parejas llave-valor. Hay lgunas llaves preestablecidas como el caso q nos interesa **"views"** y **"view engine"**.
+
+      - #### view engine
+        Le dice a express que para renderizar vistas dinámicas utilice el motor de plantillas especificado.
+      - #### views
+        Le dice a express donde encontrar las plantillas dinámicas. Por defecto las coge en la ruta "/views"
+
+      ```
+      // datos globales
+      app.set("miNombre","David");
+      app.get("miNombre");//"David"
+
+      // establecer plantillas.
+
+      const app = express();
+
+      app.set("view engine", "pug");
+      app.set("views", "Templates");
+
+      ```
+
+    - ### PUG
+
+      Es un motor que usa una versión simplificada de HTML, es muy importante respetar la identación, podemos usar css enlazados pero para aplicar una clase css a un tag HTML se utiliza la notación de punto
+
+      ```
+      <!DOCTYPE html>
+      html(lang="en")
+        head
+          meta(charset="UTF-8")
+          meta(name="viewport", content="width=device-width, initial-scale=1.0")
+          title My Shop
+          link(rel="stylesheet", href="/css/main.css")
+          link(rel="stylesheet", href="/css/main-product.css")
+        body
+          header.main-header
+            nav.main-header__nav
+              ul.main-header__item-list
+                li.main-header__item
+                  a.active(href="/") Shop
+                li.main-header__item
+                  a.active(href="/admin/add-product") Add Product
+      ```
+
+      Para renderizar la vista debemos usar el método render(), como anteriormente ya definimos dónde guardábamos las platillas dinámicas no hace falta especificar la ruta
+
+      ```
+        router.get("/", (req, res, next) => {
+
+          res.render("shop");
+
+        });
+
+      ```
+
+      - #### Añadiendo contenido dinámico a la plantilla de pug
+
+        Para pasar datos a la plantilla simplemente debemos agregárselos como segundo argumento de la función render(); en forma de objeto(clave-valor)
+
+        ```
+          const products = require("./admin").products;
+          //---------------------------------------------
+
+          const router = express.Router();
+
+          router.get("/", (req, res, next) => {
+
+            res.render("shop", { items: products, docTitle: "Shop" });
+          });
+
+        ```
+
+        Para recuperar esos datos en la plantilla de pug usamos la sitaxi  
+        `# { }`
+        Recordemos que en la clave items tenemos un array (products) que contiene objetos del tipo {title:''} Entonces solo tendremos que iterar el array e ir sacando el título de cada producto
+
+        ```
+        <!DOCTYPE html>
+        html(lang="en")
+          head
+            meta(charset="UTF-8")
+            meta(name="viewport", content="width=device-width, initial-scale=1.0")
+            title #{docTitle}
+            link(rel="stylesheet", href="/css/main.css")
+            link(rel="stylesheet", href="/css/main-product.css")
+          body
+            header.main-header
+              nav.main-header__nav
+                ul.main-header__item-list
+                  li.main-header__item
+                    a.active(href="/") Shop
+                  li.main-header__item
+                    a.active(href="/admin/add-product") Add Product
+            main
+              if items.length > 0
+                div.grid
+                    each item in items
+                      article.card.product-item
+                          header.card__header
+                              h1.product__title #{item.title}
+                          div.card__image
+                              img(src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
+                              alt="A Book")
+                          div.card__content
+                              h2.product__price $19.99
+                              p.product__description A very interesting book
+                          div.card__actions
+                              button.btn Add to Cart
+              else
+                h1 No products
+        ```
+
+        Un formulario quedaría así
+
+        ```
+          main
+            form.product-form(action="/admin/add-product",method="POST")
+                div.form-control
+                  label(for="title") Title
+                  input(type="text", name="title", id="title")
+                button.btn( type="submit") Add Product
+
+        ```
+
+      - #### Añadiendo Layouts
+
+        Si en todas nuestras páginas tenemos una estrctura similar, como nos sucede a nosotros con el header podemos hacer layouts en lugar de volver a escribirlo.
+        Estos layuots podemos personalizarlos para que se ajusten a cada situación, por ejemplo hay páginas que tendrán unos estilos css diferentes, un contenido concreto,... así para crear un layout (esqueleto) y poder añadir elementos usamos los bloques `block`
+
+        ```
+        <!DOCTYPE html>
+        html(lang="en")
+          head
+            meta(charset="UTF-8")
+            meta(name="viewport", content="width=device-width, initial-scale=1.0")
+            title #{title}
+            link(rel="stylesheet", href="/css/main.css")
+            block styles
+          body
+            header.main-header
+              nav.main-header__nav
+                ul.main-header__item-list
+                  li.main-header__item
+                    a(href="/") Shop
+                  li.main-header__item
+                    a(href="/admin/add-product") Add Product
+            block content
+
+        ```
+
+        Lo mejor para guardar los layouts es en la misma carpeta donde tenemos las plantillas.
+
+        ![not found](img/img-20.png)
+
+        Una vez hecho esto en la plantilla deseada utilizando la palabra reservada `extends`
+        importamos el layout y con `block` inyectamos el contenido que queramos
+
+        ```
+          extends layouts/main-layout.pug
+
+          block content
+            h1 Page not found
+        ```
+
+      - #### Añadir clases css de manera dinámica
+
+        Para ello podemos enviar un nuevo argumento en el método render() para saber si debemos añadir la clase o no.
+
+        ```
+          router.get("/add-product", (req, res, next) => {
+
+            res.render("add-product", {
+
+              pageTitle: "Add-Product",
+              path: "/admin/add-product",
+
+            });
+          });
+
+        ```
+
+        luego comprobamos con un `if` en la plantilla
+
+        ```
+          a(href="/admin/add-product", class= (path=== '/admin/add-product' ? 'active' : '')  ) Add Product
+        ```
+
+    - ### HandleBars
+
+      Este otro motor de plantillas usa HTML mezclado con código para generar la lantilla. Así que en app.use() modificamos nuestro motor pero handlebars no está incluido en el core así que tenemos q importarlo previamente y decirle a express que es un motor de plantillas
+
+      ```
+      const expressHbs = require('express-handlebars');//importamos
+
+      app.engine("hbs", expressHbs()); // lo registramos como motor de plantillas
+      app.set("views", "Templates");
+      app.set("view engine", "hbs");
+
+      ```
+
+      Para renderizar la página tenemos que especificar q no usamos layouts porque por defecto handlebars se construye con un esquelo principal al que le vamos añadiendo cosas, entonces busca primero un main.handlebars.
+      Busca por este árbol de directorios  
+      ![not found](img/img-21.png)
+
+      ```
+        app.use((req, res, next) => {
+          res
+            .status(404)
+            .render("404", { layout: false, pageTitle: "Page not found2" });
+        });
+      ```
+
+      Luego podemos modificar varios valores con los que trabaja handlebars por defecto
+
+      ```
+        app.engine("handlebasrs", expressHbs({
+                layoutsDir: path.join(__dirname, "Templates","layouts"),
+                partialsDir: path.join(__dirname, "Templates","layouts","partials"),
+                extname: "hbs",
+                defaultLayout: 'main',
+          })
+        );
+      ```
+
+      Una de las diferencias con pug es que en una plantilla de handlebars no podemos usar lógica, es decir evaluar con un if
+      `if items.length > 0 ...` sólo podemos pasarle variables con datos.
+      Así que la lógica la tenemos que tener en nuestro nodeJS pasarle a la plantilla el resultado
+
+      ```
+      router.get("/", (req, res, next) => {
+        res.render("shop", {
+          layout: false,
+          pageTitle: "Shop - handlebars",
+          items: products,
+          hasProducts: products.length > 0,
+        });
+      });
+      ```
+
+      una vez sabemos si tenemos productos evaluar con if en la plantilla, cuando hacemos un loop con `each` podemos acceder a cada elemento dentro de la iteración con `this`
+
+      ```
+        {{#if hasProducts}}
+                {{#each items}}
+                  <div class="grid">
+                      <article class="card product-item">
+                          <header class="card__header">
+                              <h1 class="product__title">{{this.title}}</h1>
+                          </header>
+                          <div class="card__image">
+                              <img src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png" alt="A Book">
+                          </div>
+                          <div class="card__content">
+                              <h2 class="product__price">$19.99</h2>
+                              <p class="product__description">A very interesting book about so many even more interesting things!</p>
+                          </div>
+                          <div class="card__actions">
+                              <button class="btn">Add to Cart</button>
+                          </div>
+                      </article>
+                  </div>
+                {{/each}}
+              {{else}}
+                <h1>Not found products</h1>
+              {{/if}}
+
+      ```
+
+      - #### Usando layouts con handlebars
+
+        Tenemos que especificar dónde están guardadas los layouts y como se llama el layout por defecto
+
+        ```
+          app.engine(
+            "hbs",
+            expressHbs({
+              defaultLayout: "main-layout",
+              layoutsDir: path.join(__dirname, "Templates", "layouts"),
+              extname: "hbs",
+            })
+          );
+
+        ```
+
+        Creamos nuestro layout, en la regióm `{{{body}}}` es donde inyectará la página que estamos renderizando
+
+        ```
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+              <title>{{pageTitle}}</title>
+              <link rel="stylesheet" href="/css/main.css" />
+              {{#if formsCss}}
+                <link rel="stylesheet" href="/css/forms.css" />
+              {{/if}}
+              {{#if productCss}}
+                <link rel="stylesheet" href="/css/main-product.css" />
+              {{/if}}
+            </head>
+
+            <body>
+              <header class="main-header">
+                <nav class="main-header__nav">
+                  <ul class="main-header__item-list">
+                    <li class="main-header__item"><a class= " {{#if activeShop}}active{{/if}}" href="/">Shop</a></li>
+                    <li class="main-header__item">
+                      <a class= "{{#if activeAddProduct}}active{{/if}} " href="/admin/add-product">Add Product</a>
+                    </li>
+                  </ul>
+                </nav>
+              </header>
+              {{{body}}}
+            </body>
+          </html>
+
+        ```
+
+        Una vez hecho esto en shop.js queda así
+
+        ```
+        router.get("/", (req, res, next) => {
+          res.render("shop", {
+            productCss: true,
+            activeShop: true,
+            pageTitle: "Shop - handlebars",
+            items: products,
+            hasProducts: products.length > 0,
+          });
+        });
+        ```
+
+    - ### EJS
+
+      Es parecido a Pug por lo q no necesitamos registrarlo como motor de plantillas. No es compatible con layouts.  
+      Para crear la plantilla podemos usar HTML
+
+      ```
+      <%= %> nos permite renderizar el contenido de una variable como si fuera un string
+
+      <%  %> en medio podemos incluir código JS
+      <%- %> permite enderizar código como HTML
+      ```
+
+      **mirar la sintaxis de los archivos del T4**
