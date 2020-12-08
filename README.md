@@ -55,7 +55,7 @@
     - [Servir páginas HTML](#servir-páginas-html)
       - [process.cwd()](#processcwd--)
     - [Servir archivos estáticos](#servir-archivos-estáticos)
-- [Trabajando con contenido dinámico y motor de plantillas](#trabajando-con-contenido-dinámico-y-motor-de-plantillas)
+- [T4 - Trabajando con contenido dinámico y motor de plantillas](#T4---trabajando-con-contenido-dinámico-y-motor-de-plantillas)
   - [Motor de plantillas](#motor-de-plantillas)
     - [Instalación de las plantillas](#instalación-de-las-plantillas)
       - [view engine](#view-engine)
@@ -67,6 +67,7 @@
     - [HandleBars](#handlebars)
       - [Usando layouts con handlebars](#usando-layouts-con-handlebars)
     - [EJS](#ejs)
+- [T-5 Patrón Modelo vista controlador - MVC -](#T-5-Patrón-Modelo-vista-controlador---MVC-)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -319,6 +320,32 @@
         // ["Strawberry", "Banana"]
 
         ```
+
+      - #### find and findIndex
+
+        Nos permite obtener el valor/indice del primer elemento del array que cumple con la condición especificada
+        obteniendo el índice:
+
+        ```
+        const array1 = [5, 12, 8, 130, 44];
+
+        let x = array1.findIndex( element => element>5);
+        console.log(array1[x]); // 12
+        console.log( x);        // 1
+
+        ```
+
+        o obtener el valor
+
+        ```
+        const array1 = [5, 12, 8, 130, 44];
+
+        let x = array1.find( element => element>5);
+        console.log( x);        // 12
+
+        ```
+
+        si no encuentra el valor devuelve un `undefined` el índice devuelve un `-1`
 
   - ## new Operators
 
@@ -843,13 +870,26 @@
       ```
 
       - #### Paquetes útiles
+
         1. ##### nodemon
            Nos permite reiniciar nuestro servidor cuando modificamos el código. Para instalarlo
+
         ```
           npm install nodemon --save-dev
         ```
+
+        Podemos crear una archivo, nodemon.json, en la raiz del proyecto para configurar que ignore algunos archivos
+
+        ```
+          {
+            "ignore": ["*.json"]
+          }
+
+        ```
+
         Así solo lo instalamos de manera local (solo nuestro proyecto). Nos crea en nuestro proyecto una carpeta **node_modules** donde se instalan estos paquetes.
         Para usarlo tenemos que ejecutar el proyecto mediante nodemon no usando node
+
         ```
           {
             "name": "2.1-node_server",
@@ -1098,53 +1138,76 @@
 
        - ### Servir páginas HTML
 
-         - #### process.cwd()
+         - #### Formas de acceder al path
 
-           Una manera de conocer la ruta absoluta donde se encuntra nuestro proyecto es utilizar la función:
+           - ##### process.cwd()
+
+             Esta función es una manera de conocer la ruta absoluta donde se encuntra nuestro proyecto:
+
+             ```
+             console.log(process.cwd())
+             /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server
+             ```
+
+           - ##### require.main.filename
+
+             Sustituye a process.mainModule.filename, y como este nos da el nombre del archivo donde empieza nuestra app, el que arranca la aplicación.
+
+             ```
+               console.log(require.main.filename);
+               /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server/app.js
+
+             ```
+
+           - ##### dirname
+
+             Nos da la ruta absoluta hasta el archivo donde ejecutamos `__dirname`
+
+             ```
+               console.log(__dirname);
+               /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server/controllers
+
+             ```
+
+           Creamos un directorio llamado views dnd guardaremos nuestras págias HTML.
+           Para poderlas devolver en la respuesta usamos el método sendFile() y especificamos la ruta a nuestras vistas. Para especificar el PATH tenemos un core module que nos ayuda con eso.
 
            ```
-           console.log(process.cwd())
+             const path = require("path");
+
+             router.get("/", (req, res, next) => {
+
+                 res.sendFile(path.join(__dirname,"..", "views", "shop.html"));
+
+             });
            ```
 
-         Creamos un directorio llamado views dnd guardaremos nuestras págias HTML.
-         Para poderlas devolver en la respuesta usamos el método sendFile() y especificamos la ruta a nuestras vistas. Para especificar el PATH tenemos un core module que nos ayuda con eso.
-
-         ```
-           const path = require("path");
-
-           router.get("/", (req, res, next) => {
-
-               res.sendFile(path.join(__dirname,"..", "views", "shop.html"));
-
-           });
-         ```
-
-         usamos el método join() para ir encadenando porciones de la ruta hasta llegar a nuestro archivo. la variable global **\_\_dirname** hace referncia a la ruta desde la raíz de nuestro SSOO hasta el archivo donde escribimos \_\_dirname, una vez ahí vamos completando la ruta. En nuestro caso tenemos q entrar en una carpeta hermana de la q ejecutamos el código así q tenemos q concatenar
-         "..".
+           usamos el método join() para ir encadenando porciones de la ruta hasta llegar a nuestro archivo. la variable global **\_\_dirname** hace referncia a la ruta desde la raíz de nuestro SSOO hasta el archivo donde escribimos \_\_dirname, una vez ahí vamos completando la ruta. En nuestro caso tenemos q entrar en una carpeta hermana de la q ejecutamos el código así q tenemos q concatenar
+           "..".
 
        - ### Servir archivos estáticos
 
-         Servir archivos estáticos significa poder servir archivos que no esté gestionado por el sistema de router de express u otro middleware si no que se accede directamente por el sistema de archivos.
-         En principio NodeJS bloquea el acceso al sistema de archivos pero para que el html puede acceder a una hoja CSS necesitamos hacer una excepción.
-         Para ello necesitamos otro middleware usando el propio objeto de express
+       Servir archivos estáticos significa poder servir archivos que no esté gestionado por el sistema de router de express u otro middleware si no que se accede directamente por el sistema de archivos.
+       En principio NodeJS bloquea el acceso al sistema de archivos pero para que el html puede acceder a una hoja CSS necesitamos hacer una excepción.
+       Para ello necesitamos otro middleware usando el propio objeto de express
 
-         ```
-         app.use(express.static(path.join(__dirname, "public")));
-         ```
+       ```
+       app.use(express.static(path.join(__dirname, "public")));
+       ```
 
-         De este manera hará que todo el contenido del directorio **public** sea accesible.
-         Cuando intentemos acceder desde el HTML para cargar el css el sistema ya situa la ruta en el directorio especificado "public" así que en el tag link ponemos
+       De este manera hará que todo el contenido del directorio **public** sea accesible.
+       Cuando intentemos acceder desde el HTML para cargar el css el sistema ya situa la ruta en el directorio especificado "public" así que en el tag link ponemos
 
-         ```
-         <link rel="stylesheet" href="/css/main.css" />
-         ```
+       ```
+       <link rel="stylesheet" href="/css/main.css" />
+       ```
 
-         **No hay que dejarse la "/" antes de css IMPORTANTE!!!**
-         Lo que hace express es que cualquier request que solicite un archivo terminado en .css, .js, imágenes, etc.. lo edirigirá al directorio especificado como archivos státicos, en nuestro caso el diretorio public.
+       **No hay que dejarse la "/" antes de css IMPORTANTE!!!**
+       Lo que hace express es que cualquier request que solicite un archivo terminado en .css, .js, imágenes, etc.. lo edirigirá al directorio especificado como archivos státicos, en nuestro caso el diretorio public.
 
-         Mediante el mismo método podemos registrar varios directorios como fuentes de archivos estáticos.
+       Mediante el mismo método podemos registrar varios directorios como fuentes de archivos estáticos.
 
-- # Trabajando con contenido dinámico y motor de plantillas
+- # T4 - Trabajando con contenido dinámico y motor de plantillas
 
   Hasta ahora hemos parendido a servir contenido estático lo que no es muy usual, lo habitual es que podamos modificar el contenido de nuestros HTML de manera dinámica, por ejemplo recuperando info de nuestra BBDD.
   Para simular una bbdd usaremos una array, el problema de esto es que el array es "heredado" en node para todos los usuarios que se conecten al servidor, lo que ocasiona que si un usuario modifica la info el otro tb verá esas modificaciones, lo que no es una implementación que se deba hacer, pero xa aprender a usar el motor de plantillas está bien.
@@ -1531,7 +1594,114 @@
       <%= %> nos permite renderizar el contenido de una variable como si fuera un string
 
       <%  %> en medio podemos incluir código JS
-      <%- %> permite enderizar código como HTML
+      <%- %> permite enderizar código como HTML o  hacer includes
+            <%- include('../includes/navigation.ejs') %>
+
       ```
 
+      Si quisiera pasar algún dato al include uso un segundo argumento
+
       **mirar la sintaxis de los archivos del T4**
+
+# T-5 Patrón Modelo vista controlador - MVC -
+
+![not found](img/img-23.png)
+Es un patrón de diseño que separa nuestro código en diferentes partes, cada una de ellas tiene una función concreta. Nuestra app está formada por tres partes:
+
+- **modelo** => es la parte responsable de la gestión de los datos.
+- **la vista** => se encarga de mostrar el contenido al usuario.
+- **el controlador** =>responsable de conectar el modelo con las vistas, controla qué vista se renderiza, las rutas y que modelo se usa.
+
+![not found](img/img-22.png)
+
+**mirar código del T5**
+En el archivo 'T5-MVC/5.1-eJS-node-server/model/product.js' cuando leemos el archivo para almacenar los productos lo podemos hacer directamente (readFile()) o si el archivo es muy grande leerlo como un stream (a trozos).
+
+- Refectoring usando una helper function que lea el archivo bbdd.
+
+  ```
+    const fs = require("fs"),
+      path = require("path");
+
+    const path_to_bbdd_file = path.join(
+      process.cwd(),
+      "data",
+      "products_bbdd.json"
+    );
+    //---------helper function
+    const getProductsFromFile = (cb) => {
+      fs.readFile(path_to_bbdd_file, (err, data) => {
+        if (err) {
+          cb([]);
+        } else {
+          cb(JSON.parse(data));
+        }
+      });
+    };
+    //-----------------------
+    module.exports.classProduct = class Product {
+      constructor(title) {
+        this.title = title;
+      }
+      save() {
+        getProductsFromFile((products_data) => {
+          products_data.push(this);
+          fs.writeFile(path_to_bbdd_file, JSON.stringify(products_data), (err) => {
+            if (err) console.log(err);
+          });
+        });
+      }
+      static fetchAll(cb) {
+        getProductsFromFile(cb);
+      }
+    };
+
+  ```
+
+# T-6 Enhancing app
+
+`mirar el código`
+
+# T-7 Dynamic routes and advanced models
+
+- Extaer con Router() datos de la url, para ello en el router usamos la siguiente nomenglatura
+
+```
+router.get("/products/:productId", shopController.getProduct);
+```
+
+Si tenemos otro segmento statico en la ruta `/products/` como por ejemplo `/products/delete` y lo ponemos detrás de la url con segmento dinámico express no podra acceder, es decir en este orden
+
+```
+//-- ESTO NO FUNCIONA BIEN !!!!!!
+
+//url con segmento dinámico marcado por  ":"
+router.get("/products/:productId", shopController.getProduct);
+router.get("/products/delete", shopController.deleteProduct);
+
+```
+
+Este sería el orden correcto!
+
+```
+//-- ORDEN CORRECTO !!!!!!
+
+//url con segmento dinámico marcado por  ":"
+router.get("/products/delete", shopController.deleteProduct);
+router.get("/products/:productId", shopController.getProduct);
+
+```
+
+Recordar que para pasar datos por post podemos usar el `req.body` o meter la info en la url como un `segmento dinámico (/products/:id)` y recogerlo como req.params.id
+
+- Query params
+  Son los datos que pasamos por la url, se indican a partir de un `? ` en la url y si pasamos más de uno van separados por `&`
+  ```
+    http://localhost:3000/admin/edit-product/0.12?edit=true&title=book
+  ```
+  Hay que tener en cuenta que los datos extarídos así siempre son del tipo `string`
+  Para extraerlos:
+  ```
+    req.query.edit
+  ```
+  Si no se encuentra el parámetro que buscamos nos dvuelve `undefined`
