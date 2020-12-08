@@ -63,8 +63,8 @@ module.exports.classProduct = class Product {
   static editProduct(prod) {
     getProductsFromFile((data) => {
       const indexProd = data.findIndex((element) => element.id === prod.id);
-      fileContent[indexProd] = prod;
-      fs.writeFile(path_to_bbdd_file, JSON.stringify(fileContent), (err) => {
+      data[indexProd] = prod;
+      fs.writeFile(path_to_bbdd_file, JSON.stringify(data), (err) => {
         console.log(err);
       });
     });
