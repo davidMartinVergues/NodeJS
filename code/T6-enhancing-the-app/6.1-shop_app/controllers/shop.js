@@ -24,10 +24,55 @@ module.exports.getIndex = (req, res, next) => {
 };
 
 module.exports.getCart = (req, res, next) => {
-  res.render("shop/cart", {
-    pageTitle: "Your cart",
-    path: "/cart",
+  Cart.getCart((cart) => {
+    if (cart && cart.products.length > 0) {
+      const dataProductsOfCart = [];
+      const totalPrice = cart.totalPrice;
+      const productsOfCart = [...cart.products];
+      Product.fetchAll((products) => {
+        productsOfCart.forEach((product) => {
+          const prod = products.find((prod) => prod.id === product.id);
+          if (prod) {
+            const obj = { ...prod, qty: product.qty };
+            dataProductsOfCart.push(obj);
+          }
+        });
+        res.render("shop/cart.ejs", {
+          pageTitle: "tu carrito",
+          totalPrice: totalPrice,
+          productData: dataProductsOfCart,
+          path: "/cart",
+        });
+      });
+    } else {
+      res.render("shop/cart.ejs", {
+        pageTitle: "tu carrito",
+        totalPrice: 0,
+        productData: [],
+        path: "/cart",
+      });
+    }
   });
+  // Cart.getCart((cart) => {
+  //   Product.fetchAll((products) => {
+  //     const cartProducts = [];
+  //     products.forEach((product) => {
+  //       const cartProductData = cart.products.find(
+  //         (prod) => prod.id === product.id
+  //       );
+  //       if (cartProductData) {
+  //         cartProducts.push({ productData: product, qty: cartProductData.qty });
+  //       }
+  //     });
+  //     console.log(cartProducts);
+  //     res.render("shop/cart", {
+  //       pageTitle: "Your cart",
+  //       path: "/cart",
+  //       totalPrice: cart.totalPrice,
+  //       product: cartProducts,
+  //     });
+  //   });
+  // });
 };
 
 module.exports.getCheckout = (req, res, next) => {
@@ -61,4 +106,12 @@ module.exports.addToCart = (req, res, next) => {
     Cart.addProduct(prodId, prod.price);
   });
   res.redirect("/cart");
+};
+
+module.exports.postDeleteProduct = (req, res, next) => {
+  const prodId = req.body.prodId;
+  Product.getProductById(prodId, (prod) => {
+    Cart.deleteProduct(prodId, prod.price);
+    res.redirect("/cart");
+  });
 };

@@ -1,5 +1,6 @@
 const fs = require("fs"),
-  path = require("path");
+  path = require("path"),
+  Cart = require("./cart").classCart;
 
 const path_to_bbdd_file = path.join(
   process.cwd(),
@@ -16,14 +17,16 @@ const getProductsFromFile = (cb) => {
     }
   });
 };
-//-----------------------
+//-----------------------class Product
 module.exports.classProduct = class Product {
+  //---------------constructor----
   constructor(title, description, price, imgUrl) {
     this.title = title;
     this.description = description;
     this.price = price;
     this.imgUrl = imgUrl;
   }
+  //---------------------------Methods
   save() {
     this.id = Math.random().toString();
     getProductsFromFile((products_data) => {
@@ -60,12 +63,25 @@ module.exports.classProduct = class Product {
     //   }
     // });
   }
+
   static editProduct(prod) {
+    console.log(prod);
     getProductsFromFile((data) => {
       const indexProd = data.findIndex((element) => element.id === prod.id);
       data[indexProd] = prod;
       fs.writeFile(path_to_bbdd_file, JSON.stringify(data), (err) => {
         console.log(err);
+      });
+    });
+  }
+  static deleteProduct(id) {
+    getProductsFromFile((products) => {
+      const product = products.find((element) => element.id === id);
+      const updatedroducts = products.filter((element) => element.id !== id);
+      fs.writeFile(path_to_bbdd_file, JSON.stringify(updatedroducts), (err) => {
+        if (!err) {
+          Cart.deleteProduct(id, product.price);
+        }
       });
     });
   }

@@ -258,6 +258,7 @@
         Convierte cada elemento del array, conservando el array original y devolviendo otro con los cambios efectuados. Por ejempo añadir a cada item un texto
 
         ```
+        const miArray = ["david", "martin", 36];
 
         //1 línea
         let newArray = miArray.map((item, x) => `ìtem ${x}: ${item}`);
@@ -294,6 +295,17 @@
         // this is how to remove items, n defines the number of items to be removed,
         // starting at the index position specified by pos and progressing toward the end of array.
         ```
+
+      - #### filter()
+
+        Nos permite generar un nuevo array siguiendo los criterios del filtro.
+
+        ```
+          const updatedroducts = products.filter((element) => element.id !== id);
+
+        ```
+
+        del array de productos filtramos aquellos que no tengan un id concreto, útil para el método deete by ID
 
       - #### foreach()
         looping arrays
@@ -1664,6 +1676,8 @@ En el archivo 'T5-MVC/5.1-eJS-node-server/model/product.js' cuando leemos el arc
 
 # T-7 Dynamic routes and advanced models
 
+![not found](img/img-24.png)
+
 - Extaer con Router() datos de la url, para ello en el router usamos la siguiente nomenglatura
 
 ```
@@ -1697,11 +1711,11 @@ Recordar que para pasar datos por post podemos usar el `req.body` o meter la inf
 - Query params
   Son los datos que pasamos por la url, se indican a partir de un `? ` en la url y si pasamos más de uno van separados por `&`
   ```
-    http://localhost:3000/admin/edit-product/0.12?edit=true&title=book
+    http://localhost:3000/admin/edit-product/0.12?myParam=true&title=book
   ```
   Hay que tener en cuenta que los datos extarídos así siempre son del tipo `string`
   Para extraerlos:
   ```
-    req.query.edit
+    req.query.myParam
   ```
   Si no se encuentra el parámetro que buscamos nos dvuelve `undefined`

@@ -1,10 +1,20 @@
 const fs = require("fs"),
-  path = require("path"),
-  product = require("./product").classProduct;
+  path = require("path");
 
 const path_to_cart = path.join(process.cwd(), "data", "cart_bbdd.json");
 
 module.exports.classCart = class Cart {
+  //----------methods
+  static getCart(cb) {
+    fs.readFile(path_to_cart, (err, fileContent) => {
+      if (!err) {
+        const cart = JSON.parse(fileContent);
+        cb(cart);
+      } else {
+        cb(null);
+      }
+    });
+  }
   static addProduct(id, productPrice) {
     let cart = { products: [], totalPrice: 0 };
     let updatedProduct;
@@ -30,6 +40,25 @@ module.exports.classCart = class Cart {
         cart.products = [...cart.products, updatedProduct];
       }
       cart.totalPrice = cart.totalPrice + +productPrice;
+      fs.writeFile(path_to_cart, JSON.stringify(cart), (err) => {
+        console.log(err);
+      });
+    });
+  }
+
+  static deleteProduct(id, price) {
+    fs.readFile(path_to_cart, (err, fileContent) => {
+      if (err) {
+        return; // si hay un error es q NO existe el carro así q no hay q borrar nada
+      }
+      const cart = JSON.parse(fileContent);
+
+      const product = cart.products.find((element) => element.id === id);
+      if (!product) {
+        return;
+      }
+      cart.products = cart.products.filter((element) => element.id !== id);
+      cart.totalPrice = cart.totalPrice - +price * product.qty;
       fs.writeFile(path_to_cart, JSON.stringify(cart), (err) => {
         console.log(err);
       });
