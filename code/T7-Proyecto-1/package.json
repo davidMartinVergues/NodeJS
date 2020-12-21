@@ -1,0 +1,11 @@
+{
+  "name": "t7-proyecto-1",
+  "version": "1.0.0",
+  "description": "Proyecto resumen hasta ahora",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "author": "David",
+  "license": "ISC"
+}
