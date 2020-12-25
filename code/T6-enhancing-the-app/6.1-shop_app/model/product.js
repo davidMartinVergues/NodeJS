@@ -46,7 +46,8 @@ module.exports.classProduct = class Product {
       cb(product);
     });
 
-    // MANERA LARGA
+    // MANERA LARGA -
+    // NO SE PUEDE HACER ASÍ PQ EN CADA CICLO DEL FOREACH LANZARÍAMOS UNA CALLBACK EN UNA OCASIÓN NS DARÍA EL PRODUCTO PERO EN TANTAS OTRAS UN ARRAY VACÍO ---- HAY QUE HACERLO CON EL FIND()
 
     // fs.readFile(path_to_bbdd_file, (err, data) => {
     //   if (!err) {

@@ -73,8 +73,12 @@
 - [T-6 Enhancing app](#t-6-enhancing-app)
 - [T-7 Dynamic routes and advanced models](#t-7-dynamic-routes-and-advanced-models)
 - [T-8 Proyecto-1](#t-8-proyecto-1)
+  - [Funciones a tener en cuenta](#funciones-a-tener-en-cuenta)
+  - [callbacks - aclaración -](#callbacks---aclaración--)
+  - [Proyecto para poner en práctica todo lo aprendido hasta el momento.](#proyecto-para-poner-en-práctica-todo-lo-aprendido-hasta-el-momento)
+- [T-9 BBDD](#t-9-bbdd)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 # NodeJS Course
 
@@ -1110,7 +1114,7 @@ después importamos nuestro archivo a la app.js.
 
 ### generar 404 error page
 
-Para generar una respuesta ante una url que no existe samos
+Para generar una respuesta ante una url que no existe usamos
 
     ```
       //------------ FIN IMPORTS ----------------
@@ -1201,7 +1205,7 @@ de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes.
 
       });
     ```
-    usamos el método join() para ir encadenando porciones de la ruta hasta llegar a nuestro archivo. la variable global **\_\_dirname** hace referncia a la ruta desde la raíz de nuestro SSOO hasta el archivo donde escribimos \_\_dirname, una vez ahí vamos completando la ruta. En nuestro caso tenemos q entrar en una carpeta hermana de la q ejecutamos el código así q tenemos q concatenar
+    usamos el método join() para ir encadenando porciones de la ruta hasta llegar a nuestro archivo. la variable global **__dirname** hace referncia a la ruta desde la raíz de nuestro SSOO hasta el archivo donde escribimos __dirname, una vez ahí vamos completando la ruta. En nuestro caso tenemos q entrar en una carpeta hermana de la q ejecutamos el código así q tenemos q concatenar
     "..".
 
 ### Servir archivos estáticos
@@ -1614,7 +1618,7 @@ Para crear la plantilla podemos usar HTML
     <%= %> nos permite renderizar el contenido de una variable como si fuera un string
 
     <%  %> en medio podemos incluir código JS
-    <%- %> permite enderizar código como HTML o  hacer includes
+    <%- %> permite renderizar código como HTML o  hacer includes
           <%- include('../includes/navigation.ejs') %>
 
     ```
@@ -1686,7 +1690,7 @@ En el archivo 'T5-MVC/5.1-eJS-node-server/model/product.js' cuando leemos el arc
 
 ![not found](img/img-24.png)
 
-- Extaer con Router() datos de la url, para ello en el router usamos la siguiente nomenglatura
+- Extraer con Router() datos de la url, para ello en el router usamos la siguiente nomenglatura
 
 ```
 router.get("/products/:productId", shopController.getProduct);
@@ -1726,10 +1730,594 @@ Recordar que para pasar datos por post podemos usar el `req.body` o meter la inf
   ```
     req.query.myParam
   ```
-  Si no se encuentra el parámetro que buscamos nos dvuelve `undefined`
+  Si no se encuentra el parámetro que buscamos nos devuelve `undefined`
 
 # T-8 Proyecto-1
 
-Proyecto para poner en práctica todo lo aprendido hasta el momento.
+## Funciones a tener en cuenta
+- Usaremos funcionalidades importantes de los arrays como:
+  - .find()
+  - .findIndex()
+  - .filter()
+
+## callbacks - aclaración -
+Es cuando pasamos una función como argumento de otra función, la clave aquí es q la función externa "decide" cuando se eecuta la función pasada (callback). Ponemos de ejemplo la funión de lectura y escritura en n archivo
+```
+const getProductsFromFile = (cb) => {
+  
+  fs.readFile(path_to_bbdd, (err, data) => {
+    if (err) {
+      cb([]);
+    } else {
+      cb(JSON.parse(data));
+    }
+  });
+}; 
+```
+La función getProductsFromFile recibe un callback que lo ejecutará cuando haya leído el archivo, pasándole los datos del archivo o un array vacío [].
+Entonces cuando yo ejecuta esta función le paso la implementación del callback
+
+```
+    getProductsFromFile((products_from_file) => {
+
+      products_from_file.push(this);
+
+      fs.writeFile( path_to_bbdd,
+                    JSON.stringify(products_from_file),
+                    (error) => {
+                        if (error){
+                            console.log(error);
+                          }
+        }
+      );
+
+    });
+```
+Primero lee el archivo:
+- si da un error ejecuta la arrow function que le estoy pasando y le pasa como argumento un array vacío []
+- si obtiene datos se los pasa
+La arrow function que le paso escribe los datos en un archivo
+
+
+
+## Proyecto para poner en práctica todo lo aprendido hasta el momento.
 
 1. Iniciamos proyecto con npm
+    ```
+      npm init -y
+    ```
+2. Instalamos dependencias
+   1. de desarrollo
+      1. nodemon => permite refrescar el servidor con cada cambio, podemos excluir archivos para que cuando haya modificacines en ellos no se reinicie el servirdor por ejemplo archivos tipo json.
+         ```
+          npm install nodemon --save-dev 
+         ``` 
+   2. de producción
+      1. express
+      2. ejs
+      3. body-parser
+        ```
+          npm install express ejs body-parser --save
+        ```  
+3. Archivos de configración, en la raíz del proyecto
+   1. nodemon.json 
+      ```
+        {
+          "ignore": ["*.json"]
+        }
+      ``` 
+   2. package.json
+      ```
+        {
+          "name": "t7-proyecto-1",
+          "version": "1.0.0",
+          "description": "Proyecto resumen hasta ahora",
+          "main": "app.js",
+          "scripts": {
+            "start": "nodemon app.js"
+          },
+          "author": "David",
+          "license": "ISC",
+          "devDependencies": {
+            "nodemon": "^2.0.6"
+          },
+          "dependencies": {
+            "body-parser": "^1.19.0",
+            "ejs": "^3.1.5",
+            "express": "^4.17.1"
+          }
+        }
+      ``` 
+4. Creamos toda la esructura del proyecto
+   1. archivo
+      1. app.js => archivo que pone en marcha la applicación
+   2. directorios
+      1. controllers
+      2. data => guarda archivos con la función de bbdd
+      3. model
+      4. public => archivos estáticos (css, js)
+      5. routes
+      6. views  
+
+5. levantamos un servidor
+- el método listen() devuelve un objeto `http.server` el cual tiene un método addres() que devuelve : { port: xxx, family: 'IPv4', address: '127.0.0.1' } 
+  ```
+    //--------import core modules
+    const path = require("path");
+
+    //-------- imports third party
+    const express = require("express"),
+      bodyParser = require("body-parser");
+    //--------FIN IMPORTS
+
+    const app = express();
+
+    app.use("/", (req, res, next) => {
+        console.log(`running on ${server.address().address}`);
+        console.log(`running on ${server.address().port}`);
+        console.log(`running on ${server.address().family}`);
+      res.send("<h1>hello world</h1>");
+    });
+
+    const server = app.listen(3000, "localhost");
+
+  ``` 
+
+6. configuraciones de los módulos
+   1. Seteamos qué motor de vistas usaremos (ejs) y donde guardaremos las vistas
+      ```
+        app.set("view engine", "ejs");
+        app.set("views", "viwes");
+      ``` 
+    2. configuramos boy-parser para que en cada conexión decodifique los datos del body
+       ```
+       app.use(bodyParser.urlencoded({ extended: true }));
+       ```
+    3. seteamos dónde se guardarán los archivos estáticos (css, js,...)
+       ```
+       app.use(express.static(path.join(__dirname, "public")));
+       ```
+7. Routting & controllers  
+ 
+   1. Creamos los archivos para gestionar nuestras rutas, en mi caso un gestor genérico  `shop.routes.js` y otro para gestionar las rutas con acceso al admin `admin.routes.js`. en cada archivo usamos el router de express `express.Router()` para gestionar las rutas  
+   ![not found](img/img-25.png)  
+   2. Creamos un archivo `shop.controller.js` y `404.controller.js` en la carpeta `controllers`, con diferentes funciones para cada caso/ruta  
+    ![not found](img/img-26.png)  
+      1. `shop.controller`   
+         Creamos y exportamos una función llamada `getIndex` que renderizará la página principal
+          ```
+            module.exports.getIndex = (req, res, next) => {
+              res.render("shop/index", { pageTitle: "Index Page" });
+            };
+          ``` 
+      2. `404.controller.js`  
+         creamos el controller para las páginas 404   
+          ```
+            module.exports.error = (req, res, next) => {
+                res.status(404).render("404", { pageTitle: "404 Page" });
+              };
+          ```
+   3. `shop.routes.js`  
+      le decimos al router qué función ejecutar del controlador según la url detectada y `finalmente exportamos la variable` 
+         ```
+          //------Imports
+
+          //-----Modules
+          /*-------*/ const express = require("express");
+          /*-------*/ const router = express.Router();
+
+          //-----Controller
+          /*-------*/ const shopController = require("../controllers/shop.controller.js");
+
+          //------FIN IMPORTS
+
+          router.get("/", shopController.getIndex);
+
+          module.exports = router;
+         ```
+   4. Creamos las vistas para cada página (uso bootstrap)
+         1. creo fragmentos head y nav y los guardo en includes  
+              ![not found](img/img-27.png)  
+            1. head.ejs
+            -          
+              ```
+              <!DOCTYPE html>
+              <html lang="en">
+                <head>
+                  <meta charset="UTF-8" />
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                  <title><%= pageTitle %></title>
+                  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+                    rel="stylesheet"
+                    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+                    crossorigin="anonymous"
+                  />
+                  <script
+                    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+                    integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+                    crossorigin="anonymous"
+                    defer
+                  ></script>
+                </head>
+              ```  
+            2. nav.ejs  
+             - ```
+                <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                    <div class="container-fluid">
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        </button>
+                      
+                        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/">Inicio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            </li>
+                            
+                        </ul>
+                        
+                        </div>
+                    </div>
+                </nav>  
+               ```              
+         2. index.ejs
+            - ```
+                <%- include('../includes/head.ejs')  %>
+                  <body>
+                <%- include('../includes/nav.ejs')  %>
+                    <div class="container">
+
+                        <div class="alert alert-warning mt-5" role="alert">
+                            Not products available
+                        </div>
+                  
+                    </div>
+
+                  </body>
+                </html>
+              ```  
+         3. 404.ejs          
+            - ```
+                <%- include('includes/head.ejs')  %>
+                  <body>
+                <%- include('includes/nav.ejs')  %>
+                    <div class="container">
+
+                        <div class="alert alert-danger mt-5" role="alert">
+                            Page not found!
+                        </div>
+                  
+                    </div>
+
+                  </body>
+                </html>
+              ```   
+   5. importamos todo en el archivo `app.js` para q funcione
+         ```
+            //----IMPORTS
+
+            //-----CORE MODULES
+            const path = require("path");
+            
+            //-----3º PARTY
+            const express = require("express"),
+              bodyParser = require("body-parser");
+            
+            //-----ROUTES
+            const shopRoutes = require("./routes/shop.routes");
+            const adminRoutes = require("./routes/admin.routes");
+            
+            //-----CONTROLLER
+            const errorPageController = require("./controllers/404.controller").error;
+            
+            //--------FIN IMPORTS
+
+            const app = express();
+
+            //----- configuraciones
+            app.set("view engine", "ejs");
+            app.set("views", "views");
+
+            app.use(bodyParser.urlencoded({ extended: true }));
+            app.use(express.static(path.join(__dirname, "public")));
+            // Fin configuraciones
+
+            app.use("/admin", adminRoutes);
+            app.use(shopRoutes);
+            app.use(errorPageController);
+
+            const server = app.listen(3000, "localhost");
+         ``` 
+   6. Más vistas
+      1. Formulario para entrar productos
+         - ```
+            <%- include('../includes/head.ejs')%>
+
+            <body>
+                <%- include('../includes/nav.ejs')%>
+
+            <div class="container mt-5">
+                <form method="POST" action="/admin/add-product">
+                    <div class="row mb-3">
+                        <label for="title" class="col-sm-2 col-form-label">Title</label>
+                        <div class="col-sm-10">
+                        <input name="title" type="text" class="form-control" id="title">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="price" class="col-sm-2 col-form-label">Price</label>
+                        <div class="col-sm-10">
+                        <input name="price"type="number" class="form-control" id="price">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="imgUrl" class="col-sm-2 col-form-label">imgUrl</label>
+                        <div class="col-sm-10">
+                        <input name="imgUrl"type="text" class="form-control" id="imgUrl">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="description" class="col-sm-2 col-form-label">Description</label>
+                        <div class="col-sm-10">
+                            <textarea name="description" id="description" cols="30" rows="10">
+
+                            </textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </form> 
+            </div>
+              
+            </body>
+           ``` 
+         1. añado el siguiente código en el archivo `admin.routes.js`
+            - ```
+                const express = require("express"),
+                  router = express.Router(),
+                  adminController = require("../controllers/admin.controller");
+
+                router.get("/add-product", adminController.getAddProduct);
+                router.post("/add-product", adminController.postAddProduct);
+
+                module.exports = router;
+              ```
+         2. Creo el controlador `admin.controller.js`
+            - ```
+                module.exports.getAddProduct = (req, res, next) => {
+                  res.render("admin/add-product", { pageTitle: "Add product" });
+                };
+                module.exports.postAddProduct = (req, res, next) => {
+                  const producto = req.body;
+                  const p = new Product(
+                    producto.title,
+                    producto.price,
+                    producto.imgUrl,
+                    producto.description.trim()
+                  );
+                  p.save();
+                  res.redirect("/");
+                };
+              ```  
+         3. Para que sea accesible por la ruta `/admin/...` en el archivo importo las `adminRoutes` y con `app.use` esecifico que busque en en ese archivo para las rutas que empiezan por /admin
+            - ```
+                const adminRoutes = require("./routes/admin.routes");
+                app.use("/admin", adminRoutes);
+              ```
+   7. Modelo & archivos JSON como bbdd
+      1. Class Product
+         - Creo una clase producto que me permitirá gestionar los items, crear productos y guardarlos en un archivo tipo JSON, con `this.id = Math.random();` le doy un id a cada producto. Como no voy a hacer operaciones con ese id lo transformo en string y así la comparación será más fácil pq cuando pase el id del producto por la url (cuando quiera editar/borrar el producto) será del tipo string ya que todos los datos codificados en la url quedan covertidos a tipo string.  
+           - ```
+              //-------IMPORTs
+              const fs = require("fs"),
+                path = require("path");
+
+              const path_to_bbdd = path.join(process.cwd(), "data", "product_bbdd.json");
+
+              //--- CLASS
+              module.exports.ProductClass = class Product {
+                constructor(title, price, imgUrl, description) {
+                  this.title = title;
+                  this.price = price;
+                  this.imgUrl = imgUrl;
+                  this.description = description;
+                }
+
+                save() {
+                  Product.getAllProducts((products_from_file) => {
+                    this.id = Math.random().toString();
+                    products_from_file.push(this);
+                    fs.writeFile(
+                      path_to_bbdd,
+                      JSON.stringify(products_from_file),
+                      (error) => {
+                        if (error) {
+                          console.log(error);
+                        }
+                      }
+                    );
+                  });
+                }
+
+                static getAllProducts(cb) {
+                  fs.readFile(path_to_bbdd, (err, data) => {
+                    if (err) {
+                      cb([]);
+                    } else {
+                      cb(JSON.parse(data));
+                    }
+                  });
+                }
+              };
+             ```
+      2. Tenemos que modificar el `shop.controller` para mostrar en la página principal los productos del archivo json, pero como la función de `readFile` es asíncrona intenta renderizar la vista antes de tener los datos eso no ocasiona un error para evitarlo el método para obtener los productos le pasemas un callback, y será esa función callback la que renderizará la vista
+         - ```
+            //-----IMPORTS
+
+            const Product = require("../model/product").ProductClass;
+
+            module.exports.getIndex = (req, res, next) => {
+
+              Product.getAllProducts((datos) => {
+
+                res.render("shop/index", { pageTitle: "Index Page", productos: datos });
+                
+              });
+            };
+           ```
+      3. Hemos modificado el index, en cada item hems añadido un enlace tipo botón que nos lleva a una ruta con el `id` del producto   
+      `<a href="/add-cart/<%= datos.id %>" class="btn btn-primary">Add to cart</a>`
+
+         - ```
+              <%- include('../includes/head.ejs')  %>
+                <body>
+              <%- include('../includes/nav.ejs')  %>
+                  <div class="album py-5 bg-light">
+                    <div class="container">
+
+                      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                        <% if(productos.length >0){%>
+                          <% productos.forEach(datos =>{%>
+                              <div class="col">
+                                <div class="card">
+                                  <img src="<%=datos.imgUrl%>" class="card-img-top" alt=".not found.">
+                                    <div class="card-body">
+                                      <h5 class="card-title"><%=datos.title%></h5>
+                                      <p class="card-text"><%=datos.price%> € </p>
+                                      <p class="card-text"><%=datos.description%></p>
+                                      <a href="/add-cart/<%= datos.id %>" class="btn btn-primary">Add to cart</a>
+                                    </div>
+                                </div>
+                              </div>
+                          <% }) %>
+                        <%} else{%>
+                          <div class="alert alert-warning mt-5" role="alert">NO Hay productos </div>
+                        <% }%>
+                
+                      </div>
+                    </div>
+                  </div>
+                </body>
+              </html>
+           ``` 
+      1. Ejemplo de editar productos pasamos el id por la url
+         - `<a href="/admin/edit-product/<%= datos.id %>" class="btn btn-success">Edit</a>` 
+         - para coger este dato en el routing usamos
+           - `router.get("/edit-product/:id", adminController.getEditProducts);`
+         - Para recogerlo en el controller
+           - `const id_prod = req.params.id;`
+         - añadimos un nuevo método en classProduct para uscar por id y usamos la función `find()`
+             - ```
+                static getProductById(id, cb) {
+                  Product.getAllProducts((products) => {
+                    const product = products.find((p) => p.id === id);
+                    cb(product);
+                  });
+                }
+               ```
+         - el controler pasa los datos a una nueva vista
+             - ```
+                module.exports.getEditProducts = (req, res, next) => {
+                  const id_prod = req.params.id;
+                  Product.getProductById(id_prod, (prod) => {
+                    res.render("admin/edit-product", {
+                      pageTitle: "edit product",
+                      product: prod,
+                    });
+                  });
+                };
+               ```
+         - Esta vista contiene un formulario dnd pintamos los datos y envia la confirmacion del cambio y mediante un `input:hidden` enviamos tb el id
+           - ```
+              <%- include('../includes/head.ejs')%>
+
+              <body>
+                  <%- include('../includes/nav.ejs')%>
+
+              <div class="container mt-5">
+                  <form method="POST" action="/admin/edit-product">
+                      <div class="row mb-3">
+                          <label for="title" class="col-sm-2 col-form-label">Title</label>
+                          <div class="col-sm-10">
+                          <input name="title" type="text" class="form-control" id="title" value="<%= product.title %>">
+                          </div>
+                      </div>
+                      <div class="row mb-3">
+                          <label for="price" class="col-sm-2 col-form-label">Price</label>
+                          <div class="col-sm-10">
+                          <input name="price"type="number" class="form-control" id="price" value="<%= product.price %>">
+                          </div>
+                      </div>
+                      <div class="row mb-3">
+                          <label for="imgUrl" class="col-sm-2 col-form-label">imgUrl</label>
+                          <div class="col-sm-10">
+                          <input name="imgUrl"type="text" class="form-control" id="imgUrl" value="<%= product.imgUrl %>">
+                          </div>
+                      </div>
+                      <div class="row mb-3">
+                          <label for="description" class="col-sm-2 col-form-label">Description</label>
+                          <div class="col-sm-10">
+                              <textarea name="description" id="description" cols="30" rows="10"><%= product.title %></textarea>
+                          </div>
+                      </div>
+                      <input type="hidden" name="prod_id" value="<%= product.id %>">
+                      <button type="submit" class="btn btn-primary">Editar</button>
+                  </form> 
+              </div>
+                
+              </body>
+             ```
+         - Recopilamos toda la info en el controller y se lo pasamos al método para editarlo
+           - usamos `findIndex()` para modificarlo 
+             - ```
+                module.exports.postEditProducts = (req, res, next) => {
+                  const new_prod = {
+                    title: req.body.title,
+                    price: req.body.price,
+                    imgUrl: req.body.imgUrl,
+                    description: req.body.description,
+                    id: req.body.prod_id,
+                  };
+
+                  Product.editProduct(new_prod);
+                  res.redirect("/");
+                };
+               ```
+             - ```
+                    static editProduct(prod) {
+                      Product.getAllProducts((products) => {
+
+                        const product_index = products.findIndex((p) => p.id === prod.id);
+                        products[product_index] = prod;
+
+                        fs.writeFile(path_to_bbdd, JSON.stringify(products), (err) => {
+                          console.log(err);
+                        });
+                      });
+                    }
+               ```
+              
+
+      2. Ejemplo de eliminar un prodcuto, usamos `filter()`
+         - ```
+              static deleteProduct(prod_id) {
+                Product.getAllProducts((products) => {
+                  const products_updated = products.filter((p) => p.id !== prod_id);
+                  products = products_updated;
+
+                  fs.writeFile(path_to_bbdd, JSON.stringify(products), (err) => {
+                    console.log(err);
+                  });
+                });
+              }
+           ```   
+   8. Añadimos la funcionalidad del carrito
+      1.  
+
+              
+# T-9 BBDD     

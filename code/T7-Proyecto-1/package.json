@@ -2,10 +2,18 @@
   "name": "t7-proyecto-1",
   "version": "1.0.0",
   "description": "Proyecto resumen hasta ahora",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "nodemon app.js"
   },
   "author": "David",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1"
+  }
 }

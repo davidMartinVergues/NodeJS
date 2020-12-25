@@ -1,0 +1,31 @@
+<%- include('../includes/head.ejs')  %>
+  <body>
+<%- include('../includes/nav.ejs')  %>
+    <div class="album py-5 bg-light">
+      <div class="container">
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+          <% if(productos.length >0){%>
+            <% productos.forEach(datos =>{%>
+                <div class="col">
+                  <div class="card">
+                    <img src="<%=datos.imgUrl%>" class="card-img-top" alt=".not found.">
+                      <div class="card-body">
+                        <h5 class="card-title"><%=datos.title%></h5>
+                        <p class="card-text"><%=datos.price%> € </p>
+                        <p class="card-text"><%=datos.description%></p>
+                        <a href="/admin/delete-product/<%= datos.id %>" class="btn btn-danger">Delete</a>
+                        <a href="/admin/edit-product/<%= datos.id %>" class="btn btn-success">Edit</a>
+                      </div>
+                  </div>
+                </div>
+            <% }) %>
+          <%} else{%>
+            <div class="alert alert-warning mt-5" role="alert">NO Hay productos </div>
+          <% }%>
+  
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
