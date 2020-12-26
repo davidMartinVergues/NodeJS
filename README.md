@@ -76,7 +76,16 @@
   - [Funciones a tener en cuenta](#funciones-a-tener-en-cuenta)
   - [callbacks - aclaración -](#callbacks---aclaración--)
   - [Proyecto para poner en práctica todo lo aprendido hasta el momento.](#proyecto-para-poner-en-práctica-todo-lo-aprendido-hasta-el-momento)
-- [T-9 BBDD](#t-9-bbdd)
+- [T-9 BBDD y NodeJS](#t-9-bbdd-y-nodejs)
+  - [SQL](#sql)
+  - [noSQL](#nosql)
+  - [SQL](#sql-1)
+    - [Instalando MySQL - KDE neon](#instalando-mysql---kde-neon)
+    - [Configuraciones mysql](#configuraciones-mysql)
+    - [creación de un nuevo usuario mysql](#creación-de-un-nuevo-usuario-mysql)
+    - [Usando workbench](#usando-workbench)
+    - [Conectar nuestra app a la base de datos SQL](#conectar-nuestra-app-a-la-base-de-datos-sql)
+    - [Adaptando nuestra app a la conexión con bbdd](#adaptando-nuestra-app-a-la-conexión-con-bbdd)
 
 
 
@@ -2320,4 +2329,173 @@ La arrow function que le paso escribe los datos en un archivo
       1.  
 
               
-# T-9 BBDD     
+# T-9 BBDD y NodeJS
+
+## SQL
+Las características principales de una bbdd SQL son:
+- Los datos siguen un esquema
+- Tenemos lo que llamamos database
+- Es database contiene tablas
+  - En estas tablas es donde se almacena los datos
+    - cada fila de la tabla es un registro
+    - cada registro contiene diferentes campos(columnas)
+- Todos los datos que se guardan en las tablas tiene que encajar en ese esquema
+- Se establecen relaciones entre los datos 
+  - one-to-one
+  - one-to-many
+  - many-to-many
+- Las tablas se pueden relacionar entre si  
+![not found](img/img-28.png)  
+
+## noSQL
+
+El gestor de bbdd NoSQL más conocido puede ser MongoDB. 
+La principal característica es:
+- Los datos no siguen un esquema concreto
+- Los datos no tiene relaciones, almacenando junta toda la información necesaria
+  - Esto ocasiona que haya nformación duplicada lo que nos obliga a q si esa info cambia tenerla que actualizar en diferentes colecciones 
+  - ![not found](img/img-30.png)
+
+Se compone de:
+- Database - shop - 
+  - collections (tablas)
+    - documents (registros) nomenclatura JavaScript Object  
+
+![not found](img/img-29.png)
+
+## SQL
+
+### Instalando MySQL - KDE neon
+
+1. `sudo apt install mysql-server`
+2. Si salta un error 
+   1. `sudo rm /etc/apt/preferences.d/50-neon-mariadb`
+   2. volver al comando 1
+3. comprobamos que el servicio funciona correctamente
+   1. `sudo service mysql status`
+4. Instalar MySQL workbench community
+   1. `sudo apt update`
+   2. `sudo apt install snapd`
+   3. `sudo snap install mysql-workbench-community`
+5. Dar permisos de conexión source : https://snapcraft.io/install/mysql-workbench-community/kde-neon
+   1. `snap connect mysql-workbench-community:password-manager-service `
+   2. `snap connect mysql-workbench-community:ssh-keys`
+   3. `snap connect mysql-workbench-community:cups-control`
+6. instalar gnome-keyring
+   1. `sudo apt install gnome-keyring` **IMPORTANTE**
+7. Conocer el puerto donde se conecta mysql server
+   1. `SHOW GLOBAL VARIABLES LIKE 'PORT'`
+
+### Configuraciones mysql
+
+1. `sudo mysql_secure_installation`
+   1. me preguntará si quiero añadir un complemento para passwords
+      1. Press ENTER here if you don’t want to set up the validate password plugin.
+   2. ahora nos pedirá una contraseña para `root`
+2. Remove anonymous users? (Press y|Y for Yes, any other key for No) :
+   1. yes
+3. Disallow root login remotely? (Press y|Y for Yes, any other key for No) : 
+   1. yes
+4. Remove test database and access to it? (Press y|Y for Yes, any other key for No) : 
+   1. yes
+5. Reload privilege tables now? (Press y|Y for Yes, any other key for No) : 
+   1. yes
+6. damos una contraseña a root
+   1. `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';`
+   2. `flush privileges;`
+
+### creación de un nuevo usuario mysql
+
+1. nos conectamos como root
+   1. `sudo mysql -p -u root`
+2. creación del nuevo user
+   1. `CREATE USER 'newUser'@'%' IDENTIFIED BY 'paswordUser';`
+3. damos privilegios al nuevo user
+   1. `GRANT ALL PRIVILEGES ON *.* TO 'david'@'%' WITH GRANT OPTION;`
+
+### Usando workbench
+1. creación de un schema (database)
+   - ![not found](img/img-31.png)  
+   
+   2. le damos nombre a la database
+      - ![not found](img/img-32.png)  
+   
+   3. vemos como nos aparece en la pestañas schemas
+      - ![not found](img/img-33.png)  
+
+### Conectar nuestra app a la base de datos SQL
+
+1. Instalamos el paqueta `mysql2` como dependencia de producción
+   1. ```
+        npm install mysql2 --save
+      ```
+2. Generar el código que nos permitirá conectar con el servidor mysql generando un objeto conexión, que nos permitirá ejecutar queries
+   1. Generaremos un tipo de conexión llamada `pool conexions`
+   2. Para cada query realizada se tiene que realizar una nueva conexión, por eso crearemos una conexión del tipo pool y la exportamos como una `promise`
+   3. ```
+        const mysql = require("mysql2");
+
+        const pool = mysql.createPool({
+          host: "localhost",
+          user: "david",
+          database: "node-app", // nuestro schema
+          password: "dmv1104",
+        });
+
+        module.exports = pool.promise();
+      ```
+
+   4. Este código lo creamos en el archivo `database.js` dentro del directorio util
+      1. ![not found](img/img-34.png) 
+   5. Finalmente lo importamos a nuestro archivo `app.js`
+      1. y mediante el método `execute()`ejecutamos queries con la sintaxis de sql
+      2. ```
+          //-----IMPORT DB
+          const db = require("./util/database");
+          //------------ FIN IMPORTS ----------------
+          db.execute("select * from products");
+         ```
+   6. Creo la tabla en nuestra bbdd
+      1.  ![not found](img/img-35.png) 
+      2.  Entramos algunos datos
+   7. Como el objeto `db`es una promesa dispongo de los métodos `then()` y `catch()`
+      1. Si la consulta es exitosa devuelve los datos en then()
+         ```
+            db.execute("select * from products")
+              .then((result) => {
+                console.log(result);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+         ```
+      2. Los dastos resultantes es un array que contiene a su vez un array con los registros en forma de objeto y el segundo array contiene objetos que corresponden a la difinición de cada uno de los campos de la tabla (id,price,..)
+         1. reultado de la consulta:
+            ```
+                [
+                  [
+                    BinaryRow {
+                      id: 1,
+                      title: 'book-1',
+                      price: 10.99,
+                      description: 'my first book added',
+                      imgUrl: 'https://static2planetadelibroscom.cdnstatics.com/usuaris/libros/fotos/70/original/portada_el-senor-de-los-anillos-iii-el-retorno-del-rey_j-r-r-tolkien_201505211337.jpg'
+                    },
+                    BinaryRow {
+                      id: 2,
+                      title: 'book-2',
+                      price: 20.99,
+                      description: 'my secnd book added',
+                      imgUrl: 'https://static2planetadelibroscom.cdnstatics.com/usuaris/libros/fotos/70/original/portada_el-senor-de-los-anillos-iii-el-retorno-del-rey_j-r-r-tolkien_201505211337.jpg'
+                    }
+                  ],
+                  [
+                    ColumnDefinition {...}
+                  ]
+                ]
+            ```
+### Adaptando nuestra app a la conexión con bbdd
+
+
+
+

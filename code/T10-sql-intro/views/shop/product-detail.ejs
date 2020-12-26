@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/main-product.css" />
+  </head>
+
+  <body>
+    <%- include('../includes/navigation.ejs') %>
+
+    <main class="centered">
+      <% if (typeof product != 'undefined'){ %>
+      <h1><%= product.title%></h1>
+      <hr />
+      <div>
+        <img src="<%= product.imgUrl%>" alt="A Book" />
+      </div>
+
+      <h2><%= product.price%> €</h2>
+      <p><%= product.description%></p>
+      <form action="/add-to-cart" method="post">
+            <%- include('../includes/add-to-cart.ejs', {element: product}) %>
+      <% }else { %>
+      <h1>product not found</h1>
+      <% } %>
+    </main>
+    <script src="/js/main.js"></script>
+  </body>
+</html>
