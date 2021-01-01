@@ -125,7 +125,7 @@ Js es un lenguaje débilmente tipado, podemos usar el paradigma orintado a objet
 
 ## Sintaxi de arrow function
 
-    ```
+    ```javascript
     const add2 = (a, b) => {
     return a + b;
     };
@@ -145,7 +145,7 @@ Js es un lenguaje débilmente tipado, podemos usar el paradigma orintado a objet
 - This se usa para referirnos a variables o métodos dentro de la misma clase. Si definimos una variable con this dentro de la clase ésta será accesible desde un objeto de esa clase.
 Aquí JS tiene algo curioso y es que no solo "this" hace referencia a elementos dentro de la clase si no que también hace referencia al elemento que llama a la función.
 
-    ```
+    ```javascript
     class NameGeenerator{
         constructor(){
           const btn = document.querySelector('button');
@@ -173,7 +173,7 @@ Aquí JS tiene algo curioso y es que no solo "this" hace referencia a elementos 
 
 Para cambiar este comportamiento del this debemos usar el método bind() que fija a que hace referencia el this para esa función
 
-    ```
+    ```javascript
     btn.addEventListener('click', this.addName.bind(this)); //vuelvo a poner this xq en el
                                                               contexto del contructor quien
                                                               lo llama es la propia clase
@@ -182,7 +182,7 @@ Para cambiar este comportamiento del this debemos usar el método bind() que fij
 
     Otra manera de solucionar esto es usando funciones anónimas pero aquíi otra vez nos encontramos con el problema del this
 
-    ```
+    ```javascript
     btn.addEventListener(
       "click",
       function () {
@@ -194,7 +194,7 @@ Para cambiar este comportamiento del this debemos usar el método bind() que fij
 
 Pero la última solución propuesta x ES6 son las arrow function las cuales nos permiten conservar la referencia del this, es como si llamaramos al this fuera de esa función y por lo tanto dentro del constructor.
 
-    ```
+    ```javascript
     btn.addEventListener("click", () => { this.addName(); } );
 
     ```
@@ -202,7 +202,7 @@ Pero la última solución propuesta x ES6 son las arrow function las cuales nos 
 - () indican que la función debe ser ejecutada de manera inmediata, así dentro de la clase cuando nos queremos referir a un método utilizamos this.nombreMetodo
 sin los "()" así sin () lo que hacemos es pasarle la referencia de esa función(la dirección de esa función).
 
-    ```
+    ```javascript
 
     class NameField{
       constructor(name){
@@ -229,7 +229,7 @@ sin los "()" así sin () lo que hacemos es pasarle la referencia de esa función
 
 Definir un objeto:
 
-    ```
+    ```javascript
       const person = {
         name: "David",
         age: 36,
@@ -256,7 +256,7 @@ Definir un objeto:
 
 ## Arrays y sus métodos
 
-    ```
+    ```javascript
     const miArray = ["david", "martin", 36];
 
     for (let items of miArray) {
@@ -276,7 +276,7 @@ Definir un objeto:
 
 - Convierte cada elemento del array, conservando el array original y devolviendo otro con los cambios efectuados. Por ejempo añadir a cada item un texto
 
-    ```
+    ```javascript
     const miArray = ["david", "martin", 36];
 
     //1 línea
@@ -294,7 +294,7 @@ Definir un objeto:
 
 - para copiar arrays su contenido no la referencia así q los arryas serán independientes
 
-    ```
+    ```javascript
     let shallowCopy = fruits.slice() // this is how to make a copy
     ```
 
@@ -302,7 +302,7 @@ Definir un objeto:
 
 - Eliminar items
 
-    ```
+    ```javascript
     let vegetables = ['Cabbage', 'Turnip', 'Radish', 'Carrot']
     console.log(vegetables)
     // ["Cabbage", "Turnip", "Radish", "Carrot"]
@@ -319,7 +319,7 @@ Definir un objeto:
 
 - Nos permite generar un nuevo array siguiendo los criterios del filtro.
 
-    ```
+    ```javascript
       const updatedroducts = products.filter((element) => element.id !== id);
 
     ```
@@ -329,7 +329,7 @@ Definir un objeto:
 #### foreach()
 - looping arrays
 
-    ```
+    ```javascript
     fruits.forEach(function(item, index, miArray) {
       console.log(item, index)
     })
@@ -337,7 +337,7 @@ Definir un objeto:
 #### push pop shift unshift
 
 - 
-    ```
+    ```javascript
     let fruits = ['Apple', 'Banana']
 
     let newLength = fruits.push('Orange')
@@ -359,7 +359,7 @@ Definir un objeto:
 - Nos permite obtener el valor/indice del primer elemento del array que cumple con la condición especificada
 obteniendo el índice:
 
-    ```
+    ```javascript
     const array1 = [5, 12, 8, 130, 44];
 
     let x = array1.findIndex( element => element>5);
@@ -370,7 +370,7 @@ obteniendo el índice:
 
     o obtener el valor
 
-    ```
+    ```javascript
     const array1 = [5, 12, 8, 130, 44];
 
     let x = array1.find( element => element>5);
@@ -387,23 +387,24 @@ obteniendo el índice:
 - Permite sacar el contenido(propiedades/métodos/items) de un objeto/array y crear otro objeto/array según rodeemos el spread operator.
 Atención no hace un deep copy, es decir si copiamos un array/objeto que contiene otro valor por referencia no crea un nuevo objeto si no q copia la referencia (los métodos no son referencias, se mantiene independientes).
 
-    ```
+    ```javascript
 
       const array1 = ["david", "martin", [36]];
       const arrayCopy = [...array1]; // lo rodeo de "[]" por lo q crea un array
       array1.push("vertgues");
+
       array1[0] = "david2";
       array1[2][0] = 40;
 
       console.log(array1);     //  [ 'david2', 'martin', [ 40 ], 'vertgues' ]
       console.log(arrayCopy); // [ 'david', 'martin', [ 40 ] ]
 
-      no añade el último elemento pero si modifica el array anidado xq copió la referencia a este no hizo uno nuevo
+      no añade el último elemento pero sí modifica el array anidado xq copió la referencia, NO hizo uno nuevo
     ```
 
     Puedo envolverlo con {} para crear un objeto
 
-      ```
+      ```javascript
         const arrayCopy2 = { ...array1 };
         console.log(arrayCopy2); //
           {
@@ -418,7 +419,7 @@ Atención no hace un deep copy, es decir si copiamos un array/objeto que contien
 
 - Tiene el efecto opuesto a spread, lo que hace es mergear / combinar los argumentos que le pasamos a una función en un array. También son 3 puntitos XD
 
-    ```
+    ```javascript
     const toArray = (...args) => args;
     console.log(toArray(1, 2, 3, 5)); //[ 1, 2, 3, 5 ]
 
@@ -428,9 +429,9 @@ Atención no hace un deep copy, es decir si copiamos un array/objeto que contien
 
 Nos permite obtener los datos de un objeto / array de una manera sencilla. Se puede aplicar tanto a un objeto como a un array.
 
-Le paso un objeto y de ese objeto extraigo la propiedad name y age
+Le paso un objeto y de ese objeto extraigo la propiedad name y age. Para que funcione tenemos que dar a las variables los mismos nombres que las propiedades del objeto
 
-    ```
+    ```javascript
     const person4 = {
     name: "David",
     age: 36,
@@ -443,10 +444,9 @@ Le paso un objeto y de ese objeto extraigo la propiedad name y age
     const printData = ({ name, age }) => console.log(name, age);
 
     ```
-
   También funciona fuera de las funciones y nos permite crear variables con el nombre de las propiedades de los objetos.
 
-    ```
+    ```javascript
       const person4 = {
         name4: "David",
         age4: 36,
@@ -461,14 +461,38 @@ Le paso un objeto y de ese objeto extraigo la propiedad name y age
       console.log(name4, age4);
     ```
 
+  si queremos dar un nombre diferente de las propiedades a las variables usamos la notación `:`
+  ```javascript
+    const { name4 : name, age4 } = person4;
+  ```
   Podemos hacer destructuring de arrays y crear variables separadas, en este caso el destruturing se usa "[]" pero NO crea un array
 
-    ```
+    ```javascript
       const array4 = ["fruta", "leche"];
 
       let [item1, item2] = array4;
 
       console.log(item1, item2);//fruta leche
+     //---------------------------------
+      let miArray = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+      ];
+      function miF([x, y, Z, J]) {
+        console.log(x);// [1, 2, 3]
+        console.log(y);// [4, 5, 6]
+        console.log(Z);// [7, 8, 9]
+        console.log(J); //undefined
+      }
+      miF(miArray);
+
+    //------ FUERA DE FUNCIONES
+
+      let [array1, array2, array3] = miArray;
+      console.log(array1);
+      console.log(array2);
+      console.log(array3);
     ```
 
 ## Async code & Promises
@@ -479,7 +503,7 @@ Un código síncrono es aquel que se ejecuta línea a línea, es decir un códig
 
 Un código asíncrono no espera a las instrucciones diferidas y continúa con su ejecución. Por lo general la asincronía permite tener una mejor respuesta en las aplicaciones y reduce el tiempo de espera del cliente.
 
-    ```
+    ```javascript
       //asíncrono
       setTimeout(() => {
         console.log("time done!");
@@ -494,7 +518,7 @@ el setTimeOut es como un callback, después de 2000 ms se ejecuta la función (e
 
 Si tenemos varias funciones asincronas puede ser difícil gestionarlas
 
-    ```
+    ```javascript
       //asíncrono
       setTimeout(() => {
         console.log("time done!");
@@ -510,7 +534,7 @@ Si tenemos varias funciones asincronas puede ser difícil gestionarlas
 Son un objeto de JS que nos permite ejecutar código dependiendo del resultado de otra función. Por ejemplo la concexión a un API para obtener datos si la conexión es exitosa y obtenemos los datos cn la promesa ejecutamos un código y si el servidor devuelve un error ejecutamos otro código distinto.
 Las promesas se crean usando un constructor llamado Promise y pasándole una función que recibe dos parámetros, resolve y reject, que nos permiten indicarle a esta que se resolvió o se rechazó.
 
-      ```
+      ```javascript
       const promise = new Promise((resolve, reject) => {
         const number = Math.floor(Math.random() * 10);
 
@@ -547,7 +571,7 @@ Aunque estos módulos están incluidos alguno de ellos no están disponibles de 
 ## Creación del servidor
 
   1. importamos el global module **http**
-         ```
+         ```javascript
            const http = require("http");
          ```
   2. usamos el método **createServer()**, como argumento necesita un **requestListener**, es una función tipo callback
@@ -557,7 +581,7 @@ Aunque estos módulos están incluidos alguno de ellos no están disponibles de 
    - response => respuesta del servidor  
      La función puede ser creada como función a parte, anónima o usando arrow function.
 
-     ```
+     ```javascript
        1. Función a parte
 
          function rqListener(req, res) {}
@@ -572,7 +596,7 @@ Aunque estos módulos están incluidos alguno de ellos no están disponibles de 
 
   4. el método http.createServer() nos devuelve un objeto del tipo servidor.
 
-    ```
+    ```javascript
       const server = http.createServer((req, res) => {
                     console.log(req);
                   });
@@ -582,7 +606,7 @@ Aunque estos módulos están incluidos alguno de ellos no están disponibles de 
   5. cn el servidor definimos, mediante el método listen(), un puerto y un
    hostname,si corremos en local por defecto es "localhost" así q no haría
    falta ponerlo.
-    ```
+    ```javascript
       server.listen(3000, "localhost");
     ```
 
@@ -607,7 +631,7 @@ Con el objeto response podemos mandar datos de vuelta, para ello utilizamos dife
   3.  **end()**
       Para indicar que finalizamos la respuesta. siempre tenemos que agregar end() para indicar q se finaliza
 
-      ```
+      ```javascript
           const server = http.createServer((req, res) => {
 
               const url = req.url;
@@ -625,7 +649,7 @@ Con el objeto response podemos mandar datos de vuelta, para ello utilizamos dife
 
 Vamos a gestionar las rutas de nuestro servidor, según el end-point el server nos dará una respuesta u otra.A lo cutre pero sería algo así:
 
-    ```
+    ```javascript
     if (url === "/") {
 
                 res.setHeader("Content-Type", "text/html");
@@ -648,7 +672,7 @@ Vamos a gestionar las rutas de nuestro servidor, según el end-point el server n
 
 ### Redirectign request & creating a file
 
-    ```
+    ```javascript
       // creamos estas variable como globales, fuera del http.reateServer()
       /--------------------------
       const fs = require("fs");
@@ -675,7 +699,7 @@ Es como funcionan las plataformas de "streaming" como youTube, no cargan el vido
 
 Para leer los datos del request, en nuestro caso datos enviados por un formulario (POST), en node todo son eventos así que para capturar los datos tenemos que implementar un **event listener** que esté pendiente de un evento tipo data, este evento es disparado por el stream cuando hay un paquete de datos (chunk) disponible, cuando el buffer está lleno, entonces podemos empezar a procesar esa parte de los datos y el stream dispara un evento 'data' y genera un chunk_of_data que es un objeto Buffer, cada uno de estos chunk_of_data los vamos metiendo en un array de tal manera q al finalizar el proceso tendremos un array de buffers. Al finalizar el proceso se emite un evento end (ya no hay más datos disponibles). Capturamos ese evento y mediante el método concat() de la clase buffer generamos un nuevo buffer a partir del array de buffers (body) y como sabemos q la info es tipo string lo casteamos a string
 
-    ```
+    ```javascript
           const body = [];
           req.on("data", (chunk_of_data) => {
             body.push(chunk_of_data);
@@ -738,7 +762,7 @@ En nodeJS es muy común separar nuestro código en diferentes archivos y luego e
 Podemos crear un nuevo archivo llamado **routes.js** que contendrá los pasos a seguir según la url que le solicitemos al servidor, esto es la función anónima que le pasamos como argumento a **http.createServer()**. Así podemos dejar un archivo con la creación del servidor y un archivo routes dnd encontremoslas urls de éste.
 Nuestro punto de partida será el servidor (app.js) y este requerirá el código del archivo routes, para ello desde el archio routes asignamos nuestra función **(req,res)=>{}** a una constamte llamada **requestHandler** para luego poderla exportar.
 
-    ```
+    ```javascript
     const requestHandler = (req, res) => {
       const url = req.url;
       const method = req.method;
@@ -780,7 +804,7 @@ Nuestro punto de partida será el servidor (app.js) y este requerirá el código
 Y esta constante **requestHandler** será lo que exportemos. Lo podemos hacer de varias maneras pero siempre utilizando un objeto global de JS llamada **module** que tiene una propiedad llamada **exports** a la cual le podemos asignar un valor:
 
 1. Almacenar directamente la constante en la propiedad exports
-    ```
+    ```javascript
       module.exports = requestHandler;
 
       // en app.js podríamos utilizar la constante directamente:
@@ -790,7 +814,7 @@ Y esta constante **requestHandler** será lo que exportemos. Lo podemos hacer de
     ```
 1. exportar como un objeto
 
-    ```
+    ```javascript
       module.exports = {
         handler: requestHandler,
         text : 'Hello world"
@@ -803,7 +827,7 @@ Y esta constante **requestHandler** será lo que exportemos. Lo podemos hacer de
 
 1. crear propiedades dentro de exports
 
-    ```
+    ```javascript
       module.exports.handler= requestHandler;
       module.exports.text= 'hello world';
 
@@ -815,7 +839,7 @@ Y esta constante **requestHandler** será lo que exportemos. Lo podemos hacer de
 
 Una vez hecho esto desde nuestro archivo app.js podemos importar los datos contenido en esa propiedad **exposrts** mediante un **require** y almacenar los datos en una constante. Como estamos importando un módulo que no es global necesitamos especificar el path por ello:
 
-    ```
+    ```javascript
       const routes = require("./routes");
     ```
 
@@ -832,7 +856,7 @@ Podemos usar npm para empezar un nuevo proyecto de NodeJS. En el directorio del 
 
 Esto nos guiará por un asistente para que completemos información sobre nuestro proyecto. Esto generará un archivo **package.json** (archivo de configuración de nuestro proyecto).
 
-    ```
+    ```javascript
       {
         "name": "2.1-node_server",
         "version": "1.0.0",
@@ -859,7 +883,7 @@ En este archivo hay una sección de scripts, en la cual podemos definir scripts 
 1. start  
 Este es el nombre de un script predefinido así que se ejecuta directamente **npm start** Nos permite ejecutar un comando para inicializar nuestro proyecto. Esto se utiliza cuando alguien externo quiere ejecutar nuestro proyecto y no sabe el punto de partida se suele poner "npm start" para que se ejecute.
 
-    ```
+    ```javascript
       {
         "name": "2.1-node_server",
         "version": "1.0.0",
@@ -914,7 +938,7 @@ De ambas maneras solo lo instala en nuestro proyecto, si queremos instalar un pa
       ```
       Podemos crear una archivo, nodemon.json, en la raiz del proyecto para configurar que ignore algunos archivos
 
-        ```
+        ```javascript
           {
             "ignore": ["*.json"]
           }
@@ -923,7 +947,7 @@ De ambas maneras solo lo instala en nuestro proyecto, si queremos instalar un pa
         Así solo lo instalamos de manera local (solo nuestro proyecto). Nos crea en nuestro proyecto una carpeta **node_modules** donde se instalan estos paquetes.
         Para usarlo tenemos que ejecutar el proyecto mediante nodemon no usando node
 
-        ```
+        ```javascript
           {
             "name": "2.1-node_server",
             "version": "1.0.0",
@@ -967,13 +991,13 @@ Por ejemplo para extraer el body de la request teníamos q escuchar el event dat
     ```
 2. importamos en nuestro app.js
 
-    ```
+    ```javascript
       const express = require('express');
     ```
 
 3. creamos una app cn express y arrancamos el server
 
-    ```
+    ```javascript
       const app = express();
 
       const server = http.createServer(app);
@@ -1003,14 +1027,14 @@ Para cada request entrante se ejecutará el método use(), a éste le pasamos tr
 
 - Esta función sustituye a la creación del servidor.
 
-    ```
+    ```javascript
     const server = http.createServer(app);
     server.listen(3000, "localhost");
     ```
 
   podemos escribir directamente
 
-    ```
+    ```javascript
       app.listen(3000);
     ```
 
@@ -1019,7 +1043,7 @@ Para cada request entrante se ejecutará el método use(), a éste le pasamos tr
 Podemos usar el middleware use() para especificar la url. Si solo especificamos en la ruta "/" como todas las url empiezan por '/', si queremos acceder a una url q no existe en nuestro servidor pej
 /random como el único elemento que coincide es / se dirigirá ahí. Las diferentes rutas siempre tienen que ir por encima de la principal "/". Para evitar esto podemos utilizar get(), post(),... ya que con estos métodos sólo se dirigirá si la url es exactamente igual.
 
-    ```
+    ```javascript
     app.use("/add-product", (req, res, next) => {
       console.log("in the middleware");
       res.send("<h1>Add-product page</h1>");
@@ -1051,7 +1075,7 @@ Para gestionar los request usamos el middeware use() de la siguiente manera.
     * false si los datos codificados en la url serán de tipo string o array
     
     * true si serán de cualquier tipo
-      ```
+      ```javascript
         const bodyParser = require("body-parser");
 
         const app = express();
@@ -1067,7 +1091,7 @@ Para gestionar los request usamos el middeware use() de la siguiente manera.
         app.push()  
         app.put()  
 
-        ```
+        ```javascript
         app.post("/product", (req, res, next) => {
           console.log(req.body);
           res.redirect("/");
@@ -1080,7 +1104,7 @@ La función Router() crea como una mini app de express asociada a nuestra app qu
 
 ![not found](img/img-17.png)
 
-    ```
+    ```javascript
       const express = require("express");
 
       const router = express.Router();
@@ -1110,7 +1134,7 @@ La función Router() crea como una mini app de express asociada a nuestra app qu
 
 después importamos nuestro archivo a la app.js.
 
-    ```
+    ```javascript
       const express = require("express");
       const bodyParser = require("body-parser");
 
@@ -1125,7 +1149,7 @@ después importamos nuestro archivo a la app.js.
 
 Para generar una respuesta ante una url que no existe usamos
 
-    ```
+    ```javascript
       //------------ FIN IMPORTS ----------------
       app.use(adminRoutes);
       app.use(shopRoutes);
@@ -1142,7 +1166,7 @@ Para generar una respuesta ante una url que no existe usamos
 
 Es habitual en las apps que las url se filtren por usuario, por ejemplo "/admin/add-product" o "/admin/products" y así. Si tenemos configurado nuestros paths de esa manera podemos añadirlo a use() de la siguiente manera:
 
-    ```
+    ```javascript
       app.use("/admin", adminRoutes);
 
     ```
@@ -1150,7 +1174,7 @@ Es habitual en las apps que las url se filtren por usuario, por ejemplo "/admin/
 de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes. Pero una vez dentro del archivo no debemos volver a chequear la ruta entera "/admin/add-product" solo mira a partir de
 "/admin/"
 
-    ```
+    ```javascript
       // /admin/add-product => GET
 
       router.get("/add-product", (req, res, next) => {
@@ -1177,7 +1201,7 @@ de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes.
 
 - Esta función es una manera de conocer la ruta absoluta donde se encuntra nuestro proyecto:
 
-    ```
+    ```javascript
     console.log(process.cwd())
     /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server
     ```
@@ -1186,7 +1210,7 @@ de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes.
 
 - Sustituye a process.mainModule.filename, y como este nos da el nombre del archivo donde empieza nuestra app, el que arranca la aplicación.
 
-    ```
+    ```javascript
       console.log(require.main.filename);
       /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server/app.js
 
@@ -1196,7 +1220,7 @@ de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes.
 
 - Nos da la ruta absoluta hasta el archivo donde ejecutamos `__dirname`
 
-    ```
+    ```javascript
       console.log(__dirname);
       /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server/controllers
 
@@ -1205,7 +1229,7 @@ de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes.
   Creamos un directorio llamado views dnd guardaremos nuestras págias HTML.
   Para poderlas devolver en la respuesta usamos el método sendFile() y especificamos la ruta a nuestras vistas. Para especificar el PATH tenemos un core module que nos ayuda con eso.
 
-    ```
+    ```javascript
       const path = require("path");
 
       router.get("/", (req, res, next) => {
@@ -1223,14 +1247,14 @@ Servir archivos estáticos significa poder servir archivos que no esté gestiona
 En principio NodeJS bloquea el acceso al sistema de archivos pero para que el html puede acceder a una hoja CSS necesitamos hacer una excepción.
 Para ello necesitamos otro middleware usando el propio objeto de express
 
-    ```
+    ```javascript
     app.use(express.static(path.join(__dirname, "public")));
     ```
 
 De este manera hará que todo el contenido del directorio **public** sea accesible.
 Cuando intentemos acceder desde el HTML para cargar el css el sistema ya situa la ruta en el directorio especificado "public" así que en el tag link ponemos
 
-    ```
+    ```html
     <link rel="stylesheet" href="/css/main.css" />
     ```
 
@@ -1246,7 +1270,7 @@ Para simular una bbdd usaremos una array, el problema de esto es que el array es
 
 Entonces en adimin creamos el array y lo exportamos:
 
-    ```
+    ```javascript
       const express = require("express"),
       path = require("path");
 
@@ -1291,7 +1315,7 @@ Le dice a express que para renderizar vistas dinámicas utilice el motor de plan
 #### views
 Le dice a express donde encontrar las plantillas dinámicas. Por defecto las coge en la ruta "/views"
 
-    ```
+    ```javascript
     // datos globales
     app.set("miNombre","David");
     app.get("miNombre");//"David"
@@ -1309,7 +1333,7 @@ Le dice a express donde encontrar las plantillas dinámicas. Por defecto las cog
 
 Es un motor que usa una versión simplificada de HTML, es muy importante respetar la identación, podemos usar css enlazados pero para aplicar una clase css a un tag HTML se utiliza la notación de punto
 
-    ```
+    ```pug
     <!DOCTYPE html>
     html(lang="en")
       head
@@ -1330,7 +1354,7 @@ Es un motor que usa una versión simplificada de HTML, es muy importante respeta
 
 Para renderizar la vista debemos usar el método render(), como anteriormente ya definimos dónde guardábamos las platillas dinámicas no hace falta especificar la ruta
 
-    ```
+    ```javascript
       router.get("/", (req, res, next) => {
 
         res.render("shop");
@@ -1343,7 +1367,7 @@ Para renderizar la vista debemos usar el método render(), como anteriormente ya
 
 Para pasar datos a la plantilla simplemente debemos agregárselos como segundo argumento de la función render(); en forma de objeto(clave-valor)
 
-    ```
+    ```javascript
       const products = require("./admin").products;
       //---------------------------------------------
 
@@ -1360,7 +1384,7 @@ Para recuperar esos datos en la plantilla de pug usamos la sitaxi
 `# { }`
 Recordemos que en la clave items tenemos un array (products) que contiene objetos del tipo {title:''} Entonces solo tendremos que iterar el array e ir sacando el título de cada producto
 
-    ```
+    ```pug
     <!DOCTYPE html>
     html(lang="en")
       head
@@ -1398,7 +1422,7 @@ Recordemos que en la clave items tenemos un array (products) que contiene objeto
 
 Un formulario quedaría así
 
-    ```
+    ```pug
       main
         form.product-form(action="/admin/add-product",method="POST")
             div.form-control
@@ -1413,7 +1437,7 @@ Un formulario quedaría así
 Si en todas nuestras páginas tenemos una estrctura similar, como nos sucede a nosotros con el header podemos hacer layouts en lugar de volver a escribirlo.
 Estos layuots podemos personalizarlos para que se ajusten a cada situación, por ejemplo hay páginas que tendrán unos estilos css diferentes, un contenido concreto,... así para crear un layout (esqueleto) y poder añadir elementos usamos los bloques `block`
 
-    ```
+    ```pug
     <!DOCTYPE html>
     html(lang="en")
       head
@@ -1441,7 +1465,7 @@ Lo mejor para guardar los layouts es en la misma carpeta donde tenemos las plant
 Una vez hecho esto en la plantilla deseada utilizando la palabra reservada `extends`
 importamos el layout y con `block` inyectamos el contenido que queramos
 
-    ```
+    ```pug
       extends layouts/main-layout.pug
 
       block content
@@ -1452,7 +1476,7 @@ importamos el layout y con `block` inyectamos el contenido que queramos
 
 Para ello podemos enviar un nuevo argumento en el método render() para saber si debemos añadir la clase o no.
 
-    ```
+    ```javascript
       router.get("/add-product", (req, res, next) => {
 
         res.render("add-product", {
@@ -1467,7 +1491,7 @@ Para ello podemos enviar un nuevo argumento en el método render() para saber si
 
 luego comprobamos con un `if` en la plantilla
 
-    ```
+    ```pug
       a(href="/admin/add-product", class= (path=== '/admin/add-product' ? 'active' : '')  ) Add Product
     ```
 
@@ -1475,7 +1499,7 @@ luego comprobamos con un `if` en la plantilla
 
 Este otro motor de plantillas usa HTML mezclado con código para generar la lantilla. Así que en app.use() modificamos nuestro motor pero handlebars no está incluido en el core así que tenemos q importarlo previamente y decirle a express que es un motor de plantillas
 
-    ```
+    ```javascript
     const expressHbs = require('express-handlebars');//importamos
 
     app.engine("hbs", expressHbs()); // lo registramos como motor de plantillas
@@ -1488,7 +1512,7 @@ Para renderizar la página tenemos que especificar q no usamos layouts porque po
 Busca por este árbol de directorios    
 ![not found](img/img-21.png)
 
-    ```
+    ```javascript
       app.use((req, res, next) => {
         res
           .status(404)
@@ -1498,7 +1522,7 @@ Busca por este árbol de directorios
 
 Luego podemos modificar varios valores con los que trabaja handlebars por defecto
 
-    ```
+    ```javascript
       app.engine("handlebasrs", expressHbs({
               layoutsDir: path.join(__dirname, "Templates","layouts"),
               partialsDir: path.join(__dirname, "Templates","layouts","partials"),
@@ -1512,7 +1536,7 @@ Una de las diferencias con pug es que en una plantilla de handlebars no podemos 
 `if items.length > 0 ...` sólo podemos pasarle variables con datos.
 Así que la lógica la tenemos que tener en nuestro nodeJS pasarle a la plantilla el resultado
 
-    ```
+    ```javascript
     router.get("/", (req, res, next) => {
       res.render("shop", {
         layout: false,
@@ -1525,7 +1549,7 @@ Así que la lógica la tenemos que tener en nuestro nodeJS pasarle a la plantill
 
 una vez sabemos si tenemos productos evaluar con if en la plantilla, cuando hacemos un loop con `each` podemos acceder a cada elemento dentro de la iteración con `this`
 
-    ```
+    ```handlebars
       {{#if hasProducts}}
               {{#each items}}
                 <div class="grid">
@@ -1556,7 +1580,7 @@ una vez sabemos si tenemos productos evaluar con if en la plantilla, cuando hace
 
 Tenemos que especificar dónde están guardadas los layouts y como se llama el layout por defecto
 
-    ```
+    ```javascript
       app.engine(
         "hbs",
         expressHbs({
@@ -1570,7 +1594,7 @@ Tenemos que especificar dónde están guardadas los layouts y como se llama el l
 
 Creamos nuestro layout, en la regióm `{{{body}}}` es donde inyectará la página que estamos renderizando
 
-    ```
+    ```handlebars
       <!DOCTYPE html>
       <html lang="en">
         <head>
@@ -1606,7 +1630,7 @@ Creamos nuestro layout, en la regióm `{{{body}}}` es donde inyectará la págin
 
 Una vez hecho esto en shop.js queda así
 
-    ```
+    ```javascript
     router.get("/", (req, res, next) => {
       res.render("shop", {
         productCss: true,
@@ -1651,7 +1675,7 @@ En el archivo 'T5-MVC/5.1-eJS-node-server/model/product.js' cuando leemos el arc
 
 - Refectoring usando una helper function que lea el archivo bbdd.
 
-    ```
+    ```javascript
       const fs = require("fs"),
         path = require("path");
 
@@ -1701,13 +1725,13 @@ En el archivo 'T5-MVC/5.1-eJS-node-server/model/product.js' cuando leemos el arc
 
 - Extraer con Router() datos de la url, para ello en el router usamos la siguiente nomenglatura
 
-```
+```javascript
 router.get("/products/:productId", shopController.getProduct);
 ```
 
 Si tenemos otro segmento statico en la ruta `/products/` como por ejemplo `/products/delete` y lo ponemos detrás de la url con segmento dinámico express no podra acceder, es decir en este orden
 
-```
+```javascript
 //-- ESTO NO FUNCIONA BIEN !!!!!!
 
 //url con segmento dinámico marcado por  ":"
@@ -1718,7 +1742,7 @@ router.get("/products/delete", shopController.deleteProduct);
 
 Este sería el orden correcto!
 
-```
+```javascript
 //-- ORDEN CORRECTO !!!!!!
 
 //url con segmento dinámico marcado por  ":"
@@ -1736,7 +1760,7 @@ Recordar que para pasar datos por post podemos usar el `req.body` o meter la inf
   ```
   Hay que tener en cuenta que los datos extarídos así siempre son del tipo `string`
   Para extraerlos:
-  ```
+  ```javascript
     req.query.myParam
   ```
   Si no se encuentra el parámetro que buscamos nos devuelve `undefined`
@@ -1751,7 +1775,7 @@ Recordar que para pasar datos por post podemos usar el `req.body` o meter la inf
 
 ## callbacks - aclaración -
 Es cuando pasamos una función como argumento de otra función, la clave aquí es q la función externa "decide" cuando se eecuta la función pasada (callback). Ponemos de ejemplo la funión de lectura y escritura en n archivo
-```
+```javascript
 const getProductsFromFile = (cb) => {
   
   fs.readFile(path_to_bbdd, (err, data) => {
@@ -1766,7 +1790,7 @@ const getProductsFromFile = (cb) => {
 La función getProductsFromFile recibe un callback que lo ejecutará cuando haya leído el archivo, pasándole los datos del archivo o un array vacío [].
 Entonces cuando yo ejecuta esta función le paso la implementación del callback
 
-```
+```javascript
     getProductsFromFile((products_from_file) => {
 
       products_from_file.push(this);
@@ -1810,13 +1834,13 @@ La arrow function que le paso escribe los datos en un archivo
         ```  
 3. Archivos de configración, en la raíz del proyecto
    1. nodemon.json 
-      ```
+      ```javascript
         {
           "ignore": ["*.json"]
         }
       ``` 
    2. package.json
-      ```
+      ```javascript
         {
           "name": "t7-proyecto-1",
           "version": "1.0.0",
@@ -1850,7 +1874,7 @@ La arrow function que le paso escribe los datos en un archivo
 
 5. levantamos un servidor
 - el método listen() devuelve un objeto `http.server` el cual tiene un método addres() que devuelve : { port: xxx, family: 'IPv4', address: '127.0.0.1' } 
-  ```
+  ```javascript
     //--------import core modules
     const path = require("path");
 
@@ -1874,16 +1898,16 @@ La arrow function que le paso escribe los datos en un archivo
 
 6. configuraciones de los módulos
    1. Seteamos qué motor de vistas usaremos (ejs) y donde guardaremos las vistas
-      ```
+      ```javascript
         app.set("view engine", "ejs");
         app.set("views", "viwes");
       ``` 
     2. configuramos boy-parser para que en cada conexión decodifique los datos del body
-       ```
+       ```javascript
        app.use(bodyParser.urlencoded({ extended: true }));
        ```
     3. seteamos dónde se guardarán los archivos estáticos (css, js,...)
-       ```
+       ```javascript
        app.use(express.static(path.join(__dirname, "public")));
        ```
 7. Routting & controllers  
@@ -1894,21 +1918,21 @@ La arrow function que le paso escribe los datos en un archivo
     ![not found](img/img-26.png)  
       1. `shop.controller`   
          Creamos y exportamos una función llamada `getIndex` que renderizará la página principal
-          ```
+          ```javascript
             module.exports.getIndex = (req, res, next) => {
               res.render("shop/index", { pageTitle: "Index Page" });
             };
           ``` 
       2. `404.controller.js`  
          creamos el controller para las páginas 404   
-          ```
+          ```javascript
             module.exports.error = (req, res, next) => {
                 res.status(404).render("404", { pageTitle: "404 Page" });
               };
           ```
    3. `shop.routes.js`  
       le decimos al router qué función ejecutar del controlador según la url detectada y `finalmente exportamos la variable` 
-         ```
+         ```javascript
           //------Imports
 
           //-----Modules
@@ -1929,7 +1953,7 @@ La arrow function que le paso escribe los datos en un archivo
               ![not found](img/img-27.png)  
             1. head.ejs
             -          
-              ```
+              ```html
               <!DOCTYPE html>
               <html lang="en">
                 <head>
@@ -1950,7 +1974,7 @@ La arrow function que le paso escribe los datos en un archivo
                 </head>
               ```  
             2. nav.ejs  
-             - ```
+             - ```html
                 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
                     <div class="container-fluid">
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
@@ -1976,7 +2000,7 @@ La arrow function que le paso escribe los datos en un archivo
                 </nav>  
                ```              
          2. index.ejs
-            - ```
+            - ```html
                 <%- include('../includes/head.ejs')  %>
                   <body>
                 <%- include('../includes/nav.ejs')  %>
@@ -1992,7 +2016,7 @@ La arrow function que le paso escribe los datos en un archivo
                 </html>
               ```  
          3. 404.ejs          
-            - ```
+            - ```html
                 <%- include('includes/head.ejs')  %>
                   <body>
                 <%- include('includes/nav.ejs')  %>
@@ -2008,7 +2032,7 @@ La arrow function que le paso escribe los datos en un archivo
                 </html>
               ```   
    5. importamos todo en el archivo `app.js` para q funcione
-         ```
+         ```javascript
             //----IMPORTS
 
             //-----CORE MODULES
@@ -2045,7 +2069,7 @@ La arrow function que le paso escribe los datos en un archivo
          ``` 
    6. Más vistas
       1. Formulario para entrar productos
-         - ```
+         - ```html
             <%- include('../includes/head.ejs')%>
 
             <body>
@@ -2086,7 +2110,7 @@ La arrow function que le paso escribe los datos en un archivo
             </body>
            ``` 
          1. añado el siguiente código en el archivo `admin.routes.js`
-            - ```
+            - ```javascript
                 const express = require("express"),
                   router = express.Router(),
                   adminController = require("../controllers/admin.controller");
@@ -2097,7 +2121,7 @@ La arrow function que le paso escribe los datos en un archivo
                 module.exports = router;
               ```
          2. Creo el controlador `admin.controller.js`
-            - ```
+            - ```javascript
                 module.exports.getAddProduct = (req, res, next) => {
                   res.render("admin/add-product", { pageTitle: "Add product" });
                 };
@@ -2114,14 +2138,14 @@ La arrow function que le paso escribe los datos en un archivo
                 };
               ```  
          3. Para que sea accesible por la ruta `/admin/...` en el archivo importo las `adminRoutes` y con `app.use` esecifico que busque en en ese archivo para las rutas que empiezan por /admin
-            - ```
+            - ```javascript
                 const adminRoutes = require("./routes/admin.routes");
                 app.use("/admin", adminRoutes);
               ```
    7. Modelo & archivos JSON como bbdd
       1. Class Product
          - Creo una clase producto que me permitirá gestionar los items, crear productos y guardarlos en un archivo tipo JSON, con `this.id = Math.random();` le doy un id a cada producto. Como no voy a hacer operaciones con ese id lo transformo en string y así la comparación será más fácil pq cuando pase el id del producto por la url (cuando quiera editar/borrar el producto) será del tipo string ya que todos los datos codificados en la url quedan covertidos a tipo string.  
-           - ```
+           - ```javascript
               //-------IMPORTs
               const fs = require("fs"),
                 path = require("path");
@@ -2165,7 +2189,7 @@ La arrow function que le paso escribe los datos en un archivo
               };
              ```
       2. Tenemos que modificar el `shop.controller` para mostrar en la página principal los productos del archivo json, pero como la función de `readFile` es asíncrona intenta renderizar la vista antes de tener los datos eso no ocasiona un error para evitarlo el método para obtener los productos le pasemas un callback, y será esa función callback la que renderizará la vista
-         - ```
+         - ```javascript
             //-----IMPORTS
 
             const Product = require("../model/product").ProductClass;
@@ -2182,7 +2206,7 @@ La arrow function que le paso escribe los datos en un archivo
       3. Hemos modificado el index, en cada item hems añadido un enlace tipo botón que nos lleva a una ruta con el `id` del producto   
       `<a href="/add-cart/<%= datos.id %>" class="btn btn-primary">Add to cart</a>`
 
-         - ```
+         - ```html
               <%- include('../includes/head.ejs')  %>
                 <body>
               <%- include('../includes/nav.ejs')  %>
@@ -2221,7 +2245,7 @@ La arrow function que le paso escribe los datos en un archivo
          - Para recogerlo en el controller
            - `const id_prod = req.params.id;`
          - añadimos un nuevo método en classProduct para uscar por id y usamos la función `find()`
-             - ```
+             - ```javascript
                 static getProductById(id, cb) {
                   Product.getAllProducts((products) => {
                     const product = products.find((p) => p.id === id);
@@ -2230,7 +2254,7 @@ La arrow function que le paso escribe los datos en un archivo
                 }
                ```
          - el controler pasa los datos a una nueva vista
-             - ```
+             - ```javascript
                 module.exports.getEditProducts = (req, res, next) => {
                   const id_prod = req.params.id;
                   Product.getProductById(id_prod, (prod) => {
@@ -2242,7 +2266,7 @@ La arrow function que le paso escribe los datos en un archivo
                 };
                ```
          - Esta vista contiene un formulario dnd pintamos los datos y envia la confirmacion del cambio y mediante un `input:hidden` enviamos tb el id
-           - ```
+           - ```html
               <%- include('../includes/head.ejs')%>
 
               <body>
@@ -2283,7 +2307,7 @@ La arrow function que le paso escribe los datos en un archivo
              ```
          - Recopilamos toda la info en el controller y se lo pasamos al método para editarlo
            - usamos `findIndex()` para modificarlo 
-             - ```
+             - ```javascript
                 module.exports.postEditProducts = (req, res, next) => {
                   const new_prod = {
                     title: req.body.title,
@@ -2297,7 +2321,7 @@ La arrow function que le paso escribe los datos en un archivo
                   res.redirect("/");
                 };
                ```
-             - ```
+             - ```javascript
                     static editProduct(prod) {
                       Product.getAllProducts((products) => {
 
@@ -2313,7 +2337,7 @@ La arrow function que le paso escribe los datos en un archivo
               
 
       2. Ejemplo de eliminar un prodcuto, usamos `filter()`
-         - ```
+         - ```javascript
               static deleteProduct(prod_id) {
                 Product.getAllProducts((products) => {
                   const products_updated = products.filter((p) => p.id !== prod_id);
@@ -2432,7 +2456,7 @@ Se compone de:
 2. Generar el código que nos permitirá conectar con el servidor mysql generando un objeto conexión, que nos permitirá ejecutar queries
    1. Generaremos un tipo de conexión llamada `pool conexions`
    2. Para cada query realizada se tiene que realizar una nueva conexión, por eso crearemos una conexión del tipo pool y la exportamos como una `promise`
-   3. ```
+   3. ```javascript
         const mysql = require("mysql2");
 
         const pool = mysql.createPool({
@@ -2449,7 +2473,7 @@ Se compone de:
       1. ![not found](img/img-34.png) 
    5. Finalmente lo importamos a nuestro archivo `app.js`
       1. y mediante el método `execute()`ejecutamos queries con la sintaxis de sql
-      2. ```
+      2. ```javascript
           //-----IMPORT DB
           const db = require("./util/database");
           //------------ FIN IMPORTS ----------------
@@ -2460,7 +2484,7 @@ Se compone de:
       2.  Entramos algunos datos
    7. Como el objeto `db`es una promesa dispongo de los métodos `then()` y `catch()`
       1. Si la consulta es exitosa devuelve los datos en then()
-         ```
+         ```javascript
             db.execute("select * from products")
               .then((result) => {
                 console.log(result);
@@ -2471,7 +2495,7 @@ Se compone de:
          ```
       2. Los dastos resultantes es un array que contiene a su vez un array con los registros en forma de objeto y el segundo array contiene objetos que corresponden a la difinición de cada uno de los campos de la tabla (id,price,..)
          1. reultado de la consulta:
-            ```
+            ```javascript
                 [
                   [
                     BinaryRow {
@@ -2495,6 +2519,77 @@ Se compone de:
                 ]
             ```
 ### Adaptando nuestra app a la conexión con bbdd
+
+Para ello modificaremos nuestro modelo para que en lugar de guardarlo en un archivo lo haga en la bbdd.
+
+Recordemos que no trabajaremos con callbacks sino con promesas. Será una promesa lo que devolverán los métodos. 
+
+1. fetchAll() -> obtener todos los productos
+   1. El modelo ProductClass
+      *  
+         ```javascript
+         //----import pool object
+           const bd = require("../util/database");
+         //-----
+         static fetchAll() {
+           return  bd.execute('SELECT * FROM products');
+         }
+         ```
+   2. El controlador shop
+      *  para obtener los datos usamos el `destructuring` en arrays, simplemente extraemos los datos del array devuelto por la consulta, este array contiene dos arrays anidados, uno con los resultados de la consulta (rows) y otro con información de los campos de la tabla (fieldData)
+      ```javascript
+          module.exports.getIndex = (req, res, next) => {
+
+            Product.fetchAll()
+
+              .then(([rows, fieldData]) => {
+
+                res.render("shop/index", {
+                  items: rows,
+                  pageTitle: "Shop_ejs",
+                  path: "/",
+                });
+                
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          };
+      ``` 
+2. save() -> para guaradr productos en la bbdd
+   *  modificación del modelo 
+      ```javascript
+        save() {
+          return db.execute(
+            "INSERT INTO products (title,price,imgUrl, description) VALUES (?,?,?,?)",
+            [this.title, this.price, this.imgUrl, this.description]
+          );
+        }
+      ```
+    * modificamos el controllador admin
+      ```javascript
+        module.exports.postAddProduct = (req, res, next) => {
+          const productInfo = req.body;
+          const product = new Product(
+            productInfo.title,
+            productInfo.description,
+            productInfo.price,
+            productInfo.imgUrl
+          );
+          product
+            .save()
+            .then(() => {
+              res.redirect("/");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        };
+      ```   
+
+
+
+
 
 
 

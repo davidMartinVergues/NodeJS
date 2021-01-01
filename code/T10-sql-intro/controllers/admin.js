@@ -16,8 +16,14 @@ module.exports.postAddProduct = (req, res, next) => {
     productInfo.price,
     productInfo.imgUrl
   );
-  product.save();
-  res.redirect("/");
+  product
+    .save()
+    .then(() => {
+      res.redirect("/");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 module.exports.getEditProduct = (req, res, next) => {

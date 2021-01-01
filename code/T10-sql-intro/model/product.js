@@ -1,22 +1,11 @@
-const fs = require("fs"),
-  path = require("path"),
-  Cart = require("./cart").classCart;
+//---import cart  class
+const Cart = require("./cart").classCart;
 
-const path_to_bbdd_file = path.join(
-  process.cwd(),
-  "data",
-  "products_bbdd.json"
-);
+//----import pool object
+const db = require("../util/database");
+
 //---------helper function
-const getProductsFromFile = (cb) => {
-  fs.readFile(path_to_bbdd_file, (err, data) => {
-    if (err) {
-      cb([]);
-    } else {
-      cb(JSON.parse(data));
-    }
-  });
-};
+
 //-----------------------class Product
 module.exports.classProduct = class Product {
   //---------------constructor----
@@ -28,62 +17,19 @@ module.exports.classProduct = class Product {
   }
   //---------------------------Methods
   save() {
-    this.id = Math.random().toString();
-    getProductsFromFile((products_data) => {
-      products_data.push(this);
-      fs.writeFile(path_to_bbdd_file, JSON.stringify(products_data), (err) => {
-        if (err) console.log(err);
-      });
-    });
-  }
-  static fetchAll(cb) {
-    getProductsFromFile(cb);
+    return db.execute(
+      "INSERT INTO products (title,price,imgUrl, description) VALUES (?,?,?,?)",
+      [this.title, this.price, this.imgUrl, this.description]
+    );
   }
 
-  static getProductById(id, cb) {
-    getProductsFromFile((products) => {
-      const product = products.find((p) => p.id === id);
-      cb(product);
-    });
+  static deleteProduct(id) {}
 
-    // MANERA LARGA -
-    // NO SE PUEDE HACER ASÍ PQ EN CADA CICLO DEL FOREACH LANZARÍAMOS UNA CALLBACK EN UNA OCASIÓN NS DARÍA EL PRODUCTO PERO EN TANTAS OTRAS UN ARRAY VACÍO ---- HAY QUE HACERLO CON EL FIND()
-
-    // fs.readFile(path_to_bbdd_file, (err, data) => {
-    //   if (!err) {
-    //     const allProducts = JSON.parse(data);
-    //     allProducts.forEach((element) => {
-    //       if (element.id == id) {
-    //         cb([element]);
-    //       } else {
-    //         cb([]);
-    //       }
-    //     });
-    //   } else {
-    //     console.log(err);
-    //   }
-    // });
+  static fetchAll() {
+    return db.execute("SELECT * FROM products");
   }
 
-  static editProduct(prod) {
-    console.log(prod);
-    getProductsFromFile((data) => {
-      const indexProd = data.findIndex((element) => element.id === prod.id);
-      data[indexProd] = prod;
-      fs.writeFile(path_to_bbdd_file, JSON.stringify(data), (err) => {
-        console.log(err);
-      });
-    });
-  }
-  static deleteProduct(id) {
-    getProductsFromFile((products) => {
-      const product = products.find((element) => element.id === id);
-      const updatedroducts = products.filter((element) => element.id !== id);
-      fs.writeFile(path_to_bbdd_file, JSON.stringify(updatedroducts), (err) => {
-        if (!err) {
-          Cart.deleteProduct(id, product.price);
-        }
-      });
-    });
-  }
+  static getProductById(id) {}
+
+  static editProduct(prod) {}
 };

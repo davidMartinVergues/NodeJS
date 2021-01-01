@@ -4,23 +4,31 @@ const Product = require("../model/product").classProduct;
 const Cart = require("../model/cart").classCart;
 
 module.exports.getProducts = (req, res, next) => {
-  Product.fetchAll((data) => {
-    res.render("shop/product-list", {
-      items: data,
-      pageTitle: "All products",
-      path: "/products",
+  Product.fetchAll()
+    .then(([rows]) => {
+      res.render("shop/product-list", {
+        items: rows,
+        pageTitle: "All products",
+        path: "/products",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
 };
 
 module.exports.getIndex = (req, res, next) => {
-  Product.fetchAll((data) => {
-    res.render("shop/index", {
-      items: data,
-      pageTitle: "Shop_ejs",
-      path: "/",
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("shop/index", {
+        items: rows,
+        pageTitle: "Shop_ejs",
+        path: "/",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
 };
 
 module.exports.getCart = (req, res, next) => {
