@@ -848,7 +848,7 @@ Una vez hecho esto desde nuestro archivo app.js podemos importar los datos conte
 ## Entendiendo NPM node package manager scripts
 
 Es un gestor de paquetes para NodeJS que se instala automáticamente cuando instalamos NodeJS. Este nos permitirá instalar paquetes de terceros no incluidos en el core de NodeJS.
-Podemos usar npm para empezar un nuevo proyecto de NodeJS. En el directorio del proyecto otecleamos en la terminal:
+Podemos usar npm para empezar un nuevo proyecto de NodeJS. En el directorio del proyecto tecleamos en la terminal:
 
     ```
       npm init
