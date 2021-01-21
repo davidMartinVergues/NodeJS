@@ -25,6 +25,7 @@
     - [Código síncrono vs asíncrono](#código-síncrono-vs-asíncrono)
     - [Promises](#promises)
 - [T-1 NodeJs Basics](#t-1-nodejs-basics)
+  - [Instalat nodeJS](#instalat-nodejs)
   - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
   - [Creación del servidor](#creación-del-servidor)
     - [**request object**](#request-object)
@@ -555,6 +556,15 @@ Las promesas se crean usando un constructor llamado Promise y pasándole una fun
 
 # T-1 NodeJs Basics
 
+## Instalat nodeJS
+
+Se instalará node y npm
+
+```bash
+curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
 ## Creando un servidor con NodeJS
 
 Por defecto Node incluye una serie de módulos, los llamados core modules, algunos ejemplos son:  
@@ -882,6 +892,8 @@ En este archivo hay una sección de scripts, en la cual podemos definir scripts 
 
 1. start  
 Este es el nombre de un script predefinido así que se ejecuta directamente **npm start** Nos permite ejecutar un comando para inicializar nuestro proyecto. Esto se utiliza cuando alguien externo quiere ejecutar nuestro proyecto y no sabe el punto de partida se suele poner "npm start" para que se ejecute.
+
+Puede que al ejecutar **npm start** si no tenemos instalado nodemon de antemano nos de error, así que mejor instalar nodemon y después ejecutar npm start
 
     ```javascript
       {
@@ -2455,7 +2467,7 @@ Se compone de:
       ```
 2. Generar el código que nos permitirá conectar con el servidor mysql generando un objeto conexión, que nos permitirá ejecutar queries
    1. Generaremos un tipo de conexión llamada `pool conexions`
-   2. Para cada query realizada se tiene que realizar una nueva conexión, por eso crearemos una conexión del tipo pool y la exportamos como una `promise`
+   2. Para cada query realizada se tiene que realizar una nueva conexión, por eso crearemos una conexión del tipo pool(contiene varias conexiones) y la exportamos como una `promise`
    3. ```javascript
         const mysql = require("mysql2");
 
@@ -2556,7 +2568,7 @@ Recordemos que no trabajaremos con callbacks sino con promesas. Será una promes
               });
           };
       ``` 
-2. save() -> para guaradr productos en la bbdd
+2. save() -> para guardar productos en la bbdd
    *  modificación del modelo 
       ```javascript
         save() {

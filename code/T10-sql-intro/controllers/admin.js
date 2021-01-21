@@ -18,7 +18,7 @@ module.exports.postAddProduct = (req, res, next) => {
   );
   product
     .save()
-    .then(() => {
+    .then((data) => {
       res.redirect("/");
     })
     .catch((err) => {
