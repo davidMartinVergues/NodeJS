@@ -140,6 +140,7 @@ const addOne = a => a + 1;
 // si no tien ningún argumento
 const addRandom = () => 1+2;
 ```
+cp
 
 ## Uso de la keyword this y utilidad de ()
 
