@@ -126,150 +126,150 @@ Js es un lenguaje débilmente tipado, podemos usar el paradigma orintado a objet
 
 ## Sintaxi de arrow function
 
-    ```javascript
-    const add2 = (a, b) => {
-    return a + b;
-    };
+```javascript
+const add2 = (a, b) => {
+return a + b;
+};
 
-    //podemos simplificar en un sola línea
-    const add = (a, b) => a + b;
+//podemos simplificar en un sola línea
+const add = (a, b) => a + b;
 
-    // si solo tien un argumento
-    const addOne = a => a + 1;
+// si solo tien un argumento
+const addOne = a => a + 1;
 
-    // si no tien ningún argumento
-    const addRandom = () => 1+2;
-    ```
+// si no tien ningún argumento
+const addRandom = () => 1+2;
+```
 
 ## Uso de la keyword this y utilidad de ()
 
 - This se usa para referirnos a variables o métodos dentro de la misma clase. Si definimos una variable con this dentro de la clase ésta será accesible desde un objeto de esa clase.
 Aquí JS tiene algo curioso y es que no solo "this" hace referencia a elementos dentro de la clase si no que también hace referencia al elemento que llama a la función.
 
-    ```javascript
-    class NameGeenerator{
-        constructor(){
-          const btn = document.querySelector('button');
-          this.names= ['Desi','Jenni','David']          //asequible a toda la clase
-          this.currentName= 0;
-          btn.addEventListener('click', this.addName); //acceder a 1 método de la clase
-                                                        aquí This hace referencia a la clase
-                                                        xq quien llama al constructor es la clase
-        }
+```javascript
+class NameGeenerator{
+    constructor(){
+      const btn = document.querySelector('button');
+      this.names= ['Desi','Jenni','David']          //asequible a toda la clase
+      this.currentName= 0;
+      btn.addEventListener('click', this.addName); //acceder a 1 método de la clase
+                                                    aquí This hace referencia a la clase
+                                                    xq quien llama al constructor es la clase
+    }
 
-        addName(){
+    addName(){
 
-          const name = new NameField(this.names[this.currentName]); // aquí this hace referencia al elemento que llama a la funcion addName q es el btn
-          this.currentName++;
+      const name = new NameField(this.names[this.currentName]); // aquí this hace referencia al elemento que llama a la funcion addName q es el btn
+      this.currentName++;
 
-          if(currentName>= this.names.length){
-            this.currentName= 0;
-          }
-        }
-
+      if(currentName>= this.names.length){
+        this.currentName= 0;
       }
+    }
 
-      const gen = new NameGeenerator();
-    ```
+  }
+
+  const gen = new NameGeenerator();
+```
 
 Para cambiar este comportamiento del this debemos usar el método bind() que fija a que hace referencia el this para esa función
 
-    ```javascript
-    btn.addEventListener('click', this.addName.bind(this)); //vuelvo a poner this xq en el
-                                                              contexto del contructor quien
-                                                              lo llama es la propia clase
+```javascript
+btn.addEventListener('click', this.addName.bind(this)); //vuelvo a poner this xq en el
+                                                          contexto del contructor quien
+                                                          lo llama es la propia clase
 
-    ```
+```
 
     Otra manera de solucionar esto es usando funciones anónimas pero aquíi otra vez nos encontramos con el problema del this
 
-    ```javascript
-    btn.addEventListener(
-      "click",
-      function () {
-        this.addName();
-      }.bind(this)
-    );
+```javascript
+btn.addEventListener(
+  "click",
+  function () {
+    this.addName();
+  }.bind(this)
+);
 
-    ```
+```
 
 Pero la última solución propuesta x ES6 son las arrow function las cuales nos permiten conservar la referencia del this, es como si llamaramos al this fuera de esa función y por lo tanto dentro del constructor.
 
-    ```javascript
-    btn.addEventListener("click", () => { this.addName(); } );
+```javascript
+btn.addEventListener("click", () => { this.addName(); } );
 
-    ```
+```
 
 - () indican que la función debe ser ejecutada de manera inmediata, así dentro de la clase cuando nos queremos referir a un método utilizamos this.nombreMetodo
 sin los "()" así sin () lo que hacemos es pasarle la referencia de esa función(la dirección de esa función).
 
-    ```javascript
+```javascript
 
-    class NameField{
-      constructor(name){
-        const field = document.createElement('li');
-        field.textContent = name;
-        const nameListHook = document.querySelector('#names');
-        nameListHook.appemdChild(field);
-    }
+class NameField{
+  constructor(name){
+    const field = document.createElement('li');
+    field.textContent = name;
+    const nameListHook = document.querySelector('#names');
+    nameListHook.appemdChild(field);
+}
 
-    class NameGeenerator{
-      constructor(){
-        const btn = document.querySelector('button');
-        btn.addEventListener('click', this.addName); // sin () para q no la ejecute inmediatamente
-      }
+class NameGeenerator{
+  constructor(){
+    const btn = document.querySelector('button');
+    btn.addEventListener('click', this.addName); // sin () para q no la ejecute inmediatamente
+  }
 
-      addName(){
-        const name = new NameField('Dav');
-      }
+  addName(){
+    const name = new NameField('Dav');
+  }
 
-    }
-    ```
+}
+```
 
 ## Objects properties methods
 
 Definir un objeto:
 
-    ```javascript
-      const person = {
-        name: "David",
-        age: 36,
+```javascript
+  const person = {
+    name: "David",
+    age: 36,
 
-        greet() {
-          console.log("hello from " + this.name);
-        },
+    greet() {
+      console.log("hello from " + this.name);
+    },
 
-        greet3: function () {
-          console.log("hello from " + this.name);
-        },
+    greet3: function () {
+      console.log("hello from " + this.name);
+    },
 
-        greet2: () => {
-          console.log("hi" + this.name);
+    greet2: () => {
+      console.log("hi" + this.name);
 
-           /* aquí no debemos usar ArrowsFunction xq
-              mantiene el scoope del elemento q llama
-              a la función y en este caso es el object
-              person el cual pertenece al scoope global
-             así q no "busca dentro del objeto"*/
-        },
-      };
-    ```
+        /* aquí no debemos usar ArrowsFunction xq
+          mantiene el scoope del elemento q llama
+          a la función y en este caso es el object
+          person el cual pertenece al scoope global
+          así q no "busca dentro del objeto"*/
+    },
+  };
+```
 
 ## Arrays y sus métodos
 
-    ```javascript
-    const miArray = ["david", "martin", 36];
+```javascript
+const miArray = ["david", "martin", 36];
 
-    for (let items of miArray) {
-      // "of" conseguimos los datos
-      console.log(items);
-    }
+for (let items of miArray) {
+  // "of" conseguimos los datos
+  console.log(items);
+}
 
-    for (let items in miArray) {
-      // "in" conseguimos los índices
-      console.log(items);
-    }
-    ```
+for (let items in miArray) {
+  // "in" conseguimos los índices
+  console.log(items);
+}
+```
 
 ### Métodos
 
@@ -277,107 +277,107 @@ Definir un objeto:
 
 - Convierte cada elemento del array, conservando el array original y devolviendo otro con los cambios efectuados. Por ejempo añadir a cada item un texto
 
-    ```javascript
-    const miArray = ["david", "martin", 36];
+```javascript
+const miArray = ["david", "martin", 36];
 
-    //1 línea
-    let newArray = miArray.map((item, x) => `ìtem ${x}: ${item}`);
-    //
-    let newArray2 = miArray.map((item, x) => {
-      return `ìtem ${x}: ${item}`;
-    });
+//1 línea
+let newArray = miArray.map((item, x) => `ìtem ${x}: ${item}`);
+//
+let newArray2 = miArray.map((item, x) => {
+  return `ìtem ${x}: ${item}`;
+});
 
-    console.log(newArray);//
-    output: [ 'ìtem 0: david', 'ìtem 1: martin', 'ìtem 2: 36' ]
-    ```
+console.log(newArray);//
+output: [ 'ìtem 0: david', 'ìtem 1: martin', 'ìtem 2: 36' ]
+```
 
 #### slice()
 
 - para copiar arrays su contenido no la referencia así q los arryas serán independientes
 
-    ```javascript
-    let shallowCopy = fruits.slice() // this is how to make a copy
-    ```
+```javascript
+let shallowCopy = fruits.slice() // this is how to make a copy
+```
 
 #### splice()
 
 - Eliminar items
 
-    ```javascript
-    let vegetables = ['Cabbage', 'Turnip', 'Radish', 'Carrot']
-    console.log(vegetables)
-    // ["Cabbage", "Turnip", "Radish", "Carrot"]
+```javascript
+let vegetables = ['Cabbage', 'Turnip', 'Radish', 'Carrot']
+console.log(vegetables)
+// ["Cabbage", "Turnip", "Radish", "Carrot"]
 
-    let pos = 1
-    let n = 2
+let pos = 1
+let n = 2
 
-    let removedItems = vegetables.splice(pos, n)
-    // this is how to remove items, n defines the number of items to be removed,
-    // starting at the index position specified by pos and progressing toward the end of array.
-    ```
+let removedItems = vegetables.splice(pos, n)
+// this is how to remove items, n defines the number of items to be removed,
+// starting at the index position specified by pos and progressing toward the end of array.
+```
 
 #### filter()
 
 - Nos permite generar un nuevo array siguiendo los criterios del filtro.
 
-    ```javascript
-      const updatedroducts = products.filter((element) => element.id !== id);
+```javascript
+  const updatedroducts = products.filter((element) => element.id !== id);
 
-    ```
+```
 
   del array de productos filtramos aquellos que no tengan un id concreto, útil para el método deete by ID
 
 #### foreach()
 - looping arrays
 
-    ```javascript
-    fruits.forEach(function(item, index, miArray) {
-      console.log(item, index)
-    })
-    ```
+```javascript
+fruits.forEach(function(item, index, miArray) {
+  console.log(item, index)
+})
+```
 #### push pop shift unshift
 
 - 
-    ```javascript
-    let fruits = ['Apple', 'Banana']
+```javascript
+let fruits = ['Apple', 'Banana']
 
-    let newLength = fruits.push('Orange')
-    // ["Apple", "Banana", "Orange"]
+let newLength = fruits.push('Orange')
+// ["Apple", "Banana", "Orange"]
 
-    let last = fruits.pop() // remove Orange (from the end)
-    // ["Apple", "Banana"]
+let last = fruits.pop() // remove Orange (from the end)
+// ["Apple", "Banana"]
 
-    let first = fruits.shift() // remove Apple from the front
-    // ["Banana"]
+let first = fruits.shift() // remove Apple from the front
+// ["Banana"]
 
-    let newLength = fruits.unshift('Strawberry') // add to the front
-    // ["Strawberry", "Banana"]
+let newLength = fruits.unshift('Strawberry') // add to the front
+// ["Strawberry", "Banana"]
 
-    ```
+```
 
 #### find and findIndex
 
 - Nos permite obtener el valor/indice del primer elemento del array que cumple con la condición especificada
 obteniendo el índice:
 
-    ```javascript
-    const array1 = [5, 12, 8, 130, 44];
+```javascript
+const array1 = [5, 12, 8, 130, 44];
 
-    let x = array1.findIndex( element => element>5);
-    console.log(array1[x]); // 12
-    console.log( x);        // 1
+let x = array1.findIndex( element => element>5);
+console.log(array1[x]); // 12
+console.log( x);        // 1
 
-    ```
+```
 
     o obtener el valor
 
-    ```javascript
-    const array1 = [5, 12, 8, 130, 44];
+```javascript
+const array1 = [5, 12, 8, 130, 44];
 
-    let x = array1.find( element => element>5);
-    console.log( x);        // 12
+let x = array1.find( element => element>5);
+console.log( x);        // 12
 
-    ```
+```
 
     si no encuentra el valor devuelve un `undefined` el índice devuelve un `-1`
 
@@ -388,43 +388,43 @@ obteniendo el índice:
 - Permite sacar el contenido(propiedades/métodos/items) de un objeto/array y crear otro objeto/array según rodeemos el spread operator.
 Atención no hace un deep copy, es decir si copiamos un array/objeto que contiene otro valor por referencia no crea un nuevo objeto si no q copia la referencia (los métodos no son referencias, se mantiene independientes).
 
-    ```javascript
+```javascript
 
-      const array1 = ["david", "martin", [36]];
-      const arrayCopy = [...array1]; // lo rodeo de "[]" por lo q crea un array
-      array1.push("vertgues");
+  const array1 = ["david", "martin", [36]];
+  const arrayCopy = [...array1]; // lo rodeo de "[]" por lo q crea un array
+  array1.push("vertgues");
 
-      array1[0] = "david2";
-      array1[2][0] = 40;
+  array1[0] = "david2";
+  array1[2][0] = 40;
 
-      console.log(array1);     //  [ 'david2', 'martin', [ 40 ], 'vertgues' ]
-      console.log(arrayCopy); // [ 'david', 'martin', [ 40 ] ]
+  console.log(array1);     //  [ 'david2', 'martin', [ 40 ], 'vertgues' ]
+  console.log(arrayCopy); // [ 'david', 'martin', [ 40 ] ]
 
-      no añade el último elemento pero sí modifica el array anidado xq copió la referencia, NO hizo uno nuevo
-    ```
+  no añade el último elemento pero sí modifica el array anidado xq copió la referencia, NO hizo uno nuevo
+```
 
     Puedo envolverlo con {} para crear un objeto
 
-      ```javascript
-        const arrayCopy2 = { ...array1 };
-        console.log(arrayCopy2); //
-          {
-          '0': 'david2',
-          '1': 'martin',
-          '2': [ 40 ],
-          '3': 'vertgues'
-          }
-      ```
+```javascript
+  const arrayCopy2 = { ...array1 };
+  console.log(arrayCopy2); //
+    {
+    '0': 'david2',
+    '1': 'martin',
+    '2': [ 40 ],
+    '3': 'vertgues'
+    }
+```
 
 ### rest
 
 - Tiene el efecto opuesto a spread, lo que hace es mergear / combinar los argumentos que le pasamos a una función en un array. También son 3 puntitos XD
 
-    ```javascript
-    const toArray = (...args) => args;
-    console.log(toArray(1, 2, 3, 5)); //[ 1, 2, 3, 5 ]
+```javascript
+const toArray = (...args) => args;
+console.log(toArray(1, 2, 3, 5)); //[ 1, 2, 3, 5 ]
 
-    ```
+```
 
 ## Destructuring
 
@@ -432,69 +432,69 @@ Nos permite obtener los datos de un objeto / array de una manera sencilla. Se pu
 
 Le paso un objeto y de ese objeto extraigo la propiedad name y age. Para que funcione tenemos que dar a las variables los mismos nombres que las propiedades del objeto
 
-    ```javascript
-    const person4 = {
-    name: "David",
-    age: 36,
-    hobbies: ["nadar", "correr"],
-    greet() {
-      console.log("hello david");
-    },
-    };
+```javascript
+const person4 = {
+name: "David",
+age: 36,
+hobbies: ["nadar", "correr"],
+greet() {
+  console.log("hello david");
+},
+};
 
-    const printData = ({ name, age }) => console.log(name, age);
+const printData = ({ name, age }) => console.log(name, age);
 
-    ```
+```
   También funciona fuera de las funciones y nos permite crear variables con el nombre de las propiedades de los objetos.
 
-    ```javascript
-      const person4 = {
-        name4: "David",
-        age4: 36,
-        hobbies4: ["nadar", "correr"],
-        greet4() {
-          console.log("hello david");
-        }
-      };
+```javascript
+  const person4 = {
+    name4: "David",
+    age4: 36,
+    hobbies4: ["nadar", "correr"],
+    greet4() {
+      console.log("hello david");
+    }
+  };
 
-      const { name4, age4 } = person4;
+  const { name4, age4 } = person4;
 
-      console.log(name4, age4);
-    ```
+  console.log(name4, age4);
+```
 
   si queremos dar un nombre diferente de las propiedades a las variables usamos la notación `:`
-  ```javascript
-    const { name4 : name, age4 } = person4;
-  ```
+```javascript
+const { name4 : name, age4 } = person4;
+```
   Podemos hacer destructuring de arrays y crear variables separadas, en este caso el destruturing se usa "[]" pero NO crea un array
 
-    ```javascript
-      const array4 = ["fruta", "leche"];
+```javascript
+  const array4 = ["fruta", "leche"];
 
-      let [item1, item2] = array4;
+  let [item1, item2] = array4;
 
-      console.log(item1, item2);//fruta leche
-     //---------------------------------
-      let miArray = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-      ];
-      function miF([x, y, Z, J]) {
-        console.log(x);// [1, 2, 3]
-        console.log(y);// [4, 5, 6]
-        console.log(Z);// [7, 8, 9]
-        console.log(J); //undefined
-      }
-      miF(miArray);
+  console.log(item1, item2);//fruta leche
+  //---------------------------------
+  let miArray = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+  ];
+  function miF([x, y, Z, J]) {
+    console.log(x);// [1, 2, 3]
+    console.log(y);// [4, 5, 6]
+    console.log(Z);// [7, 8, 9]
+    console.log(J); //undefined
+  }
+  miF(miArray);
 
-    //------ FUERA DE FUNCIONES
+//------ FUERA DE FUNCIONES
 
-      let [array1, array2, array3] = miArray;
-      console.log(array1);
-      console.log(array2);
-      console.log(array3);
-    ```
+  let [array1, array2, array3] = miArray;
+  console.log(array1);
+  console.log(array2);
+  console.log(array3);
+```
 
 ## Async code & Promises
 
@@ -504,53 +504,53 @@ Un código síncrono es aquel que se ejecuta línea a línea, es decir un códig
 
 Un código asíncrono no espera a las instrucciones diferidas y continúa con su ejecución. Por lo general la asincronía permite tener una mejor respuesta en las aplicaciones y reduce el tiempo de espera del cliente.
 
-    ```javascript
-      //asíncrono
-      setTimeout(() => {
-        console.log("time done!");
-      }, 2000);
+```javascript
+  //asíncrono
+  setTimeout(() => {
+    console.log("time done!");
+  }, 2000);
 
-      //síncrono
-      console.log("2");
-      console.log("1");
-    ```
+  //síncrono
+  console.log("2");
+  console.log("1");
+```
 
 el setTimeOut es como un callback, después de 2000 ms se ejecuta la función (el console.log) entonces eso es reconocido por JS y aunque el tiempo sea poco(2 s) primero ejecuta los otros console.log y después vuelve al setTimeOut.
 
 Si tenemos varias funciones asincronas puede ser difícil gestionarlas
 
-    ```javascript
-      //asíncrono
-      setTimeout(() => {
-        console.log("time done!");
-      }, 2000);
+```javascript
+  //asíncrono
+  setTimeout(() => {
+    console.log("time done!");
+  }, 2000);
 
-      //síncrono
-      console.log("2");
-      console.log("1");
-    ```
+  //síncrono
+  console.log("2");
+  console.log("1");
+```
 
 ### Promises
 
 Son un objeto de JS que nos permite ejecutar código dependiendo del resultado de otra función. Por ejemplo la concexión a un API para obtener datos si la conexión es exitosa y obtenemos los datos cn la promesa ejecutamos un código y si el servidor devuelve un error ejecutamos otro código distinto.
 Las promesas se crean usando un constructor llamado Promise y pasándole una función que recibe dos parámetros, resolve y reject, que nos permiten indicarle a esta que se resolvió o se rechazó.
 
-      ```javascript
-      const promise = new Promise((resolve, reject) => {
-        const number = Math.floor(Math.random() * 10);
+```javascript
+const promise = new Promise((resolve, reject) => {
+  const number = Math.floor(Math.random() * 10);
 
-        setTimeout(
-          () => number > 5
-                    ? resolve(number)
-                    : reject(new Error("Menor a 5"))
-          ,1000
-        );
-      });
+  setTimeout(
+    () => number > 5
+              ? resolve(number)
+              : reject(new Error("Menor a 5"))
+    ,1000
+  );
+});
 
-      promise
-        .then((number) => console.log(number))
-        .catch((error) => console.error(error));
-      ```
+promise
+  .then((number) => console.log(number))
+  .catch((error) => console.error(error));
+```
 
 ---
 
@@ -581,9 +581,9 @@ Aunque estos módulos están incluidos alguno de ellos no están disponibles de 
 ## Creación del servidor
 
   1. importamos el global module **http**
-         ```javascript
-           const http = require("http");
-         ```
+```javascript
+const http = require("http");
+```
   2. usamos el método **createServer()**, como argumento necesita un **requestListener**, es una función tipo callback
          se ejecutará por cada conexión con el servidor (incoming request).
   3. definir los argumentos de la función requestListener, estos argumentos son dos objetos:
@@ -591,34 +591,34 @@ Aunque estos módulos están incluidos alguno de ellos no están disponibles de 
    - response => respuesta del servidor  
      La función puede ser creada como función a parte, anónima o usando arrow function.
 
-     ```javascript
-       1. Función a parte
+```javascript
+1. Función a parte
 
-         function rqListener(req, res) {}
-         http.createServer(rqListener);
+  function rqListener(req, res) {}
+  http.createServer(rqListener);
 
-       2. anónima
-         http.createServer(function (req, res) {});
+2. anónima
+  http.createServer(function (req, res) {});
 
-       3. arrow funciton
-           http.createServer((req, res) => {console.log(req); });
-     ```
+3. arrow funciton
+    http.createServer((req, res) => {console.log(req); });
+```
 
   4. el método http.createServer() nos devuelve un objeto del tipo servidor.
 
-    ```javascript
-      const server = http.createServer((req, res) => {
-                    console.log(req);
-                  });
+```javascript
+const server = http.createServer((req, res) => {
+              console.log(req);
+            });
 
-    ```
+```
 
   5. cn el servidor definimos, mediante el método listen(), un puerto y un
    hostname,si corremos en local por defecto es "localhost" así q no haría
    falta ponerlo.
-    ```javascript
-      server.listen(3000, "localhost");
-    ```
+```javascript
+server.listen(3000, "localhost");
+```
 
 ### **request object**
 
@@ -641,63 +641,63 @@ Con el objeto response podemos mandar datos de vuelta, para ello utilizamos dife
   3.  **end()**
       Para indicar que finalizamos la respuesta. siempre tenemos que agregar end() para indicar q se finaliza
 
-      ```javascript
-          const server = http.createServer((req, res) => {
+```javascript
+  const server = http.createServer((req, res) => {
 
-              const url = req.url;
+      const url = req.url;
 
-              res.setHeader("Content-Type", "text/html");
-              res.write("<html>");>
-              res.write("<head><title>My Web</title></head>");
-              res.write("<body><h1>Hello world</h1></body>");
-              res.write("</html>");
-              res.end();
-        });
-      ```
+      res.setHeader("Content-Type", "text/html");
+      res.write("<html>");>
+      res.write("<head><title>My Web</title></head>");
+      res.write("<body><h1>Hello world</h1></body>");
+      res.write("</html>");
+      res.end();
+});
+```
 
 #### Routing request
 
 Vamos a gestionar las rutas de nuestro servidor, según el end-point el server nos dará una respuesta u otra.A lo cutre pero sería algo así:
 
-    ```javascript
-    if (url === "/") {
+```javascript
+if (url === "/") {
 
-                res.setHeader("Content-Type", "text/html");
-                res.write("<html>");
-                res.write("<head><title>My Web</title></head>");
-                res.write(
-                "<body>
-                  <h1>Enter massage</h1>
-                  <form action='/message' method='POST'>
-                    <input name='message' type='text'></input>
-                    <button type='submit'>Click Me!</button>
-                  </form>
-                </body>"
-                );
-                res.write("</html>");
-                return res.end();
+          res.setHeader("Content-Type", "text/html");
+          res.write("<html>");
+          res.write("<head><title>My Web</title></head>");
+          res.write(
+          "<body>
+            <h1>Enter massage</h1>
+            <form action='/message' method='POST'>
+              <input name='message' type='text'></input>
+              <button type='submit'>Click Me!</button>
+            </form>
+          </body>"
+          );
+          res.write("</html>");
+          return res.end();
 
-            }
-    ```
+      }
+```
 
 ### Redirectign request & creating a file
 
-    ```javascript
-      // creamos estas variable como globales, fuera del http.reateServer()
-      /--------------------------
-      const fs = require("fs");
-      const method = req.method;
-      //--------------------------
+```javascript
+// creamos estas variable como globales, fuera del http.reateServer()
+/--------------------------
+const fs = require("fs");
+const method = req.method;
+//--------------------------
 
-      if (url == "/message" && method === "POST") {
-        const m = "nothing";
-        fs.writeFileSync("message.txt", m);
-        res.statusCode = 302;
-        res.setHeader("Location", "/");
-        return res.end();
-      }
+if (url == "/message" && method === "POST") {
+  const m = "nothing";
+  fs.writeFileSync("message.txt", m);
+  res.statusCode = 302;
+  res.setHeader("Location", "/");
+  return res.end();
+}
 
-    ```
+```
 
 #### Obtener los datos del body de una request **Streams & Buffers**
 
@@ -709,21 +709,21 @@ Es como funcionan las plataformas de "streaming" como youTube, no cargan el vido
 
 Para leer los datos del request, en nuestro caso datos enviados por un formulario (POST), en node todo son eventos así que para capturar los datos tenemos que implementar un **event listener** que esté pendiente de un evento tipo data, este evento es disparado por el stream cuando hay un paquete de datos (chunk) disponible, cuando el buffer está lleno, entonces podemos empezar a procesar esa parte de los datos y el stream dispara un evento 'data' y genera un chunk_of_data que es un objeto Buffer, cada uno de estos chunk_of_data los vamos metiendo en un array de tal manera q al finalizar el proceso tendremos un array de buffers. Al finalizar el proceso se emite un evento end (ya no hay más datos disponibles). Capturamos ese evento y mediante el método concat() de la clase buffer generamos un nuevo buffer a partir del array de buffers (body) y como sabemos q la info es tipo string lo casteamos a string
 
-    ```javascript
-          const body = [];
-          req.on("data", (chunk_of_data) => {
-            body.push(chunk_of_data);
-          });
-          req.on("end", () => {
-            const parsedBody = Buffer.concat(body).toString();
-            const message = parsedBody.split("=")[1];
-            fs.writeFile("message.txt", message, (err)=>{
-              res.statusCode = 302;
-                res.setHeader("Location", "/");
-                return res.end();
-            });
-          });
-    ```
+```javascript
+    const body = [];
+    req.on("data", (chunk_of_data) => {
+      body.push(chunk_of_data);
+    });
+    req.on("end", () => {
+      const parsedBody = Buffer.concat(body).toString();
+      const message = parsedBody.split("=")[1];
+      fs.writeFile("message.txt", message, (err)=>{
+        res.statusCode = 302;
+          res.setHeader("Location", "/");
+          return res.end();
+      });
+    });
+```
 
 ### Lifecycle de un programa NodeJS
 
@@ -772,44 +772,44 @@ En nodeJS es muy común separar nuestro código en diferentes archivos y luego e
 Podemos crear un nuevo archivo llamado **routes.js** que contendrá los pasos a seguir según la url que le solicitemos al servidor, esto es la función anónima que le pasamos como argumento a **http.createServer()**. Así podemos dejar un archivo con la creación del servidor y un archivo routes dnd encontremoslas urls de éste.
 Nuestro punto de partida será el servidor (app.js) y este requerirá el código del archivo routes, para ello desde el archio routes asignamos nuestra función **(req,res)=>{}** a una constamte llamada **requestHandler** para luego poderla exportar.
 
-    ```javascript
-    const requestHandler = (req, res) => {
-      const url = req.url;
-      const method = req.method;
-      if (url === "/") {
-        res.setHeader("Content-Type", "text/html");
-        res.write("<html>");
-        res.write("<head><title>My Web</title></head>");
-        res.write(
-          "<body><h1>Enter massage</h1> <form action='/message' method='POST'> <input name='message' type='text'></input> <button type='submit'>Click Me!</button> </form></body>"
-        );
-        res.write("</html>");
-        return res.end();
-      }
+```javascript
+const requestHandler = (req, res) => {
+  const url = req.url;
+  const method = req.method;
+  if (url === "/") {
+    res.setHeader("Content-Type", "text/html");
+    res.write("<html>");
+    res.write("<head><title>My Web</title></head>");
+    res.write(
+      "<body><h1>Enter massage</h1> <form action='/message' method='POST'> <input name='message' type='text'></input> <button type='submit'>Click Me!</button> </form></body>"
+    );
+    res.write("</html>");
+    return res.end();
+  }
 
-      if (url === "/message" && method === "POST") {
-        const body = [];
-        req.on("data", (chunk_of_data) => {
-          body.push(chunk_of_data);
-        });
-        req.on("end", () => {
-          const parsedBody = Buffer.concat(body).toString();
-          const message = parsedBody.split("=")[1];
-          fs.writeFileSync("message.txt", message, (err) => {
-            res.statusCode = 302;
-            res.setHeader("Location", "/");
-            return res.end();
-          });
-        });
-      }
-      res.setHeader("Content-Type", "text/html");
-      res.write("<html>");
-      res.write("<head><title>My Web</title></head>");
-      res.write("<body><h1>hello world</h1> </body>");
-      res.write("</html>");
-      res.end();
-    };
-    ```
+  if (url === "/message" && method === "POST") {
+    const body = [];
+    req.on("data", (chunk_of_data) => {
+      body.push(chunk_of_data);
+    });
+    req.on("end", () => {
+      const parsedBody = Buffer.concat(body).toString();
+      const message = parsedBody.split("=")[1];
+      fs.writeFileSync("message.txt", message, (err) => {
+        res.statusCode = 302;
+        res.setHeader("Location", "/");
+        return res.end();
+      });
+    });
+  }
+  res.setHeader("Content-Type", "text/html");
+  res.write("<html>");
+  res.write("<head><title>My Web</title></head>");
+  res.write("<body><h1>hello world</h1> </body>");
+  res.write("</html>");
+  res.end();
+};
+ ```
 
 Y esta constante **requestHandler** será lo que exportemos. Lo podemos hacer de varias maneras pero siempre utilizando un objeto global de JS llamada **module** que tiene una propiedad llamada **exports** a la cual le podemos asignar un valor:
 
