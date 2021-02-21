@@ -98,13 +98,17 @@ module.exports.getOrders = (req, res, next) => {
 };
 
 module.exports.getProduct = (req, res, next) => {
-  Product.getProductById(req.params.productId, (data) => {
-    res.render("shop/product-detail", {
-      product: data,
-      pageTitle: "product detail",
-      path: "/products",
+  Product.getProductById(req.params.productId)
+    .then(([row]) => {
+      res.render("shop/product-detail", {
+        product: row[0],
+        pageTitle: "product detail",
+        path: "/products",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
 };
 
 module.exports.addToCart = (req, res, next) => {

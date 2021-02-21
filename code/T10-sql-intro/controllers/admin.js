@@ -36,11 +36,13 @@ module.exports.getEditProduct = (req, res, next) => {
     });
   });
 };
+
 module.exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.prodId;
   Product.deleteProduct(prodId);
   res.redirect("/admin/products");
 };
+
 module.exports.postEditProduct = (req, res, next) => {
   Product.editProduct(req.body);
   res.redirect("/admin/products");

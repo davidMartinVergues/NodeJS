@@ -33,6 +33,7 @@
       - [Routing request](#routing-request)
     - [Redirectign request & creating a file](#redirectign-request--creating-a-file)
       - [Obtener los datos del body de una request **Streams & Buffers**](#obtener-los-datos-del-body-de-una-request-streams--buffers)
+      - [Streams, buffers, pipes and files](#streams-buffers-pipes-and-files)
     - [Lifecycle de un programa NodeJS](#lifecycle-de-un-programa-nodejs)
       - [The Event loop deeper](#the-event-loop-deeper)
   - [Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-módulos-de-nodejs)
@@ -82,11 +83,39 @@
   - [noSQL](#nosql)
   - [SQL](#sql-1)
     - [Instalando MySQL - KDE neon](#instalando-mysql---kde-neon)
-    - [Configuraciones mysql](#configuraciones-mysql)
+    - [INSTALAR MariaDB](#instalar-mariadb)
+      - [Configuraciones MARIADB](#configuraciones-mariadb)
     - [creación de un nuevo usuario mysql](#creación-de-un-nuevo-usuario-mysql)
+    - [INSTALAR **Dbeaver** - GUI TOOL](#instalar-dbeaver---gui-tool)
+    - [INSTALAR mysql](#instalar-mysql)
+    - [Errores msql](#errores-msql)
+    - [Desinstalar mysql](#desinstalar-mysql)
     - [Usando workbench](#usando-workbench)
     - [Conectar nuestra app a la base de datos SQL](#conectar-nuestra-app-a-la-base-de-datos-sql)
     - [Adaptando nuestra app a la conexión con bbdd](#adaptando-nuestra-app-a-la-conexión-con-bbdd)
+- [Sequelize](#sequelize)
+  - [conectar sequelize a nuestra bbdd](#conectar-sequelize-a-nuestra-bbdd)
+  - [crear modelo con sequelize](#crear-modelo-con-sequelize)
+    - [Creación de product model](#creación-de-product-model)
+    - [Creación de User model](#creación-de-user-model)
+    - [usando el modelo de sequelize](#usando-el-modelo-de-sequelize)
+  - [Reescribiendo los controladores](#reescribiendo-los-controladores)
+    - [admin controller](#admin-controller)
+      - [Crear un nuevo producto](#crear-un-nuevo-producto)
+      - [obtener todos los productos de la bbdd](#obtener-todos-los-productos-de-la-bbdd)
+      - [obtener un producto por su primary_key](#obtener-un-producto-por-su-primary_key)
+      - [update a product](#update-a-product)
+      - [delete a product](#delete-a-product)
+  - [relaciones o asociaciones con sequelize](#relaciones-o-asociaciones-con-sequelize)
+    - [Opciones de los métodos](#opciones-de-los-métodos)
+      - [onDelete and onUpdate](#ondelete-and-onupdate)
+      - [Customizing the foreign key](#customizing-the-foreign-key)
+      - [Asociación obligatoria u opcional](#asociación-obligatoria-u-opcional)
+    - [one-to-one](#one-to-one)
+    - [one-to-Many](#one-to-many)
+    - [Many-to-Many](#many-to-many)
+  - [creación de un user (simple)](#creación-de-un-user-simple)
+  - [Trabajando en el modelo de cart](#trabajando-en-el-modelo-de-cart)
 
 
 
@@ -702,7 +731,7 @@ Vamos a gestionar las rutas de nuestro servidor, según el end-point el server n
 #### Obtener los datos del body de una request **Streams & Buffers**
 
 Node gestiona todos los datos del mismo modo, usando streams y buffers, es una manera muy eficiente de gestionar los datos (leer/escribir datos de entrada en una salida secuencial), son usados para leer archivos, comunicaciones en red,...
-Básicamente un stream lo que hace es partir los datos en fragmentos lo que hace que sean más manegables y que se puedan empezar a procesar a medida que vamos obteniendo estos fragmentos, en lugar de cargar todos los datos en memoria de una vez como se hacía antes.
+Básicamente un stream lo que hace es partir los datos en fragmentos lo que hace que sean más manegables y que se puedan empezar a procesar a medida que vamos obteniendo estos fragmentos, en lugar de cargar todos los wdatos en memoria de una vez como se hacía antes.
 Es como funcionan las plataformas de "streaming" como youTube, no cargan el vido completo para poder visualizarlo sino que trocean la información y la van mandando a trozos para que estos puedan ser procesados de inmediato y el video se reproduzca al momento, creando así un flujo continuo de datos. El papel del buffer es de contenedor, a medida que vamos obteniendo trozos de datos vamos llenando el buffer(éste tiene una memoria fija), así un buffer contiene fragmentos de datos antes de empezar a procesarlos, cuando este se llena los datos empiezan a ser procesados. En el flujo continuo de datos, los buffers serían como un stop para coger ese conjunto de trozos de datos y empezar a procesarlos.  
 ![not found](img/img-9.png)  
 ![not found](img/img-10.png)
@@ -724,6 +753,47 @@ Para leer los datos del request, en nuestro caso datos enviados por un formulari
             });
           });
     ```
+#### Streams, buffers, pipes and files
+
+La manera tradicional de leer un archivo podía ser usando métodos síncronos o asíncronos.
+
+```javascript 
+ // Cargamos todos los datos en memoria y luego los leermos
+const fs = require("fs");
+
+const data = fs.readFileSync(__dirname + "/data.txt", "utf8");
+
+console.log(`printing data\n ${data}`);
+const data2 = fs.readFile(__dirname + "/data.txt", "utf8", (err, data) => {
+  console.log(`printing data2\n ${data}`);
+});
+ 
+```
+
+Usando streams sería así:
+
+```javascript 
+// usando streams, dividimos los datos en chunks y lo leemos poco a poco.
+
+//streams and buffers
+const fs = require("fs");
+
+// creando un stream de lectura
+const readableStream = fs.createReadStream(__dirname + "/data2.txt", {
+  encoding: "utf8",
+});
+// creando un stream de escritura
+const writeableStream = fs.createWriteStream(__dirname + "/copy_of_data2.txt");
+
+readableStream.on("data", (chunk_data_ready) => {
+  console.log(`chunk recived`);
+  writeableStream.write(chunk_data_ready);
+});
+  
+```
+
+Cuando trabajamos con streams se suele usar pipes (tuberias) que es una manera de enlazar streams.
+
 
 ### Lifecycle de un programa NodeJS
 
@@ -2403,6 +2473,67 @@ Se compone de:
 
 ### Instalando MySQL - KDE neon
 
+CON KDE-NEON Y UBUNTU ME DA PROBLEMAS MYSQL ASÍ Q MEJOR INSTALARÉ MARIADB
+
+---
+
+### INSTALAR MariaDB
+
+1. sudo apt update
+2. sudo apt install mariadb-server
+3. sudo mysql_secure_installation
+   
+---
+#### Configuraciones MARIADB  
+1. `sudo mysql_secure_installation`  
+   1. me preguntará si quiero añadir un complemento para passwords
+      1. Press ENTER here if you don’t want to set up the validate password plugin.
+   2. ahora nos pedirá una contraseña para `root`
+2. Remove anonymous users? (Press y|Y for Yes, any other key for No) :
+   1. yes
+3. Disallow root login remotely? (Press y|Y for Yes, any other key for No) : 
+   1. yes
+4. Remove test database and access to it? (Press y|Y for Yes, any other key for No) : 
+   1. yes
+5. Reload privilege tables now? (Press y|Y for Yes, any other key for No) : 
+   1. yes
+6. damos una contraseña a root
+   1. `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';`
+   2. `flush privileges;`  
+
+
+---
+
+### creación de un nuevo usuario mysql
+
+1. nos conectamos como root
+   1. `sudo mariadb`
+2. creación del nuevo user
+   1. `CREATE USER 'newUser'@'%' IDENTIFIED BY 'paswordUser';`
+3. damos privilegios al nuevo user
+   1. `GRANT ALL PRIVILEGES ON *.* TO 'david'@'%' WITH GRANT OPTION;`
+4. `FLUSH PRIVILEGES;`
+
+
+------------------
+
+### INSTALAR **Dbeaver** - GUI TOOL
+
+En lugar de instalar mySQL workbench podemos usar una interfaz gráfica que funciona con varios gestores de bbdd (mariaDB,mysql,...) Dbeaver, es totalmente compatible con linux cosa q workbenh no
+
+```
+sudo snap install dbeaver-ce
+```
+1.  instalar gnome-keyring
+   1. `sudo apt install gnome-keyring` **IMPORTANTE**
+2.  Conocer el puerto donde se conecta mysql server
+   2. `SHOW GLOBAL VARIABLES LIKE 'PORT'`
+
+
+----------------
+
+### INSTALAR mysql
+
 1. `sudo apt install mysql-server`
 2. Si salta un error 
    1. `sudo rm /etc/apt/preferences.d/50-neon-mariadb`
@@ -2419,36 +2550,50 @@ Se compone de:
    3. `snap connect mysql-workbench-community:cups-control`
 6. instalar gnome-keyring
    1. `sudo apt install gnome-keyring` **IMPORTANTE**
-7. Conocer el puerto donde se conecta mysql server
-   1. `SHOW GLOBAL VARIABLES LIKE 'PORT'`
+7. Conocer el puerto donde se conecta mysql server  
+   1. `SHOW GLOBAL VARIABLES LIKE 'PORT' `
 
-### Configuraciones mysql
+### Errores msql 
 
-1. `sudo mysql_secure_installation`
-   1. me preguntará si quiero añadir un complemento para passwords
-      1. Press ENTER here if you don’t want to set up the validate password plugin.
-   2. ahora nos pedirá una contraseña para `root`
-2. Remove anonymous users? (Press y|Y for Yes, any other key for No) :
-   1. yes
-3. Disallow root login remotely? (Press y|Y for Yes, any other key for No) : 
-   1. yes
-4. Remove test database and access to it? (Press y|Y for Yes, any other key for No) : 
-   1. yes
-5. Reload privilege tables now? (Press y|Y for Yes, any other key for No) : 
-   1. yes
-6. damos una contraseña a root
-   1. `ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';`
-   2. `flush privileges;`
+1. sql masked
 
-### creación de un nuevo usuario mysql
+Puede ser que cuando arranquemos el servidor mysql nos aparezca el mensaje de 
+```
+loaded: masked (Reason: Unit mysql.service is masked.)
+```
+Para `unmask` el servicio basta con 
 
-1. nos conectamos como root
-   1. `sudo mysql -p -u root`
-2. creación del nuevo user
-   1. `CREATE USER 'newUser'@'%' IDENTIFIED BY 'paswordUser';`
-3. damos privilegios al nuevo user
-   1. `GRANT ALL PRIVILEGES ON *.* TO 'david'@'%' WITH GRANT OPTION;`
+```
+systemctl unmask mysql.service
+```
+2. el prompt no reconoce el comando mysql 
 
+```
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
+```
+### Desinstalar mysql 
+
+Lo mejor es desinstalar mysql y volverlo a instalar. Para ello:
+
+SI YA TENGO INSTALADO MYSQL PARA PODERLO DESINSTALR :
+
+1. sudo -i
+2. service mysql stop
+3. killall -KILL mysql mysqld_safe mysqld
+4. apt-get --yes purge mysql-server mysql-client
+5. apt-get --yes autoremove --purge
+6. apt-get autoclean
+7. deluser --remove-home mysql
+8. delgroup mysql
+9. rm ~/.mysql_history
+10. rm -rf /etc/apparmor.d/abstractions/mysql /etc/apparmor.d/cache/usr.sbin.mysqld /etc/mysql /var/lib/mysql /var/log/mysql* /var/log/upstart/mysql.log* /var/run/mysqld
+11. updatedb
+12. exit
+
+Este comando muestra todo lo q queda que esté relacionado con mysql, si queremos eliminarlo lo hacemos individualmente. Lo habitual es q quede cosas como modulos de php (eso lo dejamos)
+
+` dpkg -l | grep mysql`
+w
 ### Usando workbench
 1. creación de un schema (database)
    - ![not found](img/img-31.png)  
@@ -2461,9 +2606,11 @@ Se compone de:
 
 ### Conectar nuestra app a la base de datos SQL
 
-1. Instalamos el paqueta `mysql2` como dependencia de producción
+1. Instalamos el paqueta `mysql2` como dependencia de producción tb sirve para mariadb o podemos usar el específico 
    1. ```
         npm install mysql2 --save
+        npm install mariadb --save
+
       ```
 2. Generar el código que nos permitirá conectar con el servidor mysql generando un objeto conexión, que nos permitirá ejecutar queries
    1. Generaremos un tipo de conexión llamada `pool conexions`
@@ -2599,10 +2746,775 @@ Recordemos que no trabajaremos con callbacks sino con promesas. Será una promes
         };
       ```   
 
+Hasta ahora hemos utilizado consultas sql muy simples pero a medida que la app se vuelve más grande las consultas se van comolicando así que para facilitar esto usaremos un modulo de nodeJS `sequelize`
+
+# Sequelize
+
+Este módulo third party, concretamente una libreria 'object relational mapping', lo que hace es mapear la bbdd en objetos JS, que tienen métodos para ayudarnos en el manejo de las consultas sql.
+Básicamente crearemos objetos con sus atributos y sequelize los mapeará en forma de tabla ejecutando internamente una consulta sql.
+
+Sequelize funciona con promesas.
+
+![not found](img/img-36.png)
+
+Sequelize nos permitirá:
+
+1. Definir nuestros modelos (por ejemplo User) lo que sería la tabla
+2. Instanciar objetos en base a ese modelo (sería cada registro de la tabla)
+3. Ejecutar métodos sobre el modelo User (lo que sería las queries)
+4. Nos permitirá crear asociaciónes entre modelos 
+
+![not found](img/img-37.png)
+
+Para instalarlo en nuestro proyecto
+
+```npm 
+npm install sequelize --save 
+```
+
+Es importante recordar que sequelize necesita para funcionar el conector/driver a la bbdd, nosotros usamos mysql2 que también unciona con mariaDB.
+
+Apartir de aquí tenemos que usar sequelize en nuestro modelo y como conexión a la bbdd.
+
+source : https://sequelize.org/master/manual/getting-started.html
+
+## conectar sequelize a nuestra bbdd
+   1. ya no usaremos el siguiente código 
+      1. ```javascript 
+            const mysql = require("mysql2");
+            const pool = mysql.createPool({
+              host: "localhost",
+              user: "david",
+              database: "node-app",
+              password: "dmv1104",
+            });
+
+            module.exports = pool.promise();
+         ```
+   2. en su lugar haremos lo siguiente
+      1. ```javascript 
+            // importo sequelize q en realidad es una clase
+            const Sequelize = require("sequelize");
+
+            // instancio un objeto sequelize con los datos necesrios para relaizar la conexión a bbdd
+            const sequelize = new Sequelize("node-app", "david", "dmv1104", {
+              dialect: "mariadb",
+              host: "localhost",
+            });
+
+            // por default hace una pool conection
+
+            //exportamos
+            module.exports = sequelize;
+         ``` 
+## crear modelo con sequelize
+
+Necesitaremos dos cosas:
+1. importar sequelize
+   1. `const Sequelize = require("sequelize");`
+2. importar nuestro archivo de conexión con la bbdd 
+   1. `const sequelize = require("../util/database");`
+      1. En este archivo no solo genera la conexión con la bbdd si no que genera todo un entorno de sequelize que os permite crear un nuevo modelo
+
+### Creación de product model
+
+Definimos los atributos que tendrá nuestro modelo, campos de la tabla y características como primary_key, campos not null,...
+
+1. 
+   ```javascript 
+    const Product = sequelize.define("product", {
+      id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primayKey: true,
+      },
+      title: Sequelize.STRING, // si solo queremos definir una característica
+      price: {
+        type: Sequelize.DOUBLE,
+        allowNull: false,
+      },
+      imageUrl: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+    });
+
+    module.exports = Product;
+   ```
+### Creación de User model
+
+Creamos este nuevo modelo para imitar la funcionalidad de login y dar un ejemplo de asociaciones/ relaciones con sequelize.
+
+```javascript 
+const Sequelize = require("sequelize");
+
+const sequelize = require("../util/database");
+
+const User = sequelize.define("user", {
+  id: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+});
+
+module.exports = User;
+ 
+```
+
+### usando el modelo de sequelize
+
+Una vez definido el modelo sequelize puede crear esa tabla en nuestra bbdd, para ello en nuestro archivo app.js usamos el método `sync()` del obeto sequelize exportado en el archivo de `utils/database`. Este método revisa los modelos creados en sequelize y lo sincroniza con la bbdd si ya encontrase la tabla en la bbdd no la sobreescribe.
+
+Si hemos modificado algo de las tablas, un campo por ejemplo, al hacer sync como la tabla ya está creada no la sobreescribe con los nuevos cambios, para forzar estos tenemos q añadir `{force:true}` borrará los datos qye ya tengamos almacenados en las tablas.
+
+```javascript 
+ //-----IMPORT DB
+const sequelize_db = require("./util/database");
+//------------ FIN IMPORTS ----------------
+
+sequelize_db
+  .sync({force: true})
+  .then((result) => {
+    console.log(result);
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+```
+
+```javascript 
+ //-----IMPORT DB
+const sequelize_db = require("./util/database");
+//------------ FIN IMPORTS ----------------
+
+sequelize_db
+  .sync()
+  .then((result) => {
+    console.log(result);
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+```
+Cuando  arranquemos nuestra app nos creará la tabla en la bbdd, tiene dos particularidades la tabla la pone en plural, productos, y añade dos campos, createdAt y udatedAt.  
+
+![not found](img/img-38.png)
+
+## Reescribiendo los controladores
+
+### admin controller
+
+#### Crear un nuevo producto
+
+```javascript 
+module.exports.postAddProduct = (req, res, next) => {
+  const title = req.body.title,
+    imgUrl = req.body.imgUrl,
+    price = req.body.price,
+    description = req.body.description;
+
+  Product.create({
+    title: title,
+    imgUrl: imgUrl,
+    price: price,
+    description: description,
+  })
+    .then((result) => {
+        res.redirect("/");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+```
+
+#### obtener todos los productos de la bbdd
+
+Usando el método `findAll()` 
+```javascript 
+module.exports.getIndex = (req, res, next) => {
+  Product.findAll()
+    .then((products) => {
+      res.render("shop/index", {
+        items: products,
+        pageTitle: "Shop_ejs",
+        path: "/",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+```
+
+#### obtener un producto por su primary_key
+
+Usamos el método `findByPK`
+
+```javascript 
+module.exports.getProduct = (req, res, next) => {
+  Product.findByPk(req.params.productId)
+    .then((product) => {
+      res.render("shop/product-detail", {
+        product: product,
+        pageTitle: "product detail",
+        path: "/products",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+```
+
+Podemos usar el método `findAll()` con condiciones `where` tenemos que tener en cuenta que al usar este método nos devuelve un array.
+
+```javascript 
+  Product.findAll({
+    where: {
+      id: req.params.productId,
+    },
+  })
+    .then((products) => {
+      res.render("shop/product-detail", {
+        product: products[0],
+        pageTitle: "product detail",
+        path: "/products",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    }); 
+```
+
+#### update a product
+
+podemos hacerlo de dos maneras, usando el método `update`
+
+```javascript 
+module.exports.postEditProduct = (req, res, next) => {
+  //Product.editProduct(req.body);
+  Product.update(
+    {
+      title: req.body.title,
+      price: req.body.price,
+      description: req.body.description,
+      imgUrl: req.body.imgUrl,
+    },
+    { where: { id: req.body.id } }
+  );
+  res.redirect("/admin/products");
+};
+```
+
+o bien obtener el producto `findByPk` modificarlo y guardar los cambios con el método `save()` con este mñetodo si el artículo no existe lo creará.
+
+```javascript 
+module.exports.postEditProduct = (req, res, next) => {
+  const updatedTitle = req.body.title;
+  const updatedPrice = req.body.price;
+  const updatedDescription = req.body.description;
+  const updatedImgUrl = req.body.imgUrl;
+
+  Product.findByPk(req.body.id)
+    .then((product) => {
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.description = updatedDescription;
+      product.imgUrl = updatedImgUrl;
+
+      return product.save(); // el return aquí me permite añadir el then siguiente y si hubiese un error en save() sería manejado por el catch
+    })
+    .then((result) => {
+      console.log("updted product");
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+};
+```
+#### delete a product
+
+Para ello usamos el método `destroy()`
+
+```javascript 
+ module.exports.postDeleteProduct = (req, res, next) => {
+  const prodId = req.body.prodId;
+  Product.findByPk(prodId)
+    .then((product) => {
+      return product.destroy();
+    })
+    .then((result) => {
+      console.log(result);
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+}; 
+```
+
+## relaciones o asociaciones con sequelize
+
+source : https://sequelize.org/master/manual/assocs.html
+
+Sequelize soporta las relaciones básicas:
+
+1. **one-to-one**
+2. **One-to-Many**
+3. **Many-to-Many**
+
+En sequelize para poder hacer estas relaciones usamos
+
+1. **.hasOne()**
+2. **.hasMany()**
+3. **.belongsTo()**
+4. **.belongsToMany()**
+
+
+### Opciones de los métodos
+
+Podemos añadir opciones a la llamada de los métodos pasando un segundo parámetro.
+
+#### onDelete and onUpdate
+
+Por defecto en una relación one-to-one / one-to-Many:
+1. `on delete` está como `set Null`,
+   lo que significa que si se borra un registro de la tabla madre la foreign key se setea como Null.
+2. `on update` está como `cascade`,
+   lo que significa que si se actualiza un registro de la tabla madre la tb se actualiza en la taba hija
+
+En una relación many-to-many:
+
+1. `on delete` está como `cascade`
+2. `on update` está como `cascade`
+
+
+Las posibles opciones son `RESTRICT`, `CASCADE`, `NO ACTION`, `SET DEFAULT` and `SET NULL`
+
+RESTRICT=> restringido, no permite borrar/actualizar un registro q una foreign_key
+Esto se puede cambiar de la siguiente manera:
+
+```javascript 
+Foo.hasOne(Bar, {
+  onDelete: 'RESTRICT',
+  onUpdate: 'RESTRICT'
+});
+Bar.belongsTo(Foo);
+```
+
+#### Customizing the foreign key
+
+Podemos cambiar los nombres de la foreign keys
+
+```javascript 
+// Option 1
+Foo.hasOne(Bar, {
+  foreignKey: 'myFooId'
+});
+Bar.belongsTo(Foo);
+
+// Option 2
+Foo.hasOne(Bar, {
+  foreignKey: {
+    name: 'myFooId'
+  }
+});
+Bar.belongsTo(Foo);
+
+// Option 3
+Foo.hasOne(Bar);
+Bar.belongsTo(Foo, {
+  foreignKey: 'myFooId'
+});
+ 
+```
+#### Asociación obligatoria u opcional
+
+Por defecto en sequelize todas las foreignKey pueden ser null, lo que permite q una entidad A pueda existir sin requerir la entidad B. 
+
+Esto se puede cambiar, que una entidad no pueda existir sin otra entidad, para ello debemos especicar un segundo parámetro a las llamadas de los métodos.
+
+```javascript 
+Foo.hasOne(Bar, {
+  foreignKey: {
+    allowNull: false
+  }
+});
+ 
+```
+
+### one-to-one
+
+Una relación de este tipo se establece entre dos entidades, A y B, cuando un elemento de la entidad A solo puede estar unido a un elemento de la entidad B y viceversa, por ejemplo conjunto de humanos del planeta y conjunto de los cerebros humanos del planeta (:P). 
+
+La cosa se leería así: 
+   1. cada humano tiene un cerebro
+   2. cada cerebro pertenece a un humano
+
+Para escribir este tipo de relación con sequelize usamos:
+
+```javascript 
+human.hasOne(brain)
+brain.belongsTo(human) 
+```
+Esta relación se resume en que un único registro de la tabla A está unido únicamente a un registro de la tabla B.
+
+Para poder unir ambas tablas se debe usar una `foreign_key`, en una relación one-to-one la foreign_key puede ir en una u otra tabla. La foreignKey es la primary key de la tabla madre. La manera de escribir los métodos establece en qué tabla se escribe la foreing_key. Por ejemplo:
+
+```javascript 
+human.hasOne(brain)
+brain.belongsTo(human) 
+```
+La foreign_key se escribe en la tabla brain, lo marca el método hasOne().
+
+A la entidad/modelo situada a la izquierda del punto se le llama entidad **source**/**origen** y la que está a la derecha entidad/modelo **target**/**objetivo**
+
+Cuando usamos .hasOne() la entidad origen (human) gana los siguientes métodos especiales, son del tipo **promesas**:
+
+  1. human.getBrain()
+  2. human.setBrain()
+  3. human.createBrain()
+
+Cuando usamos .belongsTo() 
+
+  1. brain.getHuman()
+  2. brain.setHuman()
+  3. brain.createHuman()
 
 
 
+### one-to-Many
+
+Una relación de este tipo se establece entre dos entidades, A y B cuando un elemento de la unidad A puede estar ligado a varios elementos de la entidad B pero un elemento de la entidad B solo puede estar unido a un único elemento de la entidad A, por ejemplo un libro (A) y sus páginas (B):
+
+La cosa se leería así: 
+   1. un libro tiene varias páginas 
+   2. todas estas páginas pertenecen a un único libro
+
+Un source(libro) lo conectamos con múltiples targets(páginas) y todos estos targets(páginas) se conectan con una única fuente(libro).
+
+Teniendo esto claro sólo hay un lugar donde la foreign key puede ir y es en cada uno de los registros target, es decir book_id será la foreign_key de los distintos registros de la tabla páginas, ya que si fuera al revés tendrámos múltiples foreign_keys (correspondientes a cada página) para colocarlas en un único registro (libro)
+
+Para escribir este tipo de relación con sequelize usamos:
+
+```javascript 
+book.hasMany(page)
+page.belongsTo(book) 
+```
+Esta relación se resume en que un único registro de la tabla A está unido a múltiples resgistros de la tabla B pero un registro de la tabla B solo está unido a un registro de la tabla A
+
+Cuando usamos .hasMany() la entidad origen (book) gana los siguientes métodos especiales:
+
+  1. book.getPages()
+  2. book.countPages()
+  3. book.hasPage()
+  4. book.hasPages()
+  5. book.setPages()
+  6. book.addPage()
+  7. book.addPages()
+  8. book.removePage()
+  9. book.removePages()
+  10. book.createPage()
+
+Cuando usamos .belongsTo() 
+
+  1. page.getBook()
+  2. page.setBook()
+  3. page.createBook()
+  4. 
+
+### Many-to-Many
+
+Una relación de este tipo se establece entre dos entidades, A y B cuando un elemento de la unidad A puede estar ligado a varios elementos de la entidad B y viceversa, por ejemplo un producto (A) y carrito de compra (B):
+
+La cosa se leería así: 
+   1. un producto puede pertenecer a varios carritos de compra 
+   2. un carrito de compra puede tener varios productos
+
+o actor (A) y movie(B)
+
+La cosa se leería así: 
+   1. un actor puede participar en varias peliculas 
+   2. en una pelicula pueden participar varios actores
+
+Para escribir este tipo de relación con sequelize usamos:
+
+```javascript 
+movie.belongsToMany(actor, {through: ActorMovies})
+actor.belongsToMany(movie, {through: ActorMovies}) 
+```
+Cuando usamos `belongsToMany` nos bliga a especificar el nombre (String) de la tabla auxiliar, también se le puede pasar un modelo ya hecho. 
+
+Este tipo de relaciones se implementan en la bbdd creando una tabla llamada `tabla asociativa` o tb **join table** o **through table**, que en código de arriba hay que especificar el nombre de esta tabla, ActorMovies, la cual está formada por dos foreign_keys (movie_id y actor_id) y la primary_key de esta tabla está formada por la unión de las dos foreign_key.
+Esta tabla aux es necesaria xq a diferencia de las otras dos relaciones, en un many-to-many tendríamos que tener multiples foreign_keys an ambas tablas lo q no es posible por lo q generamos una tabla aux donde cada registro esrtá formado por movie_id y actor_id, esta combinación siempre será diferente para una movie_id (por ejmplo id:1) tendremos diferentes actor_id(por ejemplo id:1,2,3) así la primary_key resultante sería 1-1, 1-2, 1-3,... enlazando una pelicula con varios actores o al revés ese mismo actor con otras movies 2-3, 3-3,4-3, ...
+
+```javascript 
+const Movie = sequelize.define('Movie', { name: DataTypes.STRING });
+const Actor = sequelize.define('Actor', { name: DataTypes.STRING });
+
+Movie.belongsToMany(Actor, { through: 'ActorMovies' });
+Actor.belongsToMany(Movie, { through: 'ActorMovies' }); 
+```
+la consulta sql resultante sería:
+
+```sql
+CREATE TABLE IF NOT EXISTS "ActorMovies" (
+  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "MovieId" INTEGER REFERENCES "Movies" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "ActorId" INTEGER REFERENCES "Actors" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY ("MovieId","ActorId")
+);
+```
+
+Esta tabla auxiliar la crea automáticamene sequelize solo le tenemos que especificar un nombre, aunque también le podemos pasar un modelo ya hecho y sequealize añada las foreign keys y la primary key
+
+```javascript 
+const Movie = sequelize.define('Movie', { name: DataTypes.STRING });
+const Actor = sequelize.define('Actor', { name: DataTypes.STRING });
+// aux table 
+const ActorMovies = sequelize.define('ActorMovies', {
+  MovieId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Movie, // 'Movies' would also work
+      key: 'id'
+    }
+  },
+  ActorId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Actor, // 'Actors' would also work
+      key: 'id'
+    }
+  }
+});
+Movie.belongsToMany(Actor, { through: ActorMovies });
+Actor.belongsToMany(Movie, { through: ActorMovies });
+```
+
+```sql 
+CREATE TABLE IF NOT EXISTS "ActorMovies" (
+  "MovieId" INTEGER NOT NULL REFERENCES "Movies" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+  "ActorId" INTEGER NOT NULL REFERENCES "Actors" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+  UNIQUE ("MovieId", "ActorId"),     -- Note: Sequelize generated this UNIQUE constraint but
+  PRIMARY KEY ("MovieId","ActorId")  -- it is irrelevant since it's also a PRIMARY KEY
+);
+  
+```
+
+Por defecto una relación many-to-many tiene:
+1. `on delete` está como `cascade`
+2. `on update` está como `cascade`
 
 
+Cuando usamos .belongsToMany() la entidad origen gana los siguientes métodos especiales:
 
+  1. cart.getProducts()
+  2. cart.countProducts()
+  3. cart.hasProduct()
+  4. cart.hasProducts()
+  5. cart.setProducts()
+  6. cart.addProduct()
+  7. cart.addProducts()
+  8. cart.removeProduct()
+  9. cart.removeProducts()
+  10. cart.createProduct()
 
+----
+
+Vamos a comprobar como los diferentes modelos de nuestra app se relacionan entre sí 
+
+![not found](img/img-39.png)
+
+Para construir estas relaciones hacemos:
+
+1. Que un usuario puede crear un producto y que un producto solo puede ser creado por un usuario concreto, por defecto sequelize genera un nuevo campo en product que será `userId` la foreign_key y establece  on delete / on update como cascada (si se borra/actualiza el usuario que ese producto tb se borre/actualice)
+   
+2. finalmente establecemos que un usuario puede crear variosproductos
+  
+```javascript 
+const sequelize_db = require("./util/database");
+const User = require("./model/user");
+const Product = require("./model/product");
+
+Product.belongsTo(User);
+User.hasMany(Product); 
+
+sequelize_db
+  .sync({force:true})
+  .then((result) => {
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+```
+Con estos métodos podems modificar el nombre de la foreign_key y como queremos q actue onDelete y onUpdate. 
+
+```javascript 
+ Product.belongsTo(User, {
+   foreignKey: 'usuario', 
+   onDelete: 'RESTRICT',
+   onUpdate: 'RESTRICT' 
+  });
+ 
+```
+una vez actualizada las tablas con sus relaciones quitamos lo de (force:true) para q no nos borre las tablas cada vez q nos conectamos.
+
+## creación de un user (simple)
+
+Creamos un usuario, para ello después de llamar al método sync() buscamos en la bbdd si hay registrado un user (User.findByPk(1)) esta consulta nos devuelve o bien un user o bien null, en el siguiente then chequeamos con un if estas dos opciones así q si devuelve un user hacemos return  si no lo creamos y lo devolvemos. Todo return dentro de un then() es interpretado como una nueva promesa así que lo podemos capturar en un nuevo then y es en este último then donde ponemos a escuchar nuestro servidor.
+
+```javascript 
+sequelize_db
+  .sync()
+  .then((result) => {
+    return User.findByPk(1);
+  })
+  .then((user) => {
+    if (!user) {
+      return User.create({
+        name: "David",
+        email: "dmverges@gmail.com",
+      });
+    }
+    return user;
+  })
+  .then((user) => {
+    app.listen(3000);
+    console.log(user);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+```
+
+Tenemos q añadir un código más y es guardar nuestro user activo en cada una de las llamadas al servidor (request) para ello utilizamos el middleware app.use, que se ejecuta con cvada llamada al servidor y creamos en el objeto request una variable user que contendrá nuestro objeto user de sequelize. 
+
+```javascript 
+ app.use((req, res, next) => {
+  User.findByPk(1)
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => console.log(err));
+}); 
+```
+CUando arrancamos el servidor con npm start, este código de arriba no se ejecuta xq no ha habido una request al servidor así q no tenemos problemas de que devuelva un null, se ejecutará siempre el sync() por lo q en la primera request ya tendremos un user en nuestra bbdd.
+
+Una vez hecho esto cuando creamos un objeto hay q darle el ide del usuario que lo crea.
+
+```javascript 
+module.exports.postAddProduct = (req, res, next) => {
+  const title = req.body.title,
+    imgUrl = req.body.imgUrl,
+    price = req.body.price,
+    description = req.body.description;
+
+  Product.create({
+    title: title,
+    imgUrl: imgUrl,
+    price: price,
+    description: description,
+    userId: req.user.id, // aquí añado el userId
+  })
+    .then((result) => {
+      res.redirect("/admin/products");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+```
+
+Ahora bien hay una manera más elegante de hacer esto y es que cuando establecemos una relación entre objetos de sequelize se crean métodos especiales, y uno de ellos es q con el método Product.belongsTo(User) lo que decimos con esto es q un product depende de un user le da los objetos user un metodo para crear objetos del tipo productos (createProduct()), aprovechamos que guardamos el user en la request para crear productos asociados a ese usuario, de la siguiente manera:
+
+```javascript 
+module.exports.postAddProduct = (req, res, next) => {
+  const title = req.body.title,
+    imgUrl = req.body.imgUrl,
+    price = req.body.price,
+    description = req.body.description;
+// con el objeto user del request creamos los productos 
+  req.user
+    .createProduct({
+      title: title,
+      imgUrl: imgUrl,
+      price: price,
+      description: description,
+    })
+    .then((result) => {
+      res.redirect("/admin/products");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+```
+Otro método importante que nos genera sequelize  es `getProducts()` para buscar productos desde el user concreto que los generó.
+
+```javascript 
+module.exports.getEditProduct = (req, res, next) => {
+  const prodId = req.params.prodId;
+
+  req.user
+    .getProducts({ where: { id: prodId } })
+    .then((products) => {
+      if (!products[0]) {
+        return res.redirect("/");
+      }
+
+      res.render("admin/edit-product", {
+        pageTitle: "Edi product - ejs",
+        path: "/admin/edit-product",
+        prodInfo: products[0],
+      });
+    })
+    .catch((err) => console.log(err));
+}; 
+
+```
+
+## Trabajando en el modelo de cart
+
+Tenemos que tener en cuenta que un cart pertenece a un único user pero puede contener multiples productos y de cada producto puede pertenecer a más de uno cart. Así que:
+
+```javascript 
+Product.belongsTo(User);
+User.hasMany(Product);
+
+User.hasOne(Cart);
+//Cart.belongsTo(User) // se puede especificar xo es redundante
+
+Cart.hasMany(Product);
+Product.belongsToMany(Cart, { through: CartItem }); 
+```
+En la sentencia `Product.belongsToMany(Cart, { through: CartItem }); ` necesitamos una tabla auxiliar para poder hacer los emparejamientos entre el carro y todos los productos que contiene, mediante el atributo {through : CartItem} especificamos la tabla auxiliar que utilizaremos.
+
+UNa vez hecho esto para cada usuario que se logea deberemos crearle un carrito:
+
+```javascript 
+ 
+
+```

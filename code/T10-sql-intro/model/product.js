@@ -29,7 +29,9 @@ module.exports.classProduct = class Product {
     return db.execute("SELECT * FROM products");
   }
 
-  static getProductById(id) {}
+  static getProductById(id) {
+    return db.execute("SELECT * FROM products WHERE id = ?", [id]);
+  }
 
   static editProduct(prod) {}
 };
