@@ -155,150 +155,151 @@ Js es un lenguaje débilmente tipado, podemos usar el paradigma orintado a objet
 
 ## Sintaxi de arrow function
 
-    ```javascript
-    const add2 = (a, b) => {
-    return a + b;
-    };
+```javascript
+const add2 = (a, b) => {
+return a + b;
+};
 
-    //podemos simplificar en un sola línea
-    const add = (a, b) => a + b;
+//podemos simplificar en un sola línea
+const add = (a, b) => a + b;
 
-    // si solo tien un argumento
-    const addOne = a => a + 1;
+// si solo tien un argumento
+const addOne = a => a + 1;
 
-    // si no tien ningún argumento
-    const addRandom = () => 1+2;
-    ```
+// si no tien ningún argumento
+const addRandom = () => 1+2;
+```
+cp
 
 ## Uso de la keyword this y utilidad de ()
 
 - This se usa para referirnos a variables o métodos dentro de la misma clase. Si definimos una variable con this dentro de la clase ésta será accesible desde un objeto de esa clase.
 Aquí JS tiene algo curioso y es que no solo "this" hace referencia a elementos dentro de la clase si no que también hace referencia al elemento que llama a la función.
 
-    ```javascript
-    class NameGeenerator{
-        constructor(){
-          const btn = document.querySelector('button');
-          this.names= ['Desi','Jenni','David']          //asequible a toda la clase
-          this.currentName= 0;
-          btn.addEventListener('click', this.addName); //acceder a 1 método de la clase
-                                                        aquí This hace referencia a la clase
-                                                        xq quien llama al constructor es la clase
-        }
+```javascript
+class NameGeenerator{
+    constructor(){
+      const btn = document.querySelector('button');
+      this.names= ['Desi','Jenni','David']          //asequible a toda la clase
+      this.currentName= 0;
+      btn.addEventListener('click', this.addName); //acceder a 1 método de la clase
+                                                    aquí This hace referencia a la clase
+                                                    xq quien llama al constructor es la clase
+    }
 
-        addName(){
+    addName(){
 
-          const name = new NameField(this.names[this.currentName]); // aquí this hace referencia al elemento que llama a la funcion addName q es el btn
-          this.currentName++;
+      const name = new NameField(this.names[this.currentName]); // aquí this hace referencia al elemento que llama a la funcion addName q es el btn
+      this.currentName++;
 
-          if(currentName>= this.names.length){
-            this.currentName= 0;
-          }
-        }
-
+      if(currentName>= this.names.length){
+        this.currentName= 0;
       }
+    }
 
-      const gen = new NameGeenerator();
-    ```
+  }
+
+  const gen = new NameGeenerator();
+```
 
 Para cambiar este comportamiento del this debemos usar el método bind() que fija a que hace referencia el this para esa función
 
-    ```javascript
-    btn.addEventListener('click', this.addName.bind(this)); //vuelvo a poner this xq en el
-                                                              contexto del contructor quien
-                                                              lo llama es la propia clase
+```javascript
+btn.addEventListener('click', this.addName.bind(this)); //vuelvo a poner this xq en el
+                                                          contexto del contructor quien
+                                                          lo llama es la propia clase
 
-    ```
+```
 
     Otra manera de solucionar esto es usando funciones anónimas pero aquíi otra vez nos encontramos con el problema del this
 
-    ```javascript
-    btn.addEventListener(
-      "click",
-      function () {
-        this.addName();
-      }.bind(this)
-    );
+```javascript
+btn.addEventListener(
+  "click",
+  function () {
+    this.addName();
+  }.bind(this)
+);
 
-    ```
+```
 
 Pero la última solución propuesta x ES6 son las arrow function las cuales nos permiten conservar la referencia del this, es como si llamaramos al this fuera de esa función y por lo tanto dentro del constructor.
 
-    ```javascript
-    btn.addEventListener("click", () => { this.addName(); } );
+```javascript
+btn.addEventListener("click", () => { this.addName(); } );
 
-    ```
+```
 
 - () indican que la función debe ser ejecutada de manera inmediata, así dentro de la clase cuando nos queremos referir a un método utilizamos this.nombreMetodo
 sin los "()" así sin () lo que hacemos es pasarle la referencia de esa función(la dirección de esa función).
 
-    ```javascript
+```javascript
 
-    class NameField{
-      constructor(name){
-        const field = document.createElement('li');
-        field.textContent = name;
-        const nameListHook = document.querySelector('#names');
-        nameListHook.appemdChild(field);
-    }
+class NameField{
+  constructor(name){
+    const field = document.createElement('li');
+    field.textContent = name;
+    const nameListHook = document.querySelector('#names');
+    nameListHook.appemdChild(field);
+}
 
-    class NameGeenerator{
-      constructor(){
-        const btn = document.querySelector('button');
-        btn.addEventListener('click', this.addName); // sin () para q no la ejecute inmediatamente
-      }
+class NameGeenerator{
+  constructor(){
+    const btn = document.querySelector('button');
+    btn.addEventListener('click', this.addName); // sin () para q no la ejecute inmediatamente
+  }
 
-      addName(){
-        const name = new NameField('Dav');
-      }
+  addName(){
+    const name = new NameField('Dav');
+  }
 
-    }
-    ```
+}
+```
 
 ## Objects properties methods
 
 Definir un objeto:
 
-    ```javascript
-      const person = {
-        name: "David",
-        age: 36,
+```javascript
+  const person = {
+    name: "David",
+    age: 36,
 
-        greet() {
-          console.log("hello from " + this.name);
-        },
+    greet() {
+      console.log("hello from " + this.name);
+    },
 
-        greet3: function () {
-          console.log("hello from " + this.name);
-        },
+    greet3: function () {
+      console.log("hello from " + this.name);
+    },
 
-        greet2: () => {
-          console.log("hi" + this.name);
+    greet2: () => {
+      console.log("hi" + this.name);
 
-           /* aquí no debemos usar ArrowsFunction xq
-              mantiene el scoope del elemento q llama
-              a la función y en este caso es el object
-              person el cual pertenece al scoope global
-             así q no "busca dentro del objeto"*/
-        },
-      };
-    ```
+        /* aquí no debemos usar ArrowsFunction xq
+          mantiene el scoope del elemento q llama
+          a la función y en este caso es el object
+          person el cual pertenece al scoope global
+          así q no "busca dentro del objeto"*/
+    },
+  };
+```
 
 ## Arrays y sus métodos
 
-    ```javascript
-    const miArray = ["david", "martin", 36];
+```javascript
+const miArray = ["david", "martin", 36];
 
-    for (let items of miArray) {
-      // "of" conseguimos los datos
-      console.log(items);
-    }
+for (let items of miArray) {
+  // "of" conseguimos los datos
+  console.log(items);
+}
 
-    for (let items in miArray) {
-      // "in" conseguimos los índices
-      console.log(items);
-    }
-    ```
+for (let items in miArray) {
+  // "in" conseguimos los índices
+  console.log(items);
+}
+```
 
 ### Métodos
 
@@ -306,107 +307,107 @@ Definir un objeto:
 
 - Convierte cada elemento del array, conservando el array original y devolviendo otro con los cambios efectuados. Por ejempo añadir a cada item un texto
 
-    ```javascript
-    const miArray = ["david", "martin", 36];
+```javascript
+const miArray = ["david", "martin", 36];
 
-    //1 línea
-    let newArray = miArray.map((item, x) => `ìtem ${x}: ${item}`);
-    //
-    let newArray2 = miArray.map((item, x) => {
-      return `ìtem ${x}: ${item}`;
-    });
+//1 línea
+let newArray = miArray.map((item, x) => `ìtem ${x}: ${item}`);
+//
+let newArray2 = miArray.map((item, x) => {
+  return `ìtem ${x}: ${item}`;
+});
 
-    console.log(newArray);//
-    output: [ 'ìtem 0: david', 'ìtem 1: martin', 'ìtem 2: 36' ]
-    ```
+console.log(newArray);//
+output: [ 'ìtem 0: david', 'ìtem 1: martin', 'ìtem 2: 36' ]
+```
 
 #### slice()
 
 - para copiar arrays su contenido no la referencia así q los arryas serán independientes
 
-    ```javascript
-    let shallowCopy = fruits.slice() // this is how to make a copy
-    ```
+```javascript
+let shallowCopy = fruits.slice() // this is how to make a copy
+```
 
 #### splice()
 
 - Eliminar items
 
-    ```javascript
-    let vegetables = ['Cabbage', 'Turnip', 'Radish', 'Carrot']
-    console.log(vegetables)
-    // ["Cabbage", "Turnip", "Radish", "Carrot"]
+```javascript
+let vegetables = ['Cabbage', 'Turnip', 'Radish', 'Carrot']
+console.log(vegetables)
+// ["Cabbage", "Turnip", "Radish", "Carrot"]
 
-    let pos = 1
-    let n = 2
+let pos = 1
+let n = 2
 
-    let removedItems = vegetables.splice(pos, n)
-    // this is how to remove items, n defines the number of items to be removed,
-    // starting at the index position specified by pos and progressing toward the end of array.
-    ```
+let removedItems = vegetables.splice(pos, n)
+// this is how to remove items, n defines the number of items to be removed,
+// starting at the index position specified by pos and progressing toward the end of array.
+```
 
 #### filter()
 
 - Nos permite generar un nuevo array siguiendo los criterios del filtro.
 
-    ```javascript
-      const updatedroducts = products.filter((element) => element.id !== id);
+```javascript
+  const updatedroducts = products.filter((element) => element.id !== id);
 
-    ```
+```
 
   del array de productos filtramos aquellos que no tengan un id concreto, útil para el método deete by ID
 
 #### foreach()
 - looping arrays
 
-    ```javascript
-    fruits.forEach(function(item, index, miArray) {
-      console.log(item, index)
-    })
-    ```
+```javascript
+fruits.forEach(function(item, index, miArray) {
+  console.log(item, index)
+})
+```
 #### push pop shift unshift
 
 - 
-    ```javascript
-    let fruits = ['Apple', 'Banana']
+```javascript
+let fruits = ['Apple', 'Banana']
 
-    let newLength = fruits.push('Orange')
-    // ["Apple", "Banana", "Orange"]
+let newLength = fruits.push('Orange')
+// ["Apple", "Banana", "Orange"]
 
-    let last = fruits.pop() // remove Orange (from the end)
-    // ["Apple", "Banana"]
+let last = fruits.pop() // remove Orange (from the end)
+// ["Apple", "Banana"]
 
-    let first = fruits.shift() // remove Apple from the front
-    // ["Banana"]
+let first = fruits.shift() // remove Apple from the front
+// ["Banana"]
 
-    let newLength = fruits.unshift('Strawberry') // add to the front
-    // ["Strawberry", "Banana"]
+let newLength = fruits.unshift('Strawberry') // add to the front
+// ["Strawberry", "Banana"]
 
-    ```
+```
 
 #### find and findIndex
 
 - Nos permite obtener el valor/indice del primer elemento del array que cumple con la condición especificada
 obteniendo el índice:
 
-    ```javascript
-    const array1 = [5, 12, 8, 130, 44];
+```javascript
+const array1 = [5, 12, 8, 130, 44];
 
-    let x = array1.findIndex( element => element>5);
-    console.log(array1[x]); // 12
-    console.log( x);        // 1
+let x = array1.findIndex( element => element>5);
+console.log(array1[x]); // 12
+console.log( x);        // 1
 
-    ```
+```
 
     o obtener el valor
 
-    ```javascript
-    const array1 = [5, 12, 8, 130, 44];
+```javascript
+const array1 = [5, 12, 8, 130, 44];
 
-    let x = array1.find( element => element>5);
-    console.log( x);        // 12
+let x = array1.find( element => element>5);
+console.log( x);        // 12
 
-    ```
+```
 
     si no encuentra el valor devuelve un `undefined` el índice devuelve un `-1`
 
@@ -417,43 +418,43 @@ obteniendo el índice:
 - Permite sacar el contenido(propiedades/métodos/items) de un objeto/array y crear otro objeto/array según rodeemos el spread operator.
 Atención no hace un deep copy, es decir si copiamos un array/objeto que contiene otro valor por referencia no crea un nuevo objeto si no q copia la referencia (los métodos no son referencias, se mantiene independientes).
 
-    ```javascript
+```javascript
 
-      const array1 = ["david", "martin", [36]];
-      const arrayCopy = [...array1]; // lo rodeo de "[]" por lo q crea un array
-      array1.push("vertgues");
+  const array1 = ["david", "martin", [36]];
+  const arrayCopy = [...array1]; // lo rodeo de "[]" por lo q crea un array
+  array1.push("vertgues");
 
-      array1[0] = "david2";
-      array1[2][0] = 40;
+  array1[0] = "david2";
+  array1[2][0] = 40;
 
-      console.log(array1);     //  [ 'david2', 'martin', [ 40 ], 'vertgues' ]
-      console.log(arrayCopy); // [ 'david', 'martin', [ 40 ] ]
+  console.log(array1);     //  [ 'david2', 'martin', [ 40 ], 'vertgues' ]
+  console.log(arrayCopy); // [ 'david', 'martin', [ 40 ] ]
 
-      no añade el último elemento pero sí modifica el array anidado xq copió la referencia, NO hizo uno nuevo
-    ```
+  no añade el último elemento pero sí modifica el array anidado xq copió la referencia, NO hizo uno nuevo
+```
 
     Puedo envolverlo con {} para crear un objeto
 
-      ```javascript
-        const arrayCopy2 = { ...array1 };
-        console.log(arrayCopy2); //
-          {
-          '0': 'david2',
-          '1': 'martin',
-          '2': [ 40 ],
-          '3': 'vertgues'
-          }
-      ```
+```javascript
+  const arrayCopy2 = { ...array1 };
+  console.log(arrayCopy2); //
+    {
+    '0': 'david2',
+    '1': 'martin',
+    '2': [ 40 ],
+    '3': 'vertgues'
+    }
+```
 
 ### rest
 
 - Tiene el efecto opuesto a spread, lo que hace es mergear / combinar los argumentos que le pasamos a una función en un array. También son 3 puntitos XD
 
-    ```javascript
-    const toArray = (...args) => args;
-    console.log(toArray(1, 2, 3, 5)); //[ 1, 2, 3, 5 ]
+```javascript
+const toArray = (...args) => args;
+console.log(toArray(1, 2, 3, 5)); //[ 1, 2, 3, 5 ]
 
-    ```
+```
 
 ## Destructuring
 
@@ -461,69 +462,69 @@ Nos permite obtener los datos de un objeto / array de una manera sencilla. Se pu
 
 Le paso un objeto y de ese objeto extraigo la propiedad name y age. Para que funcione tenemos que dar a las variables los mismos nombres que las propiedades del objeto
 
-    ```javascript
-    const person4 = {
-    name: "David",
-    age: 36,
-    hobbies: ["nadar", "correr"],
-    greet() {
-      console.log("hello david");
-    },
-    };
+```javascript
+const person4 = {
+name: "David",
+age: 36,
+hobbies: ["nadar", "correr"],
+greet() {
+  console.log("hello david");
+},
+};
 
-    const printData = ({ name, age }) => console.log(name, age);
+const printData = ({ name, age }) => console.log(name, age);
 
-    ```
+```
   También funciona fuera de las funciones y nos permite crear variables con el nombre de las propiedades de los objetos.
 
-    ```javascript
-      const person4 = {
-        name4: "David",
-        age4: 36,
-        hobbies4: ["nadar", "correr"],
-        greet4() {
-          console.log("hello david");
-        }
-      };
+```javascript
+  const person4 = {
+    name4: "David",
+    age4: 36,
+    hobbies4: ["nadar", "correr"],
+    greet4() {
+      console.log("hello david");
+    }
+  };
 
-      const { name4, age4 } = person4;
+  const { name4, age4 } = person4;
 
-      console.log(name4, age4);
-    ```
+  console.log(name4, age4);
+```
 
   si queremos dar un nombre diferente de las propiedades a las variables usamos la notación `:`
-  ```javascript
-    const { name4 : name, age4 } = person4;
-  ```
+```javascript
+const { name4 : name, age4 } = person4;
+```
   Podemos hacer destructuring de arrays y crear variables separadas, en este caso el destruturing se usa "[]" pero NO crea un array
 
-    ```javascript
-      const array4 = ["fruta", "leche"];
+```javascript
+  const array4 = ["fruta", "leche"];
 
-      let [item1, item2] = array4;
+  let [item1, item2] = array4;
 
-      console.log(item1, item2);//fruta leche
-     //---------------------------------
-      let miArray = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-      ];
-      function miF([x, y, Z, J]) {
-        console.log(x);// [1, 2, 3]
-        console.log(y);// [4, 5, 6]
-        console.log(Z);// [7, 8, 9]
-        console.log(J); //undefined
-      }
-      miF(miArray);
+  console.log(item1, item2);//fruta leche
+  //---------------------------------
+  let miArray = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+  ];
+  function miF([x, y, Z, J]) {
+    console.log(x);// [1, 2, 3]
+    console.log(y);// [4, 5, 6]
+    console.log(Z);// [7, 8, 9]
+    console.log(J); //undefined
+  }
+  miF(miArray);
 
-    //------ FUERA DE FUNCIONES
+//------ FUERA DE FUNCIONES
 
-      let [array1, array2, array3] = miArray;
-      console.log(array1);
-      console.log(array2);
-      console.log(array3);
-    ```
+  let [array1, array2, array3] = miArray;
+  console.log(array1);
+  console.log(array2);
+  console.log(array3);
+```
 
 ## Async code & Promises
 
@@ -533,53 +534,53 @@ Un código síncrono es aquel que se ejecuta línea a línea, es decir un códig
 
 Un código asíncrono no espera a las instrucciones diferidas y continúa con su ejecución. Por lo general la asincronía permite tener una mejor respuesta en las aplicaciones y reduce el tiempo de espera del cliente.
 
-    ```javascript
-      //asíncrono
-      setTimeout(() => {
-        console.log("time done!");
-      }, 2000);
+```javascript
+  //asíncrono
+  setTimeout(() => {
+    console.log("time done!");
+  }, 2000);
 
-      //síncrono
-      console.log("2");
-      console.log("1");
-    ```
+  //síncrono
+  console.log("2");
+  console.log("1");
+```
 
 el setTimeOut es como un callback, después de 2000 ms se ejecuta la función (el console.log) entonces eso es reconocido por JS y aunque el tiempo sea poco(2 s) primero ejecuta los otros console.log y después vuelve al setTimeOut.
 
 Si tenemos varias funciones asincronas puede ser difícil gestionarlas
 
-    ```javascript
-      //asíncrono
-      setTimeout(() => {
-        console.log("time done!");
-      }, 2000);
+```javascript
+  //asíncrono
+  setTimeout(() => {
+    console.log("time done!");
+  }, 2000);
 
-      //síncrono
-      console.log("2");
-      console.log("1");
-    ```
+  //síncrono
+  console.log("2");
+  console.log("1");
+```
 
 ### Promises
 
 Son un objeto de JS que nos permite ejecutar código dependiendo del resultado de otra función. Por ejemplo la concexión a un API para obtener datos si la conexión es exitosa y obtenemos los datos cn la promesa ejecutamos un código y si el servidor devuelve un error ejecutamos otro código distinto.
 Las promesas se crean usando un constructor llamado Promise y pasándole una función que recibe dos parámetros, resolve y reject, que nos permiten indicarle a esta que se resolvió o se rechazó.
 
-      ```javascript
-      const promise = new Promise((resolve, reject) => {
-        const number = Math.floor(Math.random() * 10);
+```javascript
+const promise = new Promise((resolve, reject) => {
+  const number = Math.floor(Math.random() * 10);
 
-        setTimeout(
-          () => number > 5
-                    ? resolve(number)
-                    : reject(new Error("Menor a 5"))
-          ,1000
-        );
-      });
+  setTimeout(
+    () => number > 5
+              ? resolve(number)
+              : reject(new Error("Menor a 5"))
+    ,1000
+  );
+});
 
-      promise
-        .then((number) => console.log(number))
-        .catch((error) => console.error(error));
-      ```
+promise
+  .then((number) => console.log(number))
+  .catch((error) => console.error(error));
+```
 
 ---
 
@@ -610,9 +611,9 @@ Aunque estos módulos están incluidos alguno de ellos no están disponibles de 
 ## Creación del servidor
 
   1. importamos el global module **http**
-         ```javascript
-           const http = require("http");
-         ```
+```javascript
+const http = require("http");
+```
   2. usamos el método **createServer()**, como argumento necesita un **requestListener**, es una función tipo callback
          se ejecutará por cada conexión con el servidor (incoming request).
   3. definir los argumentos de la función requestListener, estos argumentos son dos objetos:
@@ -620,34 +621,34 @@ Aunque estos módulos están incluidos alguno de ellos no están disponibles de 
    - response => respuesta del servidor  
      La función puede ser creada como función a parte, anónima o usando arrow function.
 
-     ```javascript
-       1. Función a parte
+```javascript
+1. Función a parte
 
-         function rqListener(req, res) {}
-         http.createServer(rqListener);
+  function rqListener(req, res) {}
+  http.createServer(rqListener);
 
-       2. anónima
-         http.createServer(function (req, res) {});
+2. anónima
+  http.createServer(function (req, res) {});
 
-       3. arrow funciton
-           http.createServer((req, res) => {console.log(req); });
-     ```
+3. arrow funciton
+    http.createServer((req, res) => {console.log(req); });
+```
 
   4. el método http.createServer() nos devuelve un objeto del tipo servidor.
 
-    ```javascript
-      const server = http.createServer((req, res) => {
-                    console.log(req);
-                  });
+```javascript
+const server = http.createServer((req, res) => {
+              console.log(req);
+            });
 
-    ```
+```
 
   5. cn el servidor definimos, mediante el método listen(), un puerto y un
    hostname,si corremos en local por defecto es "localhost" así q no haría
    falta ponerlo.
-    ```javascript
-      server.listen(3000, "localhost");
-    ```
+```javascript
+server.listen(3000, "localhost");
+```
 
 ### **request object**
 
@@ -670,63 +671,63 @@ Con el objeto response podemos mandar datos de vuelta, para ello utilizamos dife
   3.  **end()**
       Para indicar que finalizamos la respuesta. siempre tenemos que agregar end() para indicar q se finaliza
 
-      ```javascript
-          const server = http.createServer((req, res) => {
+```javascript
+  const server = http.createServer((req, res) => {
 
-              const url = req.url;
+      const url = req.url;
 
-              res.setHeader("Content-Type", "text/html");
-              res.write("<html>");>
-              res.write("<head><title>My Web</title></head>");
-              res.write("<body><h1>Hello world</h1></body>");
-              res.write("</html>");
-              res.end();
-        });
-      ```
+      res.setHeader("Content-Type", "text/html");
+      res.write("<html>");>
+      res.write("<head><title>My Web</title></head>");
+      res.write("<body><h1>Hello world</h1></body>");
+      res.write("</html>");
+      res.end();
+});
+```
 
 #### Routing request
 
 Vamos a gestionar las rutas de nuestro servidor, según el end-point el server nos dará una respuesta u otra.A lo cutre pero sería algo así:
 
-    ```javascript
-    if (url === "/") {
+```javascript
+if (url === "/") {
 
-                res.setHeader("Content-Type", "text/html");
-                res.write("<html>");
-                res.write("<head><title>My Web</title></head>");
-                res.write(
-                "<body>
-                  <h1>Enter massage</h1>
-                  <form action='/message' method='POST'>
-                    <input name='message' type='text'></input>
-                    <button type='submit'>Click Me!</button>
-                  </form>
-                </body>"
-                );
-                res.write("</html>");
-                return res.end();
+          res.setHeader("Content-Type", "text/html");
+          res.write("<html>");
+          res.write("<head><title>My Web</title></head>");
+          res.write(
+          "<body>
+            <h1>Enter massage</h1>
+            <form action='/message' method='POST'>
+              <input name='message' type='text'></input>
+              <button type='submit'>Click Me!</button>
+            </form>
+          </body>"
+          );
+          res.write("</html>");
+          return res.end();
 
-            }
-    ```
+      }
+```
 
 ### Redirectign request & creating a file
 
-    ```javascript
-      // creamos estas variable como globales, fuera del http.reateServer()
-      /--------------------------
-      const fs = require("fs");
-      const method = req.method;
-      //--------------------------
+```javascript
+// creamos estas variable como globales, fuera del http.reateServer()
+/--------------------------
+const fs = require("fs");
+const method = req.method;
+//--------------------------
 
-      if (url == "/message" && method === "POST") {
-        const m = "nothing";
-        fs.writeFileSync("message.txt", m);
-        res.statusCode = 302;
-        res.setHeader("Location", "/");
-        return res.end();
-      }
+if (url == "/message" && method === "POST") {
+  const m = "nothing";
+  fs.writeFileSync("message.txt", m);
+  res.statusCode = 302;
+  res.setHeader("Location", "/");
+  return res.end();
+}
 
-    ```
+```
 
 #### Obtener los datos del body de una request **Streams & Buffers**
 
@@ -794,6 +795,21 @@ readableStream.on("data", (chunk_data_ready) => {
 
 Cuando trabajamos con streams se suele usar pipes (tuberias) que es una manera de enlazar streams.
 
+```javascript
+    const body = [];
+    req.on("data", (chunk_of_data) => {
+      body.push(chunk_of_data);
+    });
+    req.on("end", () => {
+      const parsedBody = Buffer.concat(body).toString();
+      const message = parsedBody.split("=")[1];
+      fs.writeFile("message.txt", message, (err)=>{
+        res.statusCode = 302;
+          res.setHeader("Location", "/");
+          return res.end();
+      });
+    });
+```
 
 ### Lifecycle de un programa NodeJS
 
@@ -842,44 +858,44 @@ En nodeJS es muy común separar nuestro código en diferentes archivos y luego e
 Podemos crear un nuevo archivo llamado **routes.js** que contendrá los pasos a seguir según la url que le solicitemos al servidor, esto es la función anónima que le pasamos como argumento a **http.createServer()**. Así podemos dejar un archivo con la creación del servidor y un archivo routes dnd encontremoslas urls de éste.
 Nuestro punto de partida será el servidor (app.js) y este requerirá el código del archivo routes, para ello desde el archio routes asignamos nuestra función **(req,res)=>{}** a una constamte llamada **requestHandler** para luego poderla exportar.
 
-    ```javascript
-    const requestHandler = (req, res) => {
-      const url = req.url;
-      const method = req.method;
-      if (url === "/") {
-        res.setHeader("Content-Type", "text/html");
-        res.write("<html>");
-        res.write("<head><title>My Web</title></head>");
-        res.write(
-          "<body><h1>Enter massage</h1> <form action='/message' method='POST'> <input name='message' type='text'></input> <button type='submit'>Click Me!</button> </form></body>"
-        );
-        res.write("</html>");
-        return res.end();
-      }
+```javascript
+const requestHandler = (req, res) => {
+  const url = req.url;
+  const method = req.method;
+  if (url === "/") {
+    res.setHeader("Content-Type", "text/html");
+    res.write("<html>");
+    res.write("<head><title>My Web</title></head>");
+    res.write(
+      "<body><h1>Enter massage</h1> <form action='/message' method='POST'> <input name='message' type='text'></input> <button type='submit'>Click Me!</button> </form></body>"
+    );
+    res.write("</html>");
+    return res.end();
+  }
 
-      if (url === "/message" && method === "POST") {
-        const body = [];
-        req.on("data", (chunk_of_data) => {
-          body.push(chunk_of_data);
-        });
-        req.on("end", () => {
-          const parsedBody = Buffer.concat(body).toString();
-          const message = parsedBody.split("=")[1];
-          fs.writeFileSync("message.txt", message, (err) => {
-            res.statusCode = 302;
-            res.setHeader("Location", "/");
-            return res.end();
-          });
-        });
-      }
-      res.setHeader("Content-Type", "text/html");
-      res.write("<html>");
-      res.write("<head><title>My Web</title></head>");
-      res.write("<body><h1>hello world</h1> </body>");
-      res.write("</html>");
-      res.end();
-    };
-    ```
+  if (url === "/message" && method === "POST") {
+    const body = [];
+    req.on("data", (chunk_of_data) => {
+      body.push(chunk_of_data);
+    });
+    req.on("end", () => {
+      const parsedBody = Buffer.concat(body).toString();
+      const message = parsedBody.split("=")[1];
+      fs.writeFileSync("message.txt", message, (err) => {
+        res.statusCode = 302;
+        res.setHeader("Location", "/");
+        return res.end();
+      });
+    });
+  }
+  res.setHeader("Content-Type", "text/html");
+  res.write("<html>");
+  res.write("<head><title>My Web</title></head>");
+  res.write("<body><h1>hello world</h1> </body>");
+  res.write("</html>");
+  res.end();
+};
+ ```
 
 Y esta constante **requestHandler** será lo que exportemos. Lo podemos hacer de varias maneras pero siempre utilizando un objeto global de JS llamada **module** que tiene una propiedad llamada **exports** a la cual le podemos asignar un valor:
 
@@ -919,9 +935,9 @@ Y esta constante **requestHandler** será lo que exportemos. Lo podemos hacer de
 
 Una vez hecho esto desde nuestro archivo app.js podemos importar los datos contenido en esa propiedad **exposrts** mediante un **require** y almacenar los datos en una constante. Como estamos importando un módulo que no es global necesitamos especificar el path por ello:
 
-    ```javascript
-      const routes = require("./routes");
-    ```
+```javascript
+  const routes = require("./routes");
+```
 
 # T2 work flow y debugging
 
@@ -930,31 +946,31 @@ Una vez hecho esto desde nuestro archivo app.js podemos importar los datos conte
 Es un gestor de paquetes para NodeJS que se instala automáticamente cuando instalamos NodeJS. Este nos permitirá instalar paquetes de terceros no incluidos en el core de NodeJS.
 Podemos usar npm para empezar un nuevo proyecto de NodeJS. En el directorio del proyecto tecleamos en la terminal:
 
-    ```
-      npm init
-    ```
+```
+  npm init
+```
 
 Esto nos guiará por un asistente para que completemos información sobre nuestro proyecto. Esto generará un archivo **package.json** (archivo de configuración de nuestro proyecto).
 
-    ```javascript
-      {
-        "name": "2.1-node_server",
-        "version": "1.0.0",
-        "description": "",
-        "main": "app.js",
-        "scripts": {
-          "test": "echo \"Error: no test specified\" && exit 1"
-        },
-        "author": "David Martin",
-        "license": "ISC"
-      }
-    ```
+```javascript
+  {
+    "name": "2.1-node_server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "David Martin",
+    "license": "ISC"
+  }
+```
 
 Gracias a este archivo de configuración nos podemos llevar nuestro proyecto a otro pc y para instalarlo (dependencias) podemos hacer
 
-    ```
-    npm install
-    ```
+```
+npm install
+```
 
 Y tendremos nuestro proyecto listo
 
@@ -965,26 +981,26 @@ Este es el nombre de un script predefinido así que se ejecuta directamente **np
 
 Puede que al ejecutar **npm start** si no tenemos instalado nodemon de antemano nos de error, así que mejor instalar nodemon y después ejecutar npm start
 
-    ```javascript
-      {
-        "name": "2.1-node_server",
-        "version": "1.0.0",
-        "description": "",
-        "main": "app.js",
-        "scripts": {
-          "test": "echo \"Error: no test specified\" && exit 1",
-          "start": "node app.js"
-        },
-        "author": "David Martin",
-        "license": "ISC"
-      }
-    ```
+```javascript
+  {
+    "name": "2.1-node_server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "node app.js"
+    },
+    "author": "David Martin",
+    "license": "ISC"
+  }
+```
 2. custom name
 Para ejecutar un scrip con un nombre puesto por nosotros debemos teclear:
 
-    ```
-      npm run nombreScript
-    ```
+```
+npm run nombreScript
+```
 
 ### Instalando paquetes de terceros
 
@@ -994,58 +1010,58 @@ NPM repository es donde se almacenan los paquetes de terceros y mediante comando
 
 Así cuando instalamos un paquete hay que decidir de que tipo es, si es dependencia de desarrollo lo instalamos como
 
-    ```
-    npm install nombrePackage --save-dev
-    ```
+```
+npm install nombrePackage --save-dev
+```
 
 Si queremos instalarlo como dependencia de producción es
 
-    ```
-    npm install nombrePackage --save
-    ```
+```
+npm install nombrePackage --save
+```
 
 De ambas maneras solo lo instala en nuestro proyecto, si queremos instalar un paquete de manero global usamos -g
 
-    ```
-    npm install -g nombrePackage
-    ```
+```
+npm install -g nombrePackage
+```
 
 #### Paquetes útiles
 
 1. ##### nodemon
    - Nos permite reiniciar nuestro servidor cuando modificamos el código. Para instalarlo
 
-      ```
-        npm install nodemon --save-dev
-      ```
+```
+  npm install nodemon --save-dev
+```
       Podemos crear una archivo, nodemon.json, en la raiz del proyecto para configurar que ignore algunos archivos
 
-        ```javascript
-          {
-            "ignore": ["*.json"]
-          }
-        ```
+```javascript
+  {
+    "ignore": ["*.json"]
+  }
+```
 
         Así solo lo instalamos de manera local (solo nuestro proyecto). Nos crea en nuestro proyecto una carpeta **node_modules** donde se instalan estos paquetes.
         Para usarlo tenemos que ejecutar el proyecto mediante nodemon no usando node
 
-        ```javascript
-          {
-            "name": "2.1-node_server",
-            "version": "1.0.0",
-            "description": "",
-            "main": "app.js",
-            "scripts": {
-              "test": "echo \"Error: no test specified\" && exit 1",
-        /*=>*/  "start": "nodemon app.js" // <==
-            },
-            "author": "David Martin",
-            "license": "ISC",
-            "devDependencies": {
-              "nodemon": "^2.0.6"
-            }
-          }
-        ```
+```javascript
+  {
+    "name": "2.1-node_server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+/*=>*/  "start": "nodemon app.js" // <==
+    },
+    "author": "David Martin",
+    "license": "ISC",
+    "devDependencies": {
+      "nodemon": "^2.0.6"
+    }
+  }
+```
 
 ## Errors and debugging
 
@@ -1068,24 +1084,24 @@ Por ejemplo para extraer el body de la request teníamos q escuchar el event dat
 
 1. Instalamos express
 
-    ```
-      npm install express --save
-    ```
+```
+  npm install express --save
+```
 2. importamos en nuestro app.js
 
-    ```javascript
-      const express = require('express');
-    ```
+```javascript
+const express = require('express');
+```
 
 3. creamos una app cn express y arrancamos el server
 
-    ```javascript
-      const app = express();
+```javascript
+const app = express();
 
-      const server = http.createServer(app);
+const server = http.createServer(app);
 
-      server.listen(3000);
-    ```
+server.listen(3000);
+```
 
 ### Middleware
 
@@ -1109,34 +1125,34 @@ Para cada request entrante se ejecutará el método use(), a éste le pasamos tr
 
 - Esta función sustituye a la creación del servidor.
 
-    ```javascript
-    const server = http.createServer(app);
-    server.listen(3000, "localhost");
-    ```
+```javascript
+const server = http.createServer(app);
+server.listen(3000, "localhost");
+```
 
   podemos escribir directamente
 
-    ```javascript
-      app.listen(3000);
-    ```
+```javascript
+app.listen(3000);
+```
 
 ### Manejando rutas
 
 Podemos usar el middleware use() para especificar la url. Si solo especificamos en la ruta "/" como todas las url empiezan por '/', si queremos acceder a una url q no existe en nuestro servidor pej
 /random como el único elemento que coincide es / se dirigirá ahí. Las diferentes rutas siempre tienen que ir por encima de la principal "/". Para evitar esto podemos utilizar get(), post(),... ya que con estos métodos sólo se dirigirá si la url es exactamente igual.
 
-    ```javascript
-    app.use("/add-product", (req, res, next) => {
-      console.log("in the middleware");
-      res.send("<h1>Add-product page</h1>");
-    }); //middleware
+```javascript
+app.use("/add-product", (req, res, next) => {
+  console.log("in the middleware");
+  res.send("<h1>Add-product page</h1>");
+}); //middleware
 
-    app.use("/", (req, res, next) => {
-      console.log("in the other middleware");
-      res.send("<h1>Hello from express</h1>");
-    }); //middleware
+app.use("/", (req, res, next) => {
+  console.log("in the other middleware");
+  res.send("<h1>Hello from express</h1>");
+}); //middleware
 
-    ```
+```
 
 ### Parsing incoming request
 
@@ -1157,14 +1173,14 @@ Para gestionar los request usamos el middeware use() de la siguiente manera.
     * false si los datos codificados en la url serán de tipo string o array
     
     * true si serán de cualquier tipo
-      ```javascript
-        const bodyParser = require("body-parser");
+```javascript
+const bodyParser = require("body-parser");
 
-        const app = express();
-        //parsear el request body
-        app.use(bodyParser.urlencoded({ extended: true }));
+const app = express();
+//parsear el request body
+app.use(bodyParser.urlencoded({ extended: true }));
 
-        ```
+```
       Para hacer que la ruta (/product) solo sea accesible mediante una petición tipo POST
       el método use() es genérico, reacciona a cualquier request si queremos filtrar r get o post debemos usar
         app.get()  
@@ -1173,12 +1189,12 @@ Para gestionar los request usamos el middeware use() de la siguiente manera.
         app.push()  
         app.put()  
 
-        ```javascript
-        app.post("/product", (req, res, next) => {
-          console.log(req.body);
-          res.redirect("/");
-        });
-      ```
+  ```javascript
+  app.post("/product", (req, res, next) => {
+    console.log(req.body);
+    res.redirect("/");
+  });
+```
 
 ### usando el router de express
 
@@ -1186,94 +1202,94 @@ La función Router() crea como una mini app de express asociada a nuestra app qu
 
 ![not found](img/img-17.png)
 
-    ```javascript
-      const express = require("express");
+```javascript
+  const express = require("express");
 
-      const router = express.Router();
+  const router = express.Router();
 
-      router.get("/add-product", (req, res, next) => {
+  router.get("/add-product", (req, res, next) => {
 
-        res.send(
-          "
-          <body>
-            <h1>Add-product</h1>
-              <form action='/product' method='POST'>
-                <input name='title' type='text'></input>
-                <button type='submit'>add produc t!</button>
-              </form>
-          </body>
-          "
-        );
-      });
+    res.send(
+      "
+      <body>
+        <h1>Add-product</h1>
+          <form action='/product' method='POST'>
+            <input name='title' type='text'></input>
+            <button type='submit'>add produc t!</button>
+          </form>
+      </body>
+      "
+    );
+  });
 
-      router.post("/product", (req, res, next) => {
-        console.log(req.body);
-        res.redirect("/");
-      });
+  router.post("/product", (req, res, next) => {
+    console.log(req.body);
+    res.redirect("/");
+  });
 
-      router.module.exports = router;
-    ```
+  router.module.exports = router;
+```
 
 después importamos nuestro archivo a la app.js.
 
-    ```javascript
-      const express = require("express");
-      const bodyParser = require("body-parser");
+```javascript
+const express = require("express");
+const bodyParser = require("body-parser");
 
-      const app = express();
+const app = express();
 
-      const adminRoutes = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 
-      app.use(adminRoutes);
-    ```
+app.use(adminRoutes);
+```
 
 ### generar 404 error page
 
 Para generar una respuesta ante una url que no existe usamos
 
-    ```javascript
-      //------------ FIN IMPORTS ----------------
-      app.use(adminRoutes);
-      app.use(shopRoutes);
+```javascript
+//------------ FIN IMPORTS ----------------
+app.use(adminRoutes);
+app.use(shopRoutes);
 
-      app.use((req, res, next) => {
-        res.status(404).send("<h1>Page not found</h1>");
-      });
+app.use((req, res, next) => {
+  res.status(404).send("<h1>Page not found</h1>");
+});
 
-      app.listen(3000);
+app.listen(3000);
 
-    ```
+```
 
 ### Filtrar los PATHS
 
 Es habitual en las apps que las url se filtren por usuario, por ejemplo "/admin/add-product" o "/admin/products" y así. Si tenemos configurado nuestros paths de esa manera podemos añadirlo a use() de la siguiente manera:
 
-    ```javascript
-      app.use("/admin", adminRoutes);
+```javascript
+  app.use("/admin", adminRoutes);
 
-    ```
+```
 
 de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes. Pero una vez dentro del archivo no debemos volver a chequear la ruta entera "/admin/add-product" solo mira a partir de
 "/admin/"
 
-    ```javascript
-      // /admin/add-product => GET
+```javascript
+// /admin/add-product => GET
 
-      router.get("/add-product", (req, res, next) => {
+router.get("/add-product", (req, res, next) => {
 
-        res.send(
-          "<body><h1>Add-product</h1> <form action='/admin/add-product' method='POST'> <input name='title' type='text'></input> <button type='submit'>add produc t!</button></form></body>"
-        );
-      });
+  res.send(
+    "<body><h1>Add-product</h1> <form action='/admin/add-product' method='POST'> <input name='title' type='text'></input> <button type='submit'>add produc t!</button></form></body>"
+  );
+});
 
-      // /admin/add-product => POST
+// /admin/add-product => POST
 
-      router.post("/add-product", (req, res, next) => {
+router.post("/add-product", (req, res, next) => {
 
-        console.log(req.body);
-        res.redirect("/");
-      });
-    ```
+  console.log(req.body);
+  res.redirect("/");
+});
+```
 
 ### Servir páginas HTML
 
@@ -1283,43 +1299,43 @@ de tal modo que solo las url que empiezan por /admin entraran en el adminRoutes.
 
 - Esta función es una manera de conocer la ruta absoluta donde se encuntra nuestro proyecto:
 
-    ```javascript
-    console.log(process.cwd())
-    /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server
-    ```
+```javascript
+console.log(process.cwd())
+/home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server
+```
 
 ##### require.main.filename
 
 - Sustituye a process.mainModule.filename, y como este nos da el nombre del archivo donde empieza nuestra app, el que arranca la aplicación.
 
-    ```javascript
-      console.log(require.main.filename);
-      /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server/app.js
+```javascript
+console.log(require.main.filename);
+/home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server/app.js
 
-    ```
+```
 
 ##### dirname
 
 - Nos da la ruta absoluta hasta el archivo donde ejecutamos `__dirname`
 
-    ```javascript
-      console.log(__dirname);
-      /home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server/controllers
+```javascript
+console.log(__dirname);
+/home/david/Programacion/WEB-DEVELOPMENT/NodeJs/code/T5-MVC/5.1-eJS-node-server/controllers
 
-    ```
+```
 
   Creamos un directorio llamado views dnd guardaremos nuestras págias HTML.
   Para poderlas devolver en la respuesta usamos el método sendFile() y especificamos la ruta a nuestras vistas. Para especificar el PATH tenemos un core module que nos ayuda con eso.
 
-    ```javascript
-      const path = require("path");
+```javascript
+  const path = require("path");
 
-      router.get("/", (req, res, next) => {
+  router.get("/", (req, res, next) => {
 
-          res.sendFile(path.join(__dirname,"..", "views", "shop.html"));
+      res.sendFile(path.join(__dirname,"..", "views", "shop.html"));
 
-      });
-    ```
+  });
+```
     usamos el método join() para ir encadenando porciones de la ruta hasta llegar a nuestro archivo. la variable global **__dirname** hace referncia a la ruta desde la raíz de nuestro SSOO hasta el archivo donde escribimos __dirname, una vez ahí vamos completando la ruta. En nuestro caso tenemos q entrar en una carpeta hermana de la q ejecutamos el código así q tenemos q concatenar
     "..".
 
@@ -1329,16 +1345,16 @@ Servir archivos estáticos significa poder servir archivos que no esté gestiona
 En principio NodeJS bloquea el acceso al sistema de archivos pero para que el html puede acceder a una hoja CSS necesitamos hacer una excepción.
 Para ello necesitamos otro middleware usando el propio objeto de express
 
-    ```javascript
-    app.use(express.static(path.join(__dirname, "public")));
-    ```
+```javascript
+app.use(express.static(path.join(__dirname, "public")));
+```
 
 De este manera hará que todo el contenido del directorio **public** sea accesible.
 Cuando intentemos acceder desde el HTML para cargar el css el sistema ya situa la ruta en el directorio especificado "public" así que en el tag link ponemos
 
-    ```html
-    <link rel="stylesheet" href="/css/main.css" />
-    ```
+```html
+<link rel="stylesheet" href="/css/main.css" />
+```
 
 **No hay que dejarse la "/" antes de css IMPORTANTE!!!**
 Lo que hace express es que cualquier request que solicite un archivo terminado en .css, .js, imágenes, etc.. lo edirigirá al directorio especificado como archivos státicos, en nuestro caso el diretorio public.
@@ -1352,28 +1368,28 @@ Para simular una bbdd usaremos una array, el problema de esto es que el array es
 
 Entonces en adimin creamos el array y lo exportamos:
 
-    ```javascript
-      const express = require("express"),
-      path = require("path");
+```javascript
+const express = require("express"),
+path = require("path");
 
-      const router = express.Router();
+const router = express.Router();
 
-      //----variable donde guardaremos info a modo de bbdd
-      const products = [];
+//----variable donde guardaremos info a modo de bbdd
+const products = [];
 
-    // /admin/add-product => GET
-      router.get("/add-product", (req, res, next) => {
-          res.sendFile(path.join(__dirname, "..", "views", "add-product.html"));
-      });
-      // /admin/add-product => POST
-      router.post("/add-product", (req, res, next) => {
-        products.push({ title: req.body.title });
-        res.redirect("/");
-      });
+// /admin/add-product => GET
+router.get("/add-product", (req, res, next) => {
+    res.sendFile(path.join(__dirname, "..", "views", "add-product.html"));
+});
+// /admin/add-product => POST
+router.post("/add-product", (req, res, next) => {
+  products.push({ title: req.body.title });
+  res.redirect("/");
+});
 
-      module.exports.routes = router;
-      module.exports.products = products;
-    ```
+module.exports.routes = router;
+module.exports.products = products;
+```
 
 ## Motor de plantillas
 
@@ -1386,9 +1402,9 @@ Motores de platillas hay muchos pero veremos los 3 más usados. Todos ellos se i
 
 1. Instalamos con npm los paquetes
 
-    ```
-        npm install ejs pug express-handlebars --save
-    ```
+```
+    npm install ejs pug express-handlebars --save
+```
 
 2. Coonfiguramos express para que use el motor de plantillas, para ello usamos método set() para establecer una configuración global. También podemos usar set() para establecer datos de manera global (accesible en toda la app), estos datos siempre son parejas llave-valor. Hay lgunas llaves preestablecidas como el caso q nos interesa **"views"** y **"view engine"**.
 
@@ -1397,148 +1413,148 @@ Le dice a express que para renderizar vistas dinámicas utilice el motor de plan
 #### views
 Le dice a express donde encontrar las plantillas dinámicas. Por defecto las coge en la ruta "/views"
 
-    ```javascript
-    // datos globales
-    app.set("miNombre","David");
-    app.get("miNombre");//"David"
+```javascript
+// datos globales
+app.set("miNombre","David");
+app.get("miNombre");//"David"
 
-    // establecer plantillas.
+// establecer plantillas.
 
-    const app = express();
+const app = express();
 
-    app.set("view engine", "pug");
-    app.set("views", "Templates");
+app.set("view engine", "pug");
+app.set("views", "Templates");
 
-    ```
+```
 
 ### PUG
 
 Es un motor que usa una versión simplificada de HTML, es muy importante respetar la identación, podemos usar css enlazados pero para aplicar una clase css a un tag HTML se utiliza la notación de punto
 
-    ```pug
-    <!DOCTYPE html>
-    html(lang="en")
-      head
-        meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        title My Shop
-        link(rel="stylesheet", href="/css/main.css")
-        link(rel="stylesheet", href="/css/main-product.css")
-      body
-        header.main-header
-          nav.main-header__nav
-            ul.main-header__item-list
-              li.main-header__item
-                a.active(href="/") Shop
-              li.main-header__item
-                a.active(href="/admin/add-product") Add Product
-    ```
+```pug
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title My Shop
+    link(rel="stylesheet", href="/css/main.css")
+    link(rel="stylesheet", href="/css/main-product.css")
+  body
+    header.main-header
+      nav.main-header__nav
+        ul.main-header__item-list
+          li.main-header__item
+            a.active(href="/") Shop
+          li.main-header__item
+            a.active(href="/admin/add-product") Add Product
+```
 
 Para renderizar la vista debemos usar el método render(), como anteriormente ya definimos dónde guardábamos las platillas dinámicas no hace falta especificar la ruta
 
-    ```javascript
-      router.get("/", (req, res, next) => {
+```javascript
+  router.get("/", (req, res, next) => {
 
-        res.render("shop");
+    res.render("shop");
 
-      });
+  });
 
-    ```
+```
 
 #### Añadiendo contenido dinámico a la plantilla de pug
 
 Para pasar datos a la plantilla simplemente debemos agregárselos como segundo argumento de la función render(); en forma de objeto(clave-valor)
 
-    ```javascript
-      const products = require("./admin").products;
-      //---------------------------------------------
+```javascript
+  const products = require("./admin").products;
+  //---------------------------------------------
 
-      const router = express.Router();
+  const router = express.Router();
 
-      router.get("/", (req, res, next) => {
+  router.get("/", (req, res, next) => {
 
-        res.render("shop", { items: products, docTitle: "Shop" });
-      });
+    res.render("shop", { items: products, docTitle: "Shop" });
+  });
 
-    ```
+```
 
 Para recuperar esos datos en la plantilla de pug usamos la sitaxi  
 `# { }`
 Recordemos que en la clave items tenemos un array (products) que contiene objetos del tipo {title:''} Entonces solo tendremos que iterar el array e ir sacando el título de cada producto
 
-    ```pug
-    <!DOCTYPE html>
-    html(lang="en")
-      head
-        meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        title #{docTitle}
-        link(rel="stylesheet", href="/css/main.css")
-        link(rel="stylesheet", href="/css/main-product.css")
-      body
-        header.main-header
-          nav.main-header__nav
-            ul.main-header__item-list
-              li.main-header__item
-                a.active(href="/") Shop
-              li.main-header__item
-                a.active(href="/admin/add-product") Add Product
-        main
-          if items.length > 0
-            div.grid
-                each item in items
-                  article.card.product-item
-                      header.card__header
-                          h1.product__title #{item.title}
-                      div.card__image
-                          img(src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
-                          alt="A Book")
-                      div.card__content
-                          h2.product__price $19.99
-                          p.product__description A very interesting book
-                      div.card__actions
-                          button.btn Add to Cart
-          else
-            h1 No products
-    ```
+```pug
+<!DOCTYPE html>
+html(lang="en")
+head
+  meta(charset="UTF-8")
+  meta(name="viewport", content="width=device-width, initial-scale=1.0")
+  title #{docTitle}
+  link(rel="stylesheet", href="/css/main.css")
+  link(rel="stylesheet", href="/css/main-product.css")
+body
+  header.main-header
+    nav.main-header__nav
+      ul.main-header__item-list
+        li.main-header__item
+          a.active(href="/") Shop
+        li.main-header__item
+          a.active(href="/admin/add-product") Add Product
+  main
+    if items.length > 0
+      div.grid
+          each item in items
+            article.card.product-item
+                header.card__header
+                    h1.product__title #{item.title}
+                div.card__image
+                    img(src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png",
+                    alt="A Book")
+                div.card__content
+                    h2.product__price $19.99
+                    p.product__description A very interesting book
+                div.card__actions
+                    button.btn Add to Cart
+    else
+      h1 No products
+```
 
 Un formulario quedaría así
 
-    ```pug
-      main
-        form.product-form(action="/admin/add-product",method="POST")
-            div.form-control
-              label(for="title") Title
-              input(type="text", name="title", id="title")
-            button.btn( type="submit") Add Product
+```pug
+  main
+    form.product-form(action="/admin/add-product",method="POST")
+        div.form-control
+          label(for="title") Title
+          input(type="text", name="title", id="title")
+        button.btn( type="submit") Add Product
 
-    ```
+```
 
 #### Añadiendo Layouts
 
 Si en todas nuestras páginas tenemos una estrctura similar, como nos sucede a nosotros con el header podemos hacer layouts en lugar de volver a escribirlo.
 Estos layuots podemos personalizarlos para que se ajusten a cada situación, por ejemplo hay páginas que tendrán unos estilos css diferentes, un contenido concreto,... así para crear un layout (esqueleto) y poder añadir elementos usamos los bloques `block`
 
-    ```pug
-    <!DOCTYPE html>
-    html(lang="en")
-      head
-        meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        title #{title}
-        link(rel="stylesheet", href="/css/main.css")
-        block styles
-      body
-        header.main-header
-          nav.main-header__nav
-            ul.main-header__item-list
-              li.main-header__item
-                a(href="/") Shop
-              li.main-header__item
-                a(href="/admin/add-product") Add Product
-        block content
+```pug
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title #{title}
+    link(rel="stylesheet", href="/css/main.css")
+    block styles
+  body
+    header.main-header
+      nav.main-header__nav
+        ul.main-header__item-list
+          li.main-header__item
+            a(href="/") Shop
+          li.main-header__item
+            a(href="/admin/add-product") Add Product
+    block content
 
-    ```
+```
 
 Lo mejor para guardar los layouts es en la misma carpeta donde tenemos las plantillas.
 
@@ -1547,196 +1563,196 @@ Lo mejor para guardar los layouts es en la misma carpeta donde tenemos las plant
 Una vez hecho esto en la plantilla deseada utilizando la palabra reservada `extends`
 importamos el layout y con `block` inyectamos el contenido que queramos
 
-    ```pug
-      extends layouts/main-layout.pug
+```pug
+  extends layouts/main-layout.pug
 
-      block content
-        h1 Page not found
-    ```
+  block content
+    h1 Page not found
+```
 
 #### Añadir clases css de manera dinámica
 
 Para ello podemos enviar un nuevo argumento en el método render() para saber si debemos añadir la clase o no.
 
-    ```javascript
-      router.get("/add-product", (req, res, next) => {
+```javascript
+  router.get("/add-product", (req, res, next) => {
 
-        res.render("add-product", {
+    res.render("add-product", {
 
-          pageTitle: "Add-Product",
-          path: "/admin/add-product",
+      pageTitle: "Add-Product",
+      path: "/admin/add-product",
 
-        });
-      });
+    });
+  });
 
-    ```
+```
 
 luego comprobamos con un `if` en la plantilla
 
-    ```pug
-      a(href="/admin/add-product", class= (path=== '/admin/add-product' ? 'active' : '')  ) Add Product
-    ```
+```pug
+  a(href="/admin/add-product", class= (path=== '/admin/add-product' ? 'active' : '')  ) Add Product
+```
 
 ### HandleBars
 
 Este otro motor de plantillas usa HTML mezclado con código para generar la lantilla. Así que en app.use() modificamos nuestro motor pero handlebars no está incluido en el core así que tenemos q importarlo previamente y decirle a express que es un motor de plantillas
 
-    ```javascript
-    const expressHbs = require('express-handlebars');//importamos
+```javascript
+const expressHbs = require('express-handlebars');//importamos
 
-    app.engine("hbs", expressHbs()); // lo registramos como motor de plantillas
-    app.set("views", "Templates");
-    app.set("view engine", "hbs");
+app.engine("hbs", expressHbs()); // lo registramos como motor de plantillas
+app.set("views", "Templates");
+app.set("view engine", "hbs");
 
-    ```
+```
 
 Para renderizar la página tenemos que especificar q no usamos layouts porque por defecto handlebars se construye con un esquelo principal al que le vamos añadiendo cosas, entonces busca primero un main.handlebars.
 Busca por este árbol de directorios    
 ![not found](img/img-21.png)
 
-    ```javascript
-      app.use((req, res, next) => {
-        res
-          .status(404)
-          .render("404", { layout: false, pageTitle: "Page not found2" });
-      });
-    ```
+```javascript
+  app.use((req, res, next) => {
+    res
+      .status(404)
+      .render("404", { layout: false, pageTitle: "Page not found2" });
+  });
+```
 
 Luego podemos modificar varios valores con los que trabaja handlebars por defecto
 
-    ```javascript
-      app.engine("handlebasrs", expressHbs({
-              layoutsDir: path.join(__dirname, "Templates","layouts"),
-              partialsDir: path.join(__dirname, "Templates","layouts","partials"),
-              extname: "hbs",
-              defaultLayout: 'main',
-        })
-      );
-    ```
+```javascript
+  app.engine("handlebasrs", expressHbs({
+          layoutsDir: path.join(__dirname, "Templates","layouts"),
+          partialsDir: path.join(__dirname, "Templates","layouts","partials"),
+          extname: "hbs",
+          defaultLayout: 'main',
+    })
+  );
+```
 
 Una de las diferencias con pug es que en una plantilla de handlebars no podemos usar lógica, es decir evaluar con un if
 `if items.length > 0 ...` sólo podemos pasarle variables con datos.
 Así que la lógica la tenemos que tener en nuestro nodeJS pasarle a la plantilla el resultado
 
-    ```javascript
-    router.get("/", (req, res, next) => {
-      res.render("shop", {
-        layout: false,
-        pageTitle: "Shop - handlebars",
-        items: products,
-        hasProducts: products.length > 0,
-      });
-    });
-    ```
+```javascript
+router.get("/", (req, res, next) => {
+  res.render("shop", {
+    layout: false,
+    pageTitle: "Shop - handlebars",
+    items: products,
+    hasProducts: products.length > 0,
+  });
+});
+```
 
 una vez sabemos si tenemos productos evaluar con if en la plantilla, cuando hacemos un loop con `each` podemos acceder a cada elemento dentro de la iteración con `this`
 
-    ```handlebars
-      {{#if hasProducts}}
-              {{#each items}}
-                <div class="grid">
-                    <article class="card product-item">
-                        <header class="card__header">
-                            <h1 class="product__title">{{this.title}}</h1>
-                        </header>
-                        <div class="card__image">
-                            <img src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png" alt="A Book">
-                        </div>
-                        <div class="card__content">
-                            <h2 class="product__price">$19.99</h2>
-                            <p class="product__description">A very interesting book about so many even more interesting things!</p>
-                        </div>
-                        <div class="card__actions">
-                            <button class="btn">Add to Cart</button>
-                        </div>
-                    </article>
-                </div>
-              {{/each}}
-            {{else}}
-              <h1>Not found products</h1>
-            {{/if}}
+```handlebars
+  {{#if hasProducts}}
+          {{#each items}}
+            <div class="grid">
+                <article class="card product-item">
+                    <header class="card__header">
+                        <h1 class="product__title">{{this.title}}</h1>
+                    </header>
+                    <div class="card__image">
+                        <img src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png" alt="A Book">
+                    </div>
+                    <div class="card__content">
+                        <h2 class="product__price">$19.99</h2>
+                        <p class="product__description">A very interesting book about so many even more interesting things!</p>
+                    </div>
+                    <div class="card__actions">
+                        <button class="btn">Add to Cart</button>
+                    </div>
+                </article>
+            </div>
+          {{/each}}
+        {{else}}
+          <h1>Not found products</h1>
+        {{/if}}
 
-    ```
+```
 
 #### Usando layouts con handlebars
 
 Tenemos que especificar dónde están guardadas los layouts y como se llama el layout por defecto
 
-    ```javascript
-      app.engine(
-        "hbs",
-        expressHbs({
-          defaultLayout: "main-layout",
-          layoutsDir: path.join(__dirname, "Templates", "layouts"),
-          extname: "hbs",
-        })
-      );
+```javascript
+  app.engine(
+    "hbs",
+    expressHbs({
+      defaultLayout: "main-layout",
+      layoutsDir: path.join(__dirname, "Templates", "layouts"),
+      extname: "hbs",
+    })
+  );
 
-    ```
+```
 
 Creamos nuestro layout, en la regióm `{{{body}}}` es donde inyectará la página que estamos renderizando
 
-    ```handlebars
-      <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-          <title>{{pageTitle}}</title>
-          <link rel="stylesheet" href="/css/main.css" />
-          {{#if formsCss}}
-            <link rel="stylesheet" href="/css/forms.css" />
-          {{/if}}
-          {{#if productCss}}
-            <link rel="stylesheet" href="/css/main-product.css" />
-          {{/if}}
-        </head>
+```handlebars
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <title>{{pageTitle}}</title>
+      <link rel="stylesheet" href="/css/main.css" />
+      {{#if formsCss}}
+        <link rel="stylesheet" href="/css/forms.css" />
+      {{/if}}
+      {{#if productCss}}
+        <link rel="stylesheet" href="/css/main-product.css" />
+      {{/if}}
+    </head>
 
-        <body>
-          <header class="main-header">
-            <nav class="main-header__nav">
-              <ul class="main-header__item-list">
-                <li class="main-header__item"><a class= " {{#if activeShop}}active{{/if}}" href="/">Shop</a></li>
-                <li class="main-header__item">
-                  <a class= "{{#if activeAddProduct}}active{{/if}} " href="/admin/add-product">Add Product</a>
-                </li>
-              </ul>
-            </nav>
-          </header>
-          {{{body}}}
-        </body>
-      </html>
+    <body>
+      <header class="main-header">
+        <nav class="main-header__nav">
+          <ul class="main-header__item-list">
+            <li class="main-header__item"><a class= " {{#if activeShop}}active{{/if}}" href="/">Shop</a></li>
+            <li class="main-header__item">
+              <a class= "{{#if activeAddProduct}}active{{/if}} " href="/admin/add-product">Add Product</a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      {{{body}}}
+    </body>
+  </html>
 
-    ```
+```
 
 Una vez hecho esto en shop.js queda así
 
-    ```javascript
-    router.get("/", (req, res, next) => {
-      res.render("shop", {
-        productCss: true,
-        activeShop: true,
-        pageTitle: "Shop - handlebars",
-        items: products,
-        hasProducts: products.length > 0,
-      });
-    });
-    ```
+```javascript
+router.get("/", (req, res, next) => {
+res.render("shop", {
+  productCss: true,
+  activeShop: true,
+  pageTitle: "Shop - handlebars",
+  items: products,
+  hasProducts: products.length > 0,
+});
+});
+```
 
 ### EJS
 
 Es parecido a Pug por lo q no necesitamos registrarlo como motor de plantillas. No es compatible con layouts.  
 Para crear la plantilla podemos usar HTML
 
-    ```
-    <%= %> nos permite renderizar el contenido de una variable como si fuera un string
+```
+<%= %> nos permite renderizar el contenido de una variable como si fuera un string
 
-    <%  %> en medio podemos incluir código JS
-    <%- %> permite renderizar código como HTML o  hacer includes
-          <%- include('../includes/navigation.ejs') %>
+<%  %> en medio podemos incluir código JS
+<%- %> permite renderizar código como HTML o  hacer includes
+      <%- include('../includes/navigation.ejs') %>
 
-    ```
+```
 
 Si quisiera pasar algún dato al include uso un segundo argumento
 
@@ -1757,43 +1773,43 @@ En el archivo 'T5-MVC/5.1-eJS-node-server/model/product.js' cuando leemos el arc
 
 - Refectoring usando una helper function que lea el archivo bbdd.
 
-    ```javascript
-      const fs = require("fs"),
-        path = require("path");
+```javascript
+const fs = require("fs"),
+  path = require("path");
 
-      const path_to_bbdd_file = path.join(
-        process.cwd(),
-        "data",
-        "products_bbdd.json"
-      );
-      //---------helper function
-      const getProductsFromFile = (cb) => {
-        fs.readFile(path_to_bbdd_file, (err, data) => {
-          if (err) {
-            cb([]);
-          } else {
-            cb(JSON.parse(data));
-          }
-        });
-      };
-      //-----------------------
-      module.exports.classProduct = class Product {
-        constructor(title) {
-          this.title = title;
-        }
-        save() {
-          getProductsFromFile((products_data) => {
-            products_data.push(this);
-            fs.writeFile(path_to_bbdd_file, JSON.stringify(products_data), (err) => {
-              if (err) console.log(err);
-            });
-          });
-        }
-        static fetchAll(cb) {
-          getProductsFromFile(cb);
-        }
-      };
-    ```
+const path_to_bbdd_file = path.join(
+  process.cwd(),
+  "data",
+  "products_bbdd.json"
+);
+//---------helper function
+const getProductsFromFile = (cb) => {
+  fs.readFile(path_to_bbdd_file, (err, data) => {
+    if (err) {
+      cb([]);
+    } else {
+      cb(JSON.parse(data));
+    }
+  });
+};
+//-----------------------
+module.exports.classProduct = class Product {
+  constructor(title) {
+    this.title = title;
+  }
+  save() {
+    getProductsFromFile((products_data) => {
+      products_data.push(this);
+      fs.writeFile(path_to_bbdd_file, JSON.stringify(products_data), (err) => {
+        if (err) console.log(err);
+      });
+    });
+  }
+  static fetchAll(cb) {
+    getProductsFromFile(cb);
+  }
+};
+```
 
 ![not found](img/img-23.png)  
 
