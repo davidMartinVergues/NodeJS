@@ -116,6 +116,7 @@
     - [Many-to-Many](#many-to-many)
   - [creación de un user (simple)](#creación-de-un-user-simple)
   - [Trabajando en el modelo de cart](#trabajando-en-el-modelo-de-cart)
+  - [Eager Loading](#eager-loading)
 
 
 
@@ -3531,6 +3532,59 @@ En la sentencia `Product.belongsToMany(Cart, { through: CartItem }); ` necesitam
 UNa vez hecho esto para cada usuario que se logea deberemos crearle un carrito:
 
 ```javascript 
- 
+sequelize_db
+  //.sync({ force: true })
+  .sync()
+  .then((result) => {
+    return User.findByPk(1);
+  })
+  .then((user) => {
+    if (!user) {
+      return User.create({
+        name: "David",
+        email: "dmverges@gmail.com",
+      });
+    }
+    return user;
+  })
+  .then((user) => {
+    user
+      .getCart()
+      .then((cart) => {
+        if (!cart) {
+          user.createCart();
+        }
+        app.listen(3000);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    //return user.createCart();
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
+```
+
+## Eager Loading
+
+source: https://sequelize.org/master/manual/eager-loading.html
+
+El eager loading es lo equivalente a hacer una consulta con multiples joins y nos permite obtener información de otros modelos para conseguirlo utilizamos el `include`
+
+
+```javascript 
+module.exports.getOrders = (req, res, next) => {
+  req.user
+    .getOrders({ include: { model: Product } })
+    .then((orders) => {
+      res.render("shop/orders", {
+        pageTitle: "Orders",
+        path: "/orders",
+        orders: orders,
+      });
+    })
+    .catch((err) => console.log(err));
+}; 
 ```

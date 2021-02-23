@@ -16,6 +16,8 @@ const User = require("./model/user");
 const Product = require("./model/product");
 const Cart = require("./model/cart");
 const CartItem = require("./model/cart-item");
+const Order = require("./model/order");
+const OrderItem = require("./model/order-item");
 //------------ FIN IMPORTS ----------------
 
 const app = express();
@@ -51,10 +53,17 @@ Cart.belongsTo(User);
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
 
+User.hasMany(Order);
+Order.belongsTo(User);
+
+Order.belongsToMany(Product, { through: OrderItem });
+Product.belongsToMany(Order, { through: OrderItem });
+
 //----------------
 
 //sincronizams tablas y generamos el user en caso q no esté creado
 sequelize_db
+  //.sync({ force: true })
   .sync()
   .then((result) => {
     return User.findByPk(1);

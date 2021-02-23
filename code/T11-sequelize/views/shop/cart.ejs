@@ -44,8 +44,20 @@
               </form>
             </td>
           </tr>
+          <% }); %>
+          <tr>
+            <td colspan="4" class="position-relative">
+              <form action="/create-order" method="POST">
+                <button
+                  class="position-absolute end-0 btn btn-outline-success"
+                  type="submit"
+                >
+                  Order now!
+                </button>
+              </form>
+            </td>
+          </tr>
         </tbody>
-        <% }); %>
       </table>
       <%}else { %>
 
