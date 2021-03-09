@@ -3632,9 +3632,14 @@ wget https://downloads.mongodb.com/compass/mongodb-compass_1.25.0_amd64.deb
 ```
 sudo dpkg -i mongodb-compass_1.25.0_amd64.deb  
 ```
+![not found](img/img-44.png)
 
-Arrancamos la app y nos permitirá conectarnos a mongodb Atlas o a nuestro mongo local
-con `mongodb://127.0.0.1:27017`
+Arrancamos la app y nos permitirá conectarnos a mongodb Atlas mediante un string de conexión
+
+![not found](img/img-45.png)
+
+
+o a nuestro mongo local con `mongodb://127.0.0.1:27017`
 
 
 ## Conectar con mongodb Atlas
