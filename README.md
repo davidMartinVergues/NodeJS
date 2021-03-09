@@ -93,7 +93,7 @@
     - [Usando workbench](#usando-workbench)
     - [Conectar nuestra app a la base de datos SQL](#conectar-nuestra-app-a-la-base-de-datos-sql)
     - [Adaptando nuestra app a la conexión con bbdd](#adaptando-nuestra-app-a-la-conexión-con-bbdd)
-- [Sequelize](#sequelize)
+- [T-10 Sequelize](#t-10-sequelize)
   - [conectar sequelize a nuestra bbdd](#conectar-sequelize-a-nuestra-bbdd)
   - [crear modelo con sequelize](#crear-modelo-con-sequelize)
     - [Creación de product model](#creación-de-product-model)
@@ -117,6 +117,18 @@
   - [creación de un user (simple)](#creación-de-un-user-simple)
   - [Trabajando en el modelo de cart](#trabajando-en-el-modelo-de-cart)
   - [Eager Loading](#eager-loading)
+- [T-11 Usando MongoDB](#t-11-usando-mongodb)
+  - [Instalamos MongoDB compass](#instalamos-mongodb-compass)
+  - [Conectar con mongodb Atlas](#conectar-con-mongodb-atlas)
+  - [Rehaciendo los modelos](#rehaciendo-los-modelos)
+    - [product model](#product-model)
+      - [Guardar un nuevo item](#guardar-un-nuevo-item)
+      - [encontrar un elemento por ID](#encontrar-un-elemento-por-id)
+      - [Modificar un item](#modificar-un-item)
+      - [eliminar un item](#eliminar-un-item)
+    - [Creando un modelo para users](#creando-un-modelo-para-users)
+    - [Cart model](#cart-model)
+    - [order model](#order-model)
 
 
 
@@ -934,7 +946,7 @@ Y esta constante **requestHandler** será lo que exportemos. Lo podemos hacer de
 
     ```
 
-Una vez hecho esto desde nuestro archivo app.js podemos importar los datos contenido en esa propiedad **exposrts** mediante un **require** y almacenar los datos en una constante. Como estamos importando un módulo que no es global necesitamos especificar el path por ello:
+Una vez hecho esto desde nuestro archivo app.js podemos importar los datos contenido en esa propiedad **exports** mediante un **require** y almacenar los datos en una constante. Como estamos importando un módulo que no es global necesitamos especificar el path por ello:
 
 ```javascript
   const routes = require("./routes");
@@ -2765,7 +2777,7 @@ Recordemos que no trabajaremos con callbacks sino con promesas. Será una promes
 
 Hasta ahora hemos utilizado consultas sql muy simples pero a medida que la app se vuelve más grande las consultas se van comolicando así que para facilitar esto usaremos un modulo de nodeJS `sequelize`
 
-# Sequelize
+# T-10 Sequelize
 
 Este módulo third party, concretamente una libreria 'object relational mapping', lo que hace es mapear la bbdd en objetos JS, que tienen métodos para ayudarnos en el manejo de las consultas sql.
 Básicamente crearemos objetos con sus atributos y sequelize los mapeará en forma de tabla ejecutando internamente una consulta sql.
@@ -3535,7 +3547,7 @@ UNa vez hecho esto para cada usuario que se logea deberemos crearle un carrito:
 sequelize_db
   //.sync({ force: true })
   .sync()
-  .then((result) => {
+  .then((result) => { 
     return User.findByPk(1);
   })
   .then((user) => {
@@ -3587,4 +3599,572 @@ module.exports.getOrders = (req, res, next) => {
     })
     .catch((err) => console.log(err));
 }; 
+```
+
+# T-11 Usando MongoDB
+
+Para trabajar con mongo usaremos mongoDB Atlas, es un servicio de bbdd en la nube.
+Creamos nuestro proyecto y nuestro cluster. Una vez hecho esto tenemos que añadir usuarios que se podrán conectar a la bbdd cn el rol que queramos
+
+![not found](img/img-40.png)
+
+y también especificamos desde qué IP nos podremos conectar a la bbdd, nos da la opción de escoger nuestra IP local.
+
+![not found](img/img-41.png)
+
+Una vez hecho esto para conectar nuestra app a mongodb atlas necesitamos instalar el driver y la url de conexión 
+
+![not found](img/img-42.png)
+
+Tener en cuenta que a mongodb Atlas le he puesto una IP pública de acceso pero cada vez que cierro el routter ésta cambia así que debo actualizarla cada vez.
+
+## Instalamos MongoDB compass 
+
+
+```
+sudo apt-get install libgconf-2-4
+```
+
+```
+wget https://downloads.mongodb.com/compass/mongodb-compass_1.25.0_amd64.deb
+```
+
+```
+sudo dpkg -i mongodb-compass_1.25.0_amd64.deb  
+```
+
+Arrancamos la app y nos permitirá conectarnos a mongodb Atlas o a nuestro mongo local
+con `mongodb://127.0.0.1:27017`
+
+
+## Conectar con mongodb Atlas
+
+1. instalamos el driver de mongodb
+```npm
+npm install mongodb --save  
+```
+
+2. creamos la conexción 
+
+```javascript 
+
+// archivo en la ruta ./util/database
+
+// importo mongodb q en realidad es una clase
+const mongodb = require("mongodb");
+
+const MongoClient = mongodb.MongoClient;
+
+const mongoConnect = (callback) => {
+  MongoClient.connect(
+    "mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+  )
+    .then((client) => {
+      console.log("connected");
+      callback(client);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+//exportamos
+module.exports = mongoConnect; 
+```
+![not found](img/img-43.png)
+
+3. creamos la conexión en nuestro archivo principal de la app
+
+```javascript 
+const mongoConnect = require("./util/database");
+
+mongoConnect((client) => {
+  console.log(client);
+  app.listen(3000);
+}); 
+```
+## Rehaciendo los modelos
+
+En el controller de admin importamos el modelo product donde utilizamos sequelize para definir el modelo ahora con mongo.
+
+Si implementamos la conexión a mongo desde cada modelo esto supondrá que cada vez que hagamos uso de estos modelos crearemos una nueva conexíon lo que no es muy eficiente. 
+
+Modificamos un poco el archivo de conexión:
+
+```javascript 
+// importo mongodb q en realidad es una clase
+const mongodb = require("mongodb");
+
+const MongoClient = mongodb.MongoClient;
+let _db;
+const mongoConnect = (callback) => {
+  MongoClient.connect(
+    "mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+  )
+    .then((client) => {
+      _db = client.db();
+      callback();
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
+};
+
+const getDb = () => {
+  if (_db) {
+    return _db;
+  }
+  throw "no database found";
+};
+
+//exportamos
+module.exports.mongoConnect = mongoConnect;
+module.exports.getDb = getDb; 
+```
+
+Podemos modificar la bbdd de datos por defecto o bien cambiando la url 
+`"mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/miBBDD?retryWrites=true&w=majority"`
+
+o bien en el método 
+
+```javascript 
+ _db = client.db('miBBDD');
+```
+
+
+con esta nueva aproximación exportamos dos métodos:
+1. **mongoConnect**, mediante el cual establecemos la conexión cn la bbdd y se mantendrá funcionando
+2. **getDb**, el cual nos permitirá recuperar en cualquier parte de nuestra app la bbdd a la q estamos conectados
+
+Esto se puede hacer xq mongo gestiona varias interacciones simultáneas con la misma conexión a la bbdd mediante lo q se llama  `connection pooling`,  conexión varias queries. 
+
+Ahora en nuestro archivo app.js la conexión queda así:
+
+```javascript 
+mongoConnect(()=>{
+  app.listen(3000)
+}) 
+```
+
+Y en los archivos de los modelos cada vez que necesitemos acceso a la bbdd no tenemos que importar la conexión (mongoConnect) si no la función que nos recupera la bbdd (getDb)
+
+### product model
+
+Quedaría así: 
+
+```javascript 
+const getDb = require("../util/database").getDb;
+const mongodb = require("mongodb");
+
+class Product {
+  constructor(title, price, description, imgUrl, userId) {
+    this.title = title;
+    this.price = price;
+    this.description = description;
+    this.imgUrl = imgUrl;
+    this.userId = userId;
+  }
+
+  save() {
+    const db = getDb();
+    return db.collection("products").insertOne(this);
+  }
+
+  static fetchAll() {
+    const db = getDb();
+    return db.collection("products").find().toArray();
+  }
+
+  static getProductById(id) {
+    const db = getDb();
+    return db
+      .collection("products")
+      .find({ _id: new mongodb.ObjectId(id) })
+      .next();
+  }
+
+  static editProduct(id, newTitle, newPrice, newDescription, newImgUrl) {
+    const db = getDb();
+    return db.collection("products").updateOne(
+      { _id: new mongodb.ObjectId(id) },
+      {
+        $set: {
+          title: newTitle,
+          price: newPrice,
+          description: newDescription,
+          imgUrl: newImgUrl,
+        },
+      }
+    );
+  }
+
+  static deletProduct(id) {
+    const db = getDb();
+    return db.collection("products").deleteOne({ _id: mongodb.ObjectId(id) });
+  }
+}
+
+module.exports = Product; 
+```
+
+#### Guardar un nuevo item
+
+```javascript 
+
+  save() {
+    const db = getDb();
+    return db.collection("products").insertOne(this);
+  }
+
+```
+
+en el controller
+
+```javascript 
+//----Importamos la clase a modo de bbdd
+const Product = require("../model/product");
+//const User = require("../model/user");
+
+module.exports.getAddProducts = (req, res, next) => {
+  res.render("admin/add-product", {
+    pageTitle: "Add-Product - ejs",
+    path: "/admin/add-product",
+  });
+};
+
+module.exports.postAddProduct = (req, res, next) => {
+  const title = req.body.title,
+    imgUrl = req.body.imgUrl,
+    price = req.body.price,
+    description = req.body.description;
+
+  const product = new Product(title, price, description, imgUrl);
+
+  product
+    .save()
+    .then((result) => {
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+};  
+ 
+```
+#### encontrar un elemento por ID
+El método `find()` no devuelve una promesa si no que duelve un cursor. Esto es así xq en principio en una collection puede haber multitud de documents y no lo queremos cargar todos en memoria. Así que nos devuelve un cursor y le vamos pidiendo a este el siguiente (next()).
+
+Para evitar que nos devuelva un cursor poque filtramos por id y estos son únicos podemos usar el método `finOne({_id:id})` así nos ahorramos el next()
+
+Si sabemos que en esa collection hay pocos documentos (aprox 100) podemos transformar ese cursor en un array, entonces nos almacena todo los documents en el array.
+
+`db.collection('product).find().toArray()`
+
+para implementar el método para obtener un producto por id hay que tener en cuenta que el id de la bbdd es un `ObjectId` por lo que para compararlo hay q transformar el id string a ObjectId
+
+Por eso después de usar find() hacemos .next() podríamos evitar llamar next() si hacemos findOne({_id:})
+
+```javascript 
+static getProductById(id) {
+  const db = getDb();
+  console.log(id);
+  return db
+    .collection("products")
+    .find({ _id: new mongodb.ObjectId(id) })
+    .next(); 
+}  
+```
+#### Modificar un item
+
+Utilizo el método `updateOne()` y tengo que pasarle un campo mediante el que filtrar y con la variable `$set` especificar las modificaciones.
+
+```javascript 
+
+static editProduct(id, newTitle, newPrice, newDescription, newImgUrl) {
+  const db = getDb();
+  return db.collection("products").updateOne(
+    { _id: new mongodb.ObjectId(id) },
+    {
+      $set: {
+        title: newTitle,
+        price: newPrice,
+        description: newDescription,
+        imgUrl: newImgUrl,
+      },
+    }
+  );
+}  
+```
+En la parte del controlador
+
+```javascript 
+module.exports.postEditProduct = (req, res, next) => {
+
+  const updatedTitle = req.body.title;
+  const updatedPrice = req.body.price;
+  const updatedDescription = req.body.description;
+  const updatedImgUrl = req.body.imgUrl;
+
+  Product.editProduct(
+    req.body.id,
+    updatedTitle,
+    updatedPrice,
+    updatedDescription,
+    updatedImgUrl
+  )
+    .then(() => {
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+};  
+```
+
+#### eliminar un item
+
+Usando el método `deleteOne()` y pasándole un id como filtro elimino una única collection.
+```javascript 
+static deletProduct(id) {
+  const db = getDb();
+  return db.collection("products").deleteOne({ _id: mongodb.ObjectId(id) });
+}
+```
+en el controlador
+
+```javascript 
+module.exports.postDeleteProduct = (req, res, next) => {
+  const prodId = req.body.prodId;
+  Product.deletProduct(prodId)
+    .then(() => {
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+}; 
+```
+### Creando un modelo para users
+
+Una vez creamos el modelo para usuarios, relacionamos el usuario con los productos que crea para ello incorporamos un nuevo campo en Product que será `userId`
+
+```javascript 
+const getDb = require("../util/database").getDb;
+const mongodb = require("mongodb");
+
+class User {
+  constructor(username, email, cart, _id) {
+    this.username = username;
+    this.email = email;
+    this.cart = cart;
+    this._id = _id;
+  }
+
+  save() {
+    const db = getDb();
+    db.collection("users").insertOne(this);
+  }
+
+  addToCart(product) {}
+
+  static getUserById(userId) {
+    const db = getDb();
+    return db.collection("users").findOne({ _id: mongodb.ObjectId(userId) });
+  }
+}
+
+module.exports = User; 
+```
+Al modelo de user incorporo dos campos el `id` y el `cart`. Creo un middleware en nuestro archivo `app.js` de tal manera que en cada conexión recupero un user de la bbdd con toda su info (nombre,mail, _id, carro) y creo un objeto user que  carguo en una variable de la request para poder utilizar sus métodos en toda la aplicación, esto simularia un login automático:
+
+```javascript 
+app.use((req, res, next) => {
+  User.getUserById("603bda7a44321577317b79ce")
+    .then((user) => {
+      req.user = new User(user.username, user.email, user.cart, user._id);
+      next();
+    })
+    .catch((err) => console.log(err));
+});  
+```
+
+
+Ahora añadimos un campo en el constructor de Product 
+
+```javascript 
+  constructor(title, price, description, imgUrl, userId) {
+    this.title = title;
+    this.price = price;
+    this.description = description;
+    this.imgUrl = imgUrl;
+    this.userId = userId;
+  }
+```
+
+### Cart model
+
+Lo que haremos con mongo es crear un objeto cart dentro de la difinición de cada usuario, lo que se llama un documento embebido.
+
+```javascript 
+  constructor(username, email, cart) {
+  this.username = username;
+  this.email = email;
+  this.cart = cart; // { items:[ {itemId: _id, quantity: cantidad},... ]}
+}
+```
+esta nueva variable será un objeto con un array items en su interior, con la siguiente estructura
+
+```javascript 
+cart= {
+    items:[
+        {productId: ObjectId, quantity:1},
+        {productId: ObjectId, quantity:1}
+      ]
+  }
+```
+Para poder añadir tiems al cart necesitamos saber si ese producto se encuentra ya en el carro, para ello tendremos que hacer una búsqueda y comparar sus id's para ello debemos transformar el id a string de la siguiente manera:
+
+```javascript 
+const cartProduct_index = this.cart.items.findIndex((prod) => {
+  return prod.productId.toString() === product._id.toString();
+}); 
+```
+con la función `findIndex()` nos dará el índice del array dnd se encuentra nuestro producto si no está devuelve un -1.
+
+Cuando modificamos datos no es bueno trabajar directamente sobre los datos de la bbdd sino copiarlos y trabajar sobre estas copias.
+
+```javascript 
+  addToCart(product) {
+    const db = getDb();
+    //creamos las variables q vamos a necesitar
+    let updatedCartItems = [...this.cart.items],
+      newQty,
+      updatedCart;
+
+    const cartProduct_index = this.cart.items.findIndex((prod) => {
+      return prod.productId.toString() === product._id.toString();
+    });
+
+    if (cartProduct_index >= 0) {
+      newQty = this.cart.items[cartProduct_index].quantity + 1;
+      updatedCartItems[cartProduct_index].quantity = newQty;
+    } else {
+      updatedCartItems.push({
+        productId: mongodb.ObjectId(product._id),
+        quantity: 1,
+      });
+    }
+
+    updatedCart = {
+      items: updatedCartItems,
+    };
+
+    return db.collection("users").updateOne(
+      { _id: mongodb.ObjectId(this._id) },
+      {
+        $set: {
+          cart: updatedCart,
+        },
+      }
+    );
+  } 
+```
+
+Ahora queremos obtener todos los productos que contiene nuestro carrito. Para ello utilizaré una sintaxi especial de mongoDB \$in, utilizando `find({_id:{$in: []}})` me permite buscar los productos que cumplan la condición, que su id se encunetre en el array que establezco con el parámetro \$in.
+
+```javascript 
+  getCart() {
+
+    const db = getDb();
+  // obtengo en un array todos los ids de los productos que tengo en el cart
+    const prodIds = this.cart.items.map((item) => item.productId);
+
+    return db
+      .collection("products")
+      .find({ _id: { $in: prodIds } })
+      .toArray()
+      .then((products) => {
+        return products.map((product) => {
+          return {
+            ...product,
+            quantity: this.cart.items.find((i) => {
+              return i.productId.toString() == product._id.toString();
+            }).quantity,
+          };
+        });
+      })
+      .catch((err) => console.log(err));
+  } 
+```
+Eliminar produtos del carro
+
+```javascript 
+  deleteProductById(prodId) {
+    const db = getDb();
+    let updatedCartItems = [...this.cart.items],
+      newQty;
+
+    const indexProduct = updatedCartItems.findIndex(
+      (p) => p.productId.toString() === prodId.toString()
+    );
+
+    if (indexProduct >= 0) {
+      newQty = updatedCartItems[indexProduct].quantity - 1;
+
+      if (newQty <= 0) {
+        updatedCartItems.splice(indexProduct, 1);
+      } else {
+        updatedCartItems[indexProduct].quantity = newQty;
+      }
+
+      return db
+        .collection("users")
+        .updateOne(
+          { _id: mongodb.ObjectId(this._id) },
+          { $set: { cart: { items: updatedCartItems } } }
+        );
+    }
+  }  
+```
+
+
+### order model
+
+Haremos algo parecido a lo q hicimos con cart, embebiremos el document order en el modelo de user. Creamos un método `addOrder` en el modelo User donde reseteamos el cart del user y creamos en la bbdd una nueva collection, orders, pasando todo el contenido de cart y tb borramos en la bbdd el array items.
+
+```javascript 
+addOrder() {
+  const db = getDb();
+  let order;
+
+  return this.getCart()
+    .then((products) => {
+      order = {
+        items: products,
+        user: {
+          _id: mongodb.ObjectId(this._id),
+          name: this.username,
+        },
+      };
+      return db.collection("orders").insertOne(order);
+    })
+    .then((result) => {
+      this.cart = { items: [] };
+      db.collection("users").updateOne(
+        { _id: mongodb.ObjectId(this._id) },
+        {
+          $set: {
+            cart: { items: [] },
+          },
+        }
+      );
+    })
+    .catch((err) => console.log(err));
+} 
+```
+Cuando queremos recuperar las orders de un user. Cuando hacemos un find() y queremos buscar por un campo dentro de otro campo debemos usar comillar.
+
+```javascript 
+getOrders() {
+  const db = getDb();
+  return db
+    .collection("orders")
+    .find({ "user._id": mongodb.ObjectId(this._id) })
+    .toArray();
+}
 ```
