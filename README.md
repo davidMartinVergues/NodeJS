@@ -129,6 +129,11 @@
     - [Creando un modelo para users](#creando-un-modelo-para-users)
     - [Cart model](#cart-model)
     - [order model](#order-model)
+- [T-12 Usando Mongoose](#t-12-usando-mongoose)
+  - [Que es mongoose?](#que-es-mongoose)
+  - [Instalar mongoose](#instalar-mongoose)
+  - [Trabajando con mongoose](#trabajando-con-mongoose)
+    - [Conectar con nuestra bbdd](#conectar-con-nuestra-bbdd)
 
 
 
@@ -2779,7 +2784,7 @@ Hasta ahora hemos utilizado consultas sql muy simples pero a medida que la app s
 
 # T-10 Sequelize
 
-Este módulo third party, concretamente una libreria 'object relational mapping', lo que hace es mapear la bbdd en objetos JS, que tienen métodos para ayudarnos en el manejo de las consultas sql.
+Es un ORM 'object relational mapping Library', lo que hace es mapear la bbdd en objetos JS, que tienen métodos para ayudarnos en el manejo de las consultas sql.
 Básicamente crearemos objetos con sus atributos y sequelize los mapeará en forma de tabla ejecutando internamente una consulta sql.
 
 Sequelize funciona con promesas.
@@ -4172,4 +4177,48 @@ getOrders() {
     .find({ "user._id": mongodb.ObjectId(this._id) })
     .toArray();
 }
+```
+
+# T-12 Usando Mongoose
+
+## Que es mongoose?
+Mongoose es un ODM (Object-Document-Mapping Lirary) para mongoDB. Éste nos permitirá simplificar la sintaxi, por ejemplo cuando quereamos añadir datos a una collection podremos hacerlo de la siguiente manera:
+
+![not found](img/img-46.png)
+
+Básicamente nos permitirá trabajar con objetos javaScript y los covertirá en collections y documents. Y podremos ejectar queries directamente sobre instancias de esos objetos.
+
+## Instalar mongoose
+
+web oficial https://mongoosejs.com/
+
+```javascript 
+npm install mongoose --save
+```
+## Trabajando con mongoose
+
+### Conectar con nuestra bbdd
+
+Mongoose ya tiene utilidad de gestión de la conexión, todo es transparente al usuario. Así que podemos borrar nuestro archivo de conexión database.js.
+
+Así que en mi archivo app.js importo mongoose y genero la conexión con mongo Atlas
+
+```javascript 
+
+//-----IMPORT
+
+const mongoose = require("mongoose");
+
+//------establcemos la conexion
+
+mongoose
+  .connect(
+    'mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+  )
+  .then((result) => {
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });  
 ```

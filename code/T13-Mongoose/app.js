@@ -12,8 +12,9 @@ const adminRoutes = require("./routes/admin");
 const errorController = require("./controllers/error");
 //-----IMPORT DB
 
-const mongoConnect = require("./util/database").mongoConnect;
-const User = require("./model/user");
+const mongoose = require("mongoose");
+
+//const User = require("./model/user");
 
 //------------ FIN IMPORTS ----------------
 
@@ -26,12 +27,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // para cada request guardamos el user en el objeto req
 app.use((req, res, next) => {
-  User.getUserById("60470af1d26ca646565213bc")
-    .then((user) => {
-      req.user = new User(user.username, user.email, user.cart, user._id);
-      next();
-    })
-    .catch((err) => console.log(err));
+  // User.getUserById("60470af1d26ca646565213bc")
+  //   .then((user) => {
+  //     req.user = new User(user.username, user.email, user.cart, user._id);
+  //     next();
+  //   })
+  //   .catch((err) => console.log(err));
 });
 //--------------
 // fijamos las rutas
@@ -40,6 +41,13 @@ app.use(shopRoutes);
 //--------------
 app.use(errorController.get404);
 
-mongoConnect(() => {
-  app.listen(3000);
-});
+mongoose
+  .connect(
+    "mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+  )
+  .then((result) => {
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
