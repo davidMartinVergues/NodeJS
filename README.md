@@ -219,8 +219,8 @@ Para cambiar este comportamiento del this debemos usar el método bind() que fij
 
 ```javascript
 btn.addEventListener('click', this.addName.bind(this)); //vuelvo a poner this xq en el
-                                                          contexto del contructor quien
-                                                          lo llama es la propia clase
+                                                         // contexto del contructor quien
+                                                        //  lo llama es la propia clase
 
 ```
 
