@@ -196,8 +196,8 @@ class NameGeenerator{
       this.names= ['Desi','Jenni','David']          //asequible a toda la clase
       this.currentName= 0;
       btn.addEventListener('click', this.addName); //acceder a 1 método de la clase
-                                                    aquí This hace referencia a la clase
-                                                    xq quien llama al constructor es la clase
+                                                   //aquí This hace referencia a la clase
+                                                   // xq quien llama al constructor es la clase
     }
 
     addName(){
