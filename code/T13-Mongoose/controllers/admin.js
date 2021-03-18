@@ -13,15 +13,20 @@ module.exports.postAddProduct = (req, res, next) => {
   const title = req.body.title,
     imgUrl = req.body.imgUrl,
     price = req.body.price,
-    description = req.body.description,
-    userId = req.user._id;
+    description = req.body.description;
 
-  const product = new Product(title, price, description, imgUrl, userId);
+  const product = new Product({
+    title: title,
+    price: price,
+    description: description,
+    imgUrl: imgUrl,
+    userId: req.user,
+  });
 
   product
     .save()
     .then((result) => {
-      console.log(result);
+      console.log("added" + result);
       res.redirect("/admin/products");
     })
     .catch((err) => console.log(err));
@@ -30,7 +35,7 @@ module.exports.postAddProduct = (req, res, next) => {
 module.exports.getEditProduct = (req, res, next) => {
   const prodId = req.params.prodId;
 
-  Product.getProductById(prodId)
+  Product.findById(prodId)
     .then((product) => {
       if (!product) {
         return res.redirect("/");
@@ -47,7 +52,7 @@ module.exports.getEditProduct = (req, res, next) => {
 
 module.exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.prodId;
-  Product.deletProduct(prodId)
+  Product.findByIdAndDelete(prodId)
     .then(() => {
       res.redirect("/admin/products");
     })
@@ -60,13 +65,15 @@ module.exports.postEditProduct = (req, res, next) => {
   const updatedDescription = req.body.description;
   const updatedImgUrl = req.body.imgUrl;
 
-  Product.editProduct(
-    req.body.id,
-    updatedTitle,
-    updatedPrice,
-    updatedDescription,
-    updatedImgUrl
-  )
+  Product.findById(req.body.id)
+    .then((product) => {
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.imgUrl = updatedImgUrl;
+      product.description = updatedDescription;
+
+      return product.save();
+    })
     .then(() => {
       res.redirect("/admin/products");
     })
@@ -74,8 +81,11 @@ module.exports.postEditProduct = (req, res, next) => {
 };
 
 module.exports.getAdminProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
+    // .select("title price -_id")
+    // .populate("userId", "name")
     .then((products) => {
+      console.log(products);
       res.render("admin/products", {
         items: products,
         pageTitle: "Admin Products",

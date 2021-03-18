@@ -134,6 +134,18 @@
   - [Instalar mongoose](#instalar-mongoose)
   - [Trabajando con mongoose](#trabajando-con-mongoose)
     - [Conectar con nuestra bbdd](#conectar-con-nuestra-bbdd)
+    - [Product model](#product-model-1)
+      - [CRUD con mongoose](#crud-con-mongoose)
+        - [Create](#create)
+        - [Read](#read)
+        - [Update](#update)
+        - [Delete](#delete)
+    - [User model](#user-model)
+    - [Establecer relaciones con mongoose](#establecer-relaciones-con-mongoose)
+    - [Obtener datos de modelos relacionados](#obtener-datos-de-modelos-relacionados)
+      - [select()](#select)
+      - [populate()](#populate)
+    - [Trabajando en el cart](#trabajando-en-el-cart)
 
 
 
@@ -3712,7 +3724,7 @@ const mongoConnect = (callback) => {
     "mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
   )
     .then((client) => {
-      _db = client.db();
+      _db = client.db('node-app');
       callback();
     })
     .catch((err) => {
@@ -3734,12 +3746,12 @@ module.exports.getDb = getDb;
 ```
 
 Podemos modificar la bbdd de datos por defecto o bien cambiando la url 
-`"mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/miBBDD?retryWrites=true&w=majority"`
+`"mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/node-app?retryWrites=true&w=majority"`
 
 o bien en el método 
 
 ```javascript 
- _db = client.db('miBBDD');
+ _db = client.db('node-app');
 ```
 
 
@@ -4203,6 +4215,7 @@ Mongoose ya tiene utilidad de gestión de la conexión, todo es transparente al 
 
 Así que en mi archivo app.js importo mongoose y genero la conexión con mongo Atlas
 
+Tener en cuenta que en la URL suministrada por Atlas puedo cambiar la bbdd por defecto así que le pongo un nuevo nombre, `shop-mongoose`
 ```javascript 
 
 //-----IMPORT
@@ -4213,7 +4226,7 @@ const mongoose = require("mongoose");
 
 mongoose
   .connect(
-    'mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+    'mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/shop-mongoose?retryWrites=true&w=majority'
   )
   .then((result) => {
     app.listen(3000);
@@ -4222,3 +4235,385 @@ mongoose
     console.log(err);
   });  
 ```
+
+### Product model
+
+
+Para crear un modelo/schema con mongoose utilizamos la siguiente sintaxi. Cuando definimos los campos del modelo debemos especificar el tipo de dato(importante). Lo que parece contradictorio ya que mongoDB se caracteriza por no tener un esquema fijo, es decir los datos que almacenamos en cada documento dentro de una conllection pueden variar. Pero mongoose no restringe esta flexibilidad pero si necesita para funcionar que nuestros datos tengas un cierta estructura.
+
+```javascript 
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+const productSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  imgUrl: {
+    type: String,
+    required: true,
+  },
+});
+ 
+module.exports = mongoose.model("Product", productSchema);
+```
+
+Para poder usar este schema de mongoose debemos exportarlo de una manera especial, usando el método `model()`
+
+#### CRUD con mongoose
+
+##### Create 
+
+Ahora en el admin controller podemos crear nuevos productos y guardardarlos en la bbdd, cuando guardemos un schema(Product) por primera vez mongoose generará una collection con el mismo nombre pero en plural.
+
+En el campo `userId` almacenamos todo el objeto user en lugar de solo el _id pq mongoose trabaja mejor así, ya se encargará de coger el _id.
+
+```javascript 
+
+//----Importamos el schema/model creado con monogoose.
+const Product = require("../model/product");
+//--------------
+module.exports.postAddProduct = (req, res, next) => {
+  const title = req.body.title,
+    imgUrl = req.body.imgUrl,
+    price = req.body.price,
+    description = req.body.description;
+// creamos el objeto usando sintaxi mongoose
+  const product = new Product({
+    title: title,
+    price: price,
+    description: description,
+    imgUrl: imgUrl,
+    userId: req.user
+  });
+//guardamos el bjeto usando método save suministrado por monogoose
+  product
+    .save()
+    .then((result) => {
+      console.log("added" + result);
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+}; 
+```
+
+##### Read
+
+Para poder ver los productos de la bbdd tenemos que modificar lo siguiente en el controller shop. Mongoose tb tiene un método find() pero no nos devuelve un cursor si no todos los datos de la collection en forma de array, sii sabemos que son muchos podemos convertirlo en cursor con `Product.find().cursor().next()` pero nosotros los obtendremos todos.
+
+```javascript 
+module.exports.getProducts = (req, res, next) => {
+  Product.find()
+    .then((products) => {
+      console.log(products);
+      res.render("shop/product-list", {
+        items: products,
+        pageTitle: "All products",
+        path: "/products",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+```
+Si queremos buscar un poducto en concreto mongoose tiene un método `findById()` que le podeemos pasar el id en forma de string que mongoose se encarga de transformarlo a ObjectId() para poder compararlo.
+
+##### Update
+
+Para modificar un objeto, podemos usar el modo  `findById()` lo que nos devuelve no es un objeto tipo JS sino un objeto de mongoose sobre el cual podemos llamar métodos como `save()`, si llamamos save() sobre un objeto existente en la bbdd lo que conseguimos es guardar los cambios del obeto(update)
+
+```javascript 
+
+module.exports.postEditProduct = (req, res, next) => {
+  const updatedTitle = req.body.title;
+  const updatedPrice = req.body.price;
+  const updatedDescription = req.body.description;
+  const updatedImgUrl = req.body.imgUrl;
+
+  Product.findById(req.body.id)
+    .then((product) => {
+      // recuperamos el objeto tipo mongoose
+
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.imgUrl = updatedImgUrl;
+      product.description = updatedDescription;
+// llamamos al método save() sobre el mongoose object
+      return product.save();
+    })
+    .then(() => {
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+};
+ 
+```
+
+##### Delete
+
+Para eliminar un documento podemos usar el método `findByIdAnDelete()`
+
+```javascript 
+module.exports.postDeleteProduct = (req, res, next) => {
+  const prodId = req.body.prodId;
+  Product.findByIdAndDelete(prodId)
+    .then(() => {
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+}; 
+```
+
+### User model
+
+Creamos el modelo para User y este schema será un poco más complejo pq contiene un document embedido.
+```javascript 
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+const userSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  cart: {
+    items: [
+      {
+        productId: { type: Schema.Types.ObjectId,required: true },
+        quantity: { type: Number, required: true },
+      },
+    ],
+  },
+}); 
+
+module.exports = mongoose.model("User", userSchema);
+ 
+```
+
+Una vez definido nuestro schema xa user creamos uno cuando se levante el servidor, con el condicional si no existe ninguno en la bbdd, ya q `finOne()` devuelve el primero que encuentre.
+
+```javascript 
+mongoose
+  .connect(
+    "mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/shop-mongoose?retryWrites=true&w=majority"
+  )
+  .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "David Martin",
+          email: "dmverges@gmail.com",
+          cart: {
+            items: [],
+          },
+        });
+        user.save();
+      }
+    });
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+```
+
+una vez lo tenemos almacenado en la bbdd podemos activar el middleware que permitirá guardar el objeto user (es un objeto de mongoose, por lo tanto con todos sus métodos) en cada request.
+
+```javascript 
+app.use((req, res, next) => {
+  User.findById("604935bbbb2da1de484b55b8")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => console.log(err));
+});  
+```
+### Establecer relaciones con mongoose
+
+Cuando tenemos modelos que están relacionados como en nuestro caso Products y Users, en la definición del modelo podemos especificar un campo `ref` y el nombre del modelo el que indicamos en la sentencia `module.exports = mongoose.model("User", userSchema);` por ejemplo `(ref:'User')`. Entonces los modelos quedan de la siguiente manera:
+
+```javascript 
+const productSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  imgUrl: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+}); 
+
+module.exports = mongoose.model("Product", productSchema);
+```
+
+```javascript 
+const userSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  cart: {
+    items: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+      },
+    ],
+  },
+});
+
+module.exports = mongoose.model("User", userSchema);
+```
+
+### Obtener datos de modelos relacionados
+
+Hay métodos que nos pueden ayudar a obtener los datos: 
+1. `select('field1 field2')`
+2. `populate('fieldName')` 
+
+#### select()
+
+Select en combinación con `fin()` permite obtener solo los campos especificados, por defecto siempre se devuele el _id si lo queremos evitar especificamos `-_id`.
+
+```javascript 
+Product.find()
+  .select("title price -_id")
+  .then(prdocts=>{
+    console.log(products)
+  })
+  .catch(err=>console.log(err))
+ 
+```
+
+#### populate()
+
+Ahora mismo nuestros productos guardados en la bbdd cuentan con un campo `userId` que es una referencia al modelo user. El campo tiene esta estructura definida en el modelo
+```javascript 
+userId: {
+  type: Schema.Types.ObjectId,
+  ref: "User",
+  required: true,
+},  
+```
+
+el producto almacenado en la bbdd tiene esta estructura:
+
+```javascript 
+{
+  _id: 604c8c0f9afa3725d624425d,
+  title: 'book-2',
+  price: 3.99,
+  description: '5eu4j455444',
+  imgUrl: 'https://static2planetadelibroscom.cdnstatics.com/usuaris/libros/fotos/70/original/portada_el-senor-de-los-anillos-iii-el-retorno-del-rey_j-r-r-tolkien_201505211337.jpg',
+  userId: 6049388ff1f3dae6be7e56a8,
+  __v: 0
+}  
+```
+Podemos obtener los datos asociados al campo `userId` de product utilizando un método de mongoose llamado `populate('userId')` especificando el campo con referencia. Este método se utiliza en combinación con `find()`. Podemos añadir otro argumento, del tipo string, a populate('field1', 'field2 field2.1 field2.3') este segundo argumento indica los campo que queremos obtener del modelo especificado (User) funciona como `select()`
+
+```javascript 
+module.exports.getAdminProducts = (req, res, next) => {
+  Product.find()
+    .populate("userId")
+    .then((products) => {
+      console.log(products);
+      res.render("admin/products", {
+        items: products,
+        pageTitle: "Admin Products",
+        path: "/admin/products",
+      });
+    })
+    .catch((err) => console.log(err));
+}; 
+```
+Los datos que nos devuelve son además de los datos del Product todos los datos referentes al usuario:
+
+```javascript 
+{
+    _id: 604c8c0f9afa3725d624425d,
+    title: 'book-2',
+    price: 3.99,
+    description: '5eu4j455444',
+    imgUrl: 'https://static2planetadelibroscom.cdnstatics.com/usuaris/libros/fotos/70/original/portada_el-senor-de-los-anillos-iii-el-retorno-del-rey_j-r-r-tolkien_201505211337.jpg',
+    userId: {
+      cart: [Object],
+      _id: 6049388ff1f3dae6be7e56a8,
+      name: 'David Martin',
+      email: 'dmverges@gmail.com',
+      __v: 0
+    },
+    __v: 0
+  } 
+ 
+```
+### Trabajando en el cart
+
+Para añadir productos al cart esente en cada user teníamos un método en user, Con mongoose podemos añadir a los models nuestros propios métodos:
+
+```javascript 
+userSchema.methods.addToCart = function (product) {
+  let updatedCartItems = [...this.cart.items],
+    newQty,
+    updatedCart;
+
+  const cartProduct_index = this.cart.items.findIndex((prod) => {
+    return prod.productId.toString() === product._id.toString();
+  });
+
+  if (cartProduct_index >= 0) {
+    newQty = this.cart.items[cartProduct_index].quantity + 1;
+    updatedCartItems[cartProduct_index].quantity = newQty;
+  } else {
+    updatedCartItems.push({
+      productId: product._id,
+      quantity: 1,
+    });
+  }
+  updatedCart = {
+    items: updatedCartItems,
+  };
+  this.cart = updatedCart;
+  return this.save();
+};
+```
+Hay pequeñas diferencias con el anterior y es que los _id los podemos usar directamente, no es necesario hacer `mongodb.ObjectId(product._id)` y que una vez modificado el cart solo tenemos que llamar al método  `save()` no tenemos que hacer un update específicamente, ya que mongoose si detecta que ya existe en nugar de guardar uno nuevo sobreescribirá el anterior
+

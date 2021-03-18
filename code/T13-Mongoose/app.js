@@ -14,7 +14,7 @@ const errorController = require("./controllers/error");
 
 const mongoose = require("mongoose");
 
-//const User = require("./model/user");
+const User = require("./model/user");
 
 //------------ FIN IMPORTS ----------------
 
@@ -27,12 +27,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // para cada request guardamos el user en el objeto req
 app.use((req, res, next) => {
-  // User.getUserById("60470af1d26ca646565213bc")
-  //   .then((user) => {
-  //     req.user = new User(user.username, user.email, user.cart, user._id);
-  //     next();
-  //   })
-  //   .catch((err) => console.log(err));
+  User.findById("6049388ff1f3dae6be7e56a8")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => console.log(err));
 });
 //--------------
 // fijamos las rutas
@@ -43,9 +43,21 @@ app.use(errorController.get404);
 
 mongoose
   .connect(
-    "mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+    "mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/shop-mongoose?retryWrites=true&w=majority"
   )
   .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "David Martin",
+          email: "dmverges@gmail.com",
+          cart: {
+            items: [],
+          },
+        });
+        user.save();
+      }
+    });
     app.listen(3000);
   })
   .catch((err) => {

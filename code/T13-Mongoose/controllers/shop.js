@@ -4,8 +4,9 @@ const Product = require("../model/product");
 const User = require("../model/user");
 
 module.exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
+      console.log(products);
       res.render("shop/product-list", {
         items: products,
         pageTitle: "All products",
@@ -18,7 +19,7 @@ module.exports.getProducts = (req, res, next) => {
 };
 
 module.exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/index", {
         items: products,
@@ -33,23 +34,18 @@ module.exports.getIndex = (req, res, next) => {
 
 module.exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
+    .populate("cart.items.productId")
+    .execPopulate()
     .then((datos) => {
-      res.render("shop/cart.ejs", {
-        pageTitle: "tu carrito",
-        productData: datos,
-        path: "/cart",
-      });
+      console.log(datos.cart.items);
+      // res.render("shop/cart.ejs", {
+      //   pageTitle: "tu carrito",
+      //   productData: datos,
+      //   path: "/cart",
+      // });
     })
     .catch((err) => console.log(err));
 };
-
-// module.exports.getCheckout = (req, res, next) => {
-//   res.render("shop/checkout", {
-//     pageTitle: "Checkout",
-//     path: "/checkout",
-//   });
-// };
 
 module.exports.getOrders = (req, res, next) => {
   req.user
@@ -65,7 +61,7 @@ module.exports.getOrders = (req, res, next) => {
 };
 
 module.exports.getProduct = (req, res, next) => {
-  Product.getProductById(req.params.productId)
+  Product.findById(req.params.productId)
     .then((product) => {
       res.render("shop/product-detail", {
         product: product,
@@ -81,7 +77,7 @@ module.exports.getProduct = (req, res, next) => {
 module.exports.addToCart = (req, res, next) => {
   const prodId = req.body.productId;
 
-  Product.getProductById(prodId)
+  Product.findById(prodId)
     .then((prod) => {
       return req.user.addToCart(prod);
     })
