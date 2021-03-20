@@ -26,6 +26,30 @@ const userSchema = new Schema({
   },
 });
 
+userSchema.methods.deleteProductById = function(prodId){
+  let updatedCartItems = [...this.cart.items],
+        newQty;
+  
+      const indexProduct = updatedCartItems.findIndex(
+        (p) => p.productId.toString() === prodId.toString()
+      );
+  
+      if (indexProduct >= 0) {
+        newQty = updatedCartItems[indexProduct].quantity - 1;
+  
+        if (newQty <= 0) {
+          updatedCartItems.splice(indexProduct, 1);
+        } else {
+          updatedCartItems[indexProduct].quantity = newQty;
+        }
+
+        this.cart.items = updatedCartItems;
+        return this.save();
+  
+      }
+
+}
+
 userSchema.methods.addToCart = function (product) {
   let updatedCartItems = [...this.cart.items],
     newQty,

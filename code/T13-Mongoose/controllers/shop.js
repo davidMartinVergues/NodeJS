@@ -1,7 +1,10 @@
-const path = require("path");
-//----Importamos la clase a modo de bbdd
+
+
 const Product = require("../model/product");
 const User = require("../model/user");
+const Order = require("../model/order");
+const { Logger } = require("mongodb");
+
 
 module.exports.getProducts = (req, res, next) => {
   Product.find()
@@ -33,24 +36,23 @@ module.exports.getIndex = (req, res, next) => {
 };
 
 module.exports.getCart = (req, res, next) => {
-  req.user
-    .populate("cart.items.productId")
-    .execPopulate()
-    .then((datos) => {
-      console.log(datos.cart.items);
-      // res.render("shop/cart.ejs", {
-      //   pageTitle: "tu carrito",
-      //   productData: datos,
-      //   path: "/cart",
-      // });
-    })
+
+req.user
+   .execPopulate("cart.items.productId")
+   .then((userEnhanced) => {
+      res.render("shop/cart.ejs", {
+        pageTitle: "tu carrito",
+        productData: userEnhanced.cart.items,
+        path: "/cart",
+      });
+   })
     .catch((err) => console.log(err));
 };
 
 module.exports.getOrders = (req, res, next) => {
-  req.user
-    .getOrders()
+  Order.find({'user.userId' : req.user._id})
     .then((orders) => {
+      console.log(orders);
       res.render("shop/orders", {
         pageTitle: "Orders",
         path: "/orders",
@@ -102,10 +104,35 @@ module.exports.postDeleteProduct = (req, res, next) => {
 };
 
 module.exports.postOrder = (req, res, next) => {
+
   req.user
-    .addOrder()
-    .then((result) => {
+  .execPopulate('cart.items.productId')
+  .then(user=>{
+
+    console.log(user.cart.items);
+
+    const products = user.cart.items.map(item=>{
+      return { quantity: item.quantity, product: {...item.productId._doc}}
+    })
+
+    const order = new Order({
+      user:{
+        name : req.user.name,
+        userId: req.user
+      },
+      products:products
+    })
+    return order.save();
+  })
+  .then((result) => {
+    req.user.cart = {
+      items:[]
+    }
+    return req.user.save();
+      
+    })
+    .then(result=>{
       res.redirect("/orders");
     })
-    .catch((err) => console.log(err));
+  .catch((err) => console.log(err));
 };

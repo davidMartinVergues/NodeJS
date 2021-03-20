@@ -32,12 +32,12 @@
         <tbody>
           <% productData.forEach(element => { %>
           <tr>
-            <th scope="row"><%= element.title%></th>
-            <td><%= element.price%></td>
+            <th scope="row"><%= element.productId.title%></th>
+            <td><%= element.productId.price%></td>
             <td><%= element.quantity%></td>
             <td>
               <form action="/cart-delete-product/" method="POST">
-                <input type="hidden" name="prodId" value="<%= element._id%>" />
+                <input type="hidden" name="prodId" value="<%= element.productId._id%>" />
                 <button class="btn btn-outline-danger" type="submit">
                   Delete
                 </button>
