@@ -146,6 +146,12 @@
       - [select()](#select)
       - [populate()](#populate)
     - [Trabajando en el cart](#trabajando-en-el-cart)
+      - [Añadir productos al cart](#añadir-productos-al-cart)
+      - [Pintar productos del cart](#pintar-productos-del-cart)
+      - [Eliminar productos del cart](#eliminar-productos-del-cart)
+    - [order model](#order-model-1)
+      - [creando una orden](#creando-una-orden)
+      - [obtener las orders](#obtener-las-orders)
 
 
 
@@ -4539,16 +4545,16 @@ el producto almacenado en la bbdd tiene esta estructura:
 
 ```javascript 
 {
-  _id: 604c8c0f9afa3725d624425d,
+  _id: ObjectId(604c8c0f9afa3725d624425d),
   title: 'book-2',
   price: 3.99,
   description: '5eu4j455444',
   imgUrl: 'https://static2planetadelibroscom.cdnstatics.com/usuaris/libros/fotos/70/original/portada_el-senor-de-los-anillos-iii-el-retorno-del-rey_j-r-r-tolkien_201505211337.jpg',
-  userId: 6049388ff1f3dae6be7e56a8,
+  userId: ObjectId(6049388ff1f3dae6be7e56a8),
   __v: 0
 }  
 ```
-Podemos obtener los datos asociados al campo `userId` de product utilizando un método de mongoose llamado `populate('userId')` especificando el campo con referencia. Este método se utiliza en combinación con `find()`. Podemos añadir otro argumento, del tipo string, a populate('field1', 'field2 field2.1 field2.3') este segundo argumento indica los campo que queremos obtener del modelo especificado (User) funciona como `select()`
+Podemos obtener los datos asociados al campo `userId` de product utilizando un método de mongoose llamado `populate('userId')` especificando el campo con referencia. Este método se utiliza en combinación con `find()`. Podemos añadir otro argumento, del tipo string, a populate('userId', 'field1', 'field2 field2.1 field2.3') este segundo argumento indica los campo que queremos obtener del modelo especificado (User) funciona como `select()`
 
 ```javascript 
 module.exports.getAdminProducts = (req, res, next) => {
@@ -4585,8 +4591,11 @@ Los datos que nos devuelve son además de los datos del Product todos los datos 
   } 
  
 ```
+No es necesario utilizar populate con find() podemos llamar al método pobre un modelo que sabemos que uno de sus campos está enlazado con otro modelo.
+
 ### Trabajando en el cart
 
+#### Añadir productos al cart
 Para añadir productos al cart esente en cada user teníamos un método en user, Con mongoose podemos añadir a los models nuestros propios métodos:
 
 ```javascript 
@@ -4615,5 +4624,216 @@ userSchema.methods.addToCart = function (product) {
   return this.save();
 };
 ```
-Hay pequeñas diferencias con el anterior y es que los _id los podemos usar directamente, no es necesario hacer `mongodb.ObjectId(product._id)` y que una vez modificado el cart solo tenemos que llamar al método  `save()` no tenemos que hacer un update específicamente, ya que mongoose si detecta que ya existe en nugar de guardar uno nuevo sobreescribirá el anterior
+Hay pequeñas diferencias con el anterior y es que los _id los podemos usar directamente, no es necesario hacer `mongodb.ObjectId(product._id)` y que una vez modificado el cart solo tenemos que llamar al método  `save()` no tenemos que hacer un update específicamente, ya que mongoose si detecta que ya existe ese registro, en nugar de guardar uno nuevo sobreescribirá el anterior.
 
+#### Pintar productos del cart
+
+Tenemos que tener en cuenta varias cosas, `populate()`por si mismo no devuelve nada tiene que estar asociado a un método de búsqueda como find() por ejemplo si ejecuto :
+```javascript
+const x = req.user
+                .populate("cart.items.productId");
+
+console.log(x);
+
+```
+me devuelve
+```javascript
+{
+  cart: { items: [ [Object] ] },
+  _id: 6049388ff1f3dae6be7e56a8,
+  name: 'David Martin',
+  email: 'dmverges@gmail.com',
+  __v: 0
+}
+```
+los datos del user sin más, como si hubiese hecho `req.user` Ahora bien si lo asocio a un find()
+
+```javascript
+Product
+  .find()
+  .populate("userId")
+  .then(r=>{
+    console.log(r);
+})
+```
+me devuelve los productos con los datos del user asociados
+
+```javascript
+  {
+    _id: 604c8c0f9afa3725d624425d,
+    title: 'book-2',
+    price: 3.99,
+    description: '5eu4j455444',
+    imgUrl: 'https://static2planetadelibroscom.cdnstatics.com/usuaris/libros/fotos/70/original/portada_el-senor-de-los-anillos-iii-el-retorno-del-rey_j-r-r-tolkien_201505211337.jpg',
+    userId: {
+      cart: [Object],
+      _id: 6049388ff1f3dae6be7e56a8,
+      name: 'David Martin',
+      email: 'dmverges@gmail.com',
+      __v: 0
+    },
+    __v: 0
+  }
+```
+Si quisiera ejecutar un populate() directamente porque sé que el campo está enlazado con otro modelo entonces tengo que usar el método  `execPopulate()`
+
+```javascript
+req.user
+    .execPopulate("cart.items.productId")
+    .then(userEnhanced=>{
+      console.log(userEnhanced);
+    })
+    .catch((err) => console.log(err));
+```
+esto me devuelve 
+```javascript
+{
+  cart: { items: [ [Object] ] },
+  _id: ObjectId(6049388ff1f3dae6be7e56a8),
+  name: 'David Martin',
+  email: 'dmverges@gmail.com',
+  __v: 0
+}
+```
+con la diferencia que cart.items contiene toda la info de los productos, para poder acceder a ella solo tengo q navegar por el objeto.
+```javascript
+req.user
+    .execPopulate("cart.items.productId")
+    .then(userEnhanced=>{
+      console.log(userEnhanced.cart.items);
+    })
+    .catch((err) => console.log(err));
+```
+
+esto nos devuelve el array de los items junto con la info de los productos, si quisieramos solo cierta info del producto podemos añadir un segundo argumento al método 
+
+```javascript
+  req.user
+    //.populate("cart.items.productId")
+    .execPopulate("cart.items.productId", "title")
+    .then((datos) => {
+      console.log(datos.cart.items);
+```
+
+#### Eliminar productos del cart
+
+Para ello extenderemos la funcionalidad de nuestro model User añadiendo un método
+
+```javascript
+userSchema.methods.deleteProductById = function(prodId){
+  let updatedCartItems = [...this.cart.items],
+        newQty;
+  
+      const indexProduct = updatedCartItems.findIndex(
+        (p) => p.productId.toString() === prodId.toString()
+      );
+  
+      if (indexProduct >= 0) {
+        newQty = updatedCartItems[indexProduct].quantity - 1;
+  
+        if (newQty <= 0) {
+          updatedCartItems.splice(indexProduct, 1);
+        } else {
+          updatedCartItems[indexProduct].quantity = newQty;
+        }
+
+        this.cart.items = updatedCartItems;
+        return this.save();
+  
+      }
+
+}
+
+```
+
+### order model
+
+Creamos un nuevo modelo para orders
+
+```javascript
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+
+const orderSchema = new Schema({
+    user :{
+      name:{
+        type: String,
+        required: true
+    },
+    userId:{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+
+    }
+    },
+    products:[{
+        product: {type:Object,require: true},
+        quantity: {type:Number, required: true}
+    }]
+
+})
+
+
+module.exports = mongoose.model('Order', orderSchema);
+
+```
+#### creando una orden
+
+Siguiendo el esquema que hemos definido para una orden.
+
+`_doc` es para que del objeto que obtengo de la bbdd solo coja los datos que hemos almacenado nosotros directamente como title,  que no devuelva otros datos propios de la bbdd como info sobre la collection o document y cosas así
+
+```javascript
+module.exports.postOrder = (req, res, next) => {
+
+  req.user
+  .execPopulate('cart.items.productId')
+  .then(user=>{
+
+    const products = user.cart.items.map(item=>{
+      return { quantity: item.quantity, product: {...item.productId._doc}}
+    })
+
+    const order = new Order({
+      user:{
+        name : req.user.name,
+        userId: req.user
+      },
+      products:products
+    })
+    return order.save();
+  })
+  .then((result) => {
+    req.user.cart = {
+      items:[]
+    }
+    return req.user.save();
+      
+    })
+    .then(result=>{
+      res.redirect("/orders");
+    })
+  .catch((err) => console.log(err));
+};
+
+```
+#### obtener las orders
+
+```javascript
+module.exports.getOrders = (req, res, next) => {
+  Order.find({'user.userId' : req.user._id})
+    .then((orders) => {
+      console.log(orders);
+      res.render("shop/orders", {
+        pageTitle: "Orders",
+        path: "/orders",
+        orders: orders,
+      });
+    })
+    .catch((err) => console.log(err));
+};
+
+
+```
