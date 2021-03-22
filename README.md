@@ -152,6 +152,11 @@
     - [order model](#order-model-1)
       - [creando una orden](#creando-una-orden)
       - [obtener las orders](#obtener-las-orders)
+- [T13 - Sessions and cookies](#t13---sessions-and-cookies)
+  - [creando una cookie](#creando-una-cookie)
+  - [creando sessiones](#creando-sessiones)
+    - [Implementación de una session](#implementación-de-una-session)
+    - [guardando la session en la bbdd](#guardando-la-session-en-la-bbdd)
 
 
 
@@ -4834,6 +4839,112 @@ module.exports.getOrders = (req, res, next) => {
     })
     .catch((err) => console.log(err));
 };
+```
+# T13 - Sessions and cookies
 
+Las cookies son datos que almacenamos en el browser del user. Por ejemplo un usuario  se logea en nuestra app, rellena el login form y hace una petición al server este, si la info es correcta devuelve una respuesta, por ejemplo lo redirige a otra página de la app pero además le manda una cookie via response header con info del user por ejemplo que el usuario está autenticado y lo almacena en el browser. En las subsiguientes peticiones del user enviar de veulta esa cookie con la info q vamos almacenando.
 
+Lo bueno de las cookies es q son exclusivas de usuarios, se almacenan en el navegador de usuario que genera la petición.
+
+![not found](img/img-47.png)
+
+En esta sección solo nos centraremos en como trabajar con cookies, no haremos comprobacionesde las credenciales.
+
+Cosas a tener en cuenta:
+
+1. Cada petición al servidor se trata de manera independiente, incluso aunq vengan de la misma ip.
+2. Cuando hago un `res.redirect()`esto crea una nueva request al servidor.
+  
+3. 
+```javascript
+      app.use((req, res, next) => {
+        User.findById("6049388ff1f3dae6be7e56a8")
+          .then((user) => {
+            req.user = user;
+            next();
+          })
+          .catch((err) => console.log(err));
+      });
+``` 
+Este código se encunetra en mi archivo de entrada a la app, para cada request, lo primero que hacía antes de que se pudiera acceder a las routes
+`app.use("/admin", adminRoutes.routes); app.use(shopRoutes); `  (recordemos que node se lee de arriba hacia abajo)  es crear una variable `user` en la request. Pero si en un controller hacemos : 
+
+```javascript
+ req.isLogged = true;
+ res.redirect('/')
+```
+al hacer un redirect se crea una nueva request y la variable `isLogged` se pierde junto a la request inicial.
+
+4. Para poder tranmitir información a toda la app en este puntp hay q hacer una cookie.
+
+## creando una cookie
+
+Para crear una cookie usamos:
+
+```javascript
+res.setHeader('set-cookie','loggIn=true');
+```
+La cookie acepta como info pares clave-valor. Una vez creada para ese usuario el navegador la enviará para cada request.
+
+Podemos encadenar varios pares clave-valor separados por ';'. Hay algunas keywords como:
+
+1. `Expires` para fijar cuando se eliminará la cookie la fecha debe seguir un formato http date format. Si no se especifica este valor por defecto la cookie se borra al cerra el navegador.
+   1. `res.setHeader('set-cookie','Expires=Expires=Thu, 31 Oct 2021 07:28:00 GMT');`
+2. `Max-Age` hay que especificar un valor en segundos
+   1. `res.setHeader('set-cookie','Max-Age=10');`
+3. `Secure` para especificar que la cookie solo se cree en servidores seguros https `res.setHeader('set-cookie','Secure');`
+4. `HttpOnly` permite definir que la info de la cookie solo se puede leer usando peticiones http no desde JS del cliente
+
+![not found](img/img-48.png)
+
+Ahora si generamos una nueva petición al servidor vemos como en la cabecera de la request manda la cookie
+
+![not found](img/img-49.png)
+
+El punto malo de las cookies es q el usuario puede manipular su contenido así que no debemos almacenar info importante en ellas. Para esos casos tenemos las sessions.
+
+## creando sessiones
+
+Hemos visto cómo las cookies se crean en el cliente, en cambio las sessions las creamos en el servidor, esta sessions se compartirá para todas las request del mismo usuario. La info de la session puede estar almacenada en ls bbdd o en memoria del servidor. Para ello cada vez que el user hace la request tiene q comunicarle al server cual es su sesión. Para poder hacer esto almacenaremos el ID de la sesión en una cookie pero encriptado.
+
+Será la session la que contendrá info sensible del user.
+
+![not found](img/img-50.png)
+
+### Implementación de una session
+
+Para ello necesitaremos un paquete de terceros. INstalamos `express-sessions`
+
+```javascript
+npm install express-session --save
+```
+Configuramos el middleware para generar la session
+
+```javascript
+
+const session = require('express-session')
+
+app.use(session({secret: 'my secret', resave:false ,saveUninitialized:false}))
+```
+
+Vamos a nuestro controller auth, ahora en la request tenemos un campo session donde podemos almacenar info. Esto creará una cookie automáticamente con el id de la session a la q pertenece.
+
+```javascript
+module.exports.postLogin= (req,res,next)=>{
+
+    req.session.isLogged = true;
+    res.redirect('/')
+   
+}
+```
+![not found](img/img-51.png)
+
+### guardando la session en la bbdd
+
+Hasta ahora almacenábamos la session en memoria pero en producción, si se conectan muchos users pueden colapsar la memoria, por eso guardaremos la session en la bbdd.
+
+PAra ello requerimos instalar un nuevo paquete
+
+```javascript
+npm install connect-mongodb-session --save
 ```

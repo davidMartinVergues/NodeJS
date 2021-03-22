@@ -14,6 +14,7 @@ module.exports.getProducts = (req, res, next) => {
         items: products,
         pageTitle: "All products",
         path: "/products",
+        logged: req.isLogged
       });
     })
     .catch((err) => {
@@ -28,6 +29,7 @@ module.exports.getIndex = (req, res, next) => {
         items: products,
         pageTitle: "Shop_ejs",
         path: "/",
+        logged: req.isLogged
       });
     })
     .catch((err) => {
@@ -44,6 +46,7 @@ req.user
         pageTitle: "tu carrito",
         productData: userEnhanced.cart.items,
         path: "/cart",
+        logged: req.isLogged
       });
    })
     .catch((err) => console.log(err));
@@ -57,6 +60,7 @@ module.exports.getOrders = (req, res, next) => {
         pageTitle: "Orders",
         path: "/orders",
         orders: orders,
+        logged: req.isLogged
       });
     })
     .catch((err) => console.log(err));
@@ -69,6 +73,7 @@ module.exports.getProduct = (req, res, next) => {
         product: product,
         pageTitle: "product detail",
         path: "/products",
+        logged: req.isLogged
       });
     })
     .catch((err) => {
@@ -108,6 +113,8 @@ module.exports.postOrder = (req, res, next) => {
   req.user
   .execPopulate('cart.items.productId')
   .then(user=>{
+
+    console.log(user.cart.items);
 
     const products = user.cart.items.map(item=>{
       return { quantity: item.quantity, product: {...item.productId._doc}}
