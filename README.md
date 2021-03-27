@@ -155,8 +155,9 @@
 - [T13 - Sessions and cookies](#t13---sessions-and-cookies)
   - [creando una cookie](#creando-una-cookie)
   - [creando sessiones](#creando-sessiones)
-    - [Implementación de una session](#implementación-de-una-session)
-    - [guardando la session en la bbdd](#guardando-la-session-en-la-bbdd)
+    - [**IMPLEMENTACIÓN DE UNA SESSION**](#implementación-de-una-session)
+    - [**GUARDANDO LA SESSION EN LA BBDD**](#guardando-la-session-en-la-bbdd)
+    - [**ELIMINAR UNA SESSION**](#eliminar-una-session)
 
 
 
@@ -4907,13 +4908,15 @@ El punto malo de las cookies es q el usuario puede manipular su contenido así q
 
 Hemos visto cómo las cookies se crean en el cliente, en cambio las sessions las creamos en el servidor, esta sessions se compartirá para todas las request del mismo usuario. La info de la session puede estar almacenada en ls bbdd o en memoria del servidor. Para ello cada vez que el user hace la request tiene q comunicarle al server cual es su sesión. Para poder hacer esto almacenaremos el ID de la sesión en una cookie pero encriptado.
 
+Todo este proceso de creación de la cookie lo gestiona el package `express-session`.
+
 Será la session la que contendrá info sensible del user.
 
 ![not found](img/img-50.png)
 
-### Implementación de una session
+### **IMPLEMENTACIÓN DE UNA SESSION**
 
-Para ello necesitaremos un paquete de terceros. INstalamos `express-sessions`
+Para ello necesitaremos un paquete de terceros. Instalamos `express-sessions`
 
 ```javascript
 npm install express-session --save
@@ -4939,14 +4942,102 @@ module.exports.postLogin= (req,res,next)=>{
 ```
 ![not found](img/img-51.png)
 
-### guardando la session en la bbdd
+Con esta aproximación generamos a cada conexión con el servidor una session, propia de cada user. En esa session podemos almacenar info como en nuestro caso añadimos una variable `isLogged`, en cuanto guardamos datos en la session se generará una cookie en el navegador del user llamada `connect.sid` con el id session para buscarla en nuestro servidor y poder recuperar la info que contiene la session (isLogged), pero la cookie no contiene los datos, sólo tiene el id de session.
+
+Cuando conectemos cn la bbdd sucederá igual, hasta q no guardemos datos en la session no se almacenará en la bbdd.
+
+### **GUARDANDO LA SESSION EN LA BBDD**
 
 Hasta ahora almacenábamos la session en memoria pero en producción, si se conectan muchos users pueden colapsar la memoria, por eso guardaremos la session en la bbdd.
 
-PAra ello requerimos instalar un nuevo paquete
+Para ello requerimos instalar un nuevo paquete
 
-```javascript
-npm install connect-mongodb-session --save
+1. #### **INSTALAR PACKAGE** `connect-mongodb-session`
+   
+    ```javascript
+    npm install connect-mongodb-session --save
+    ```
+2. #### **IMPORTAMOS MONGODB-SESSION EN NUESTRO ARCHIVO APP.JS**
+ 
+    En el archivo app importamos mongoDB-session y al requiere le pasamos el express-session
+
+    ```javascript 
+    const session = require("express-session");
+    const MongoDBStore = require("connect-mongodb-session")(session);
+
+    ```
+3. #### **CONFIGURAR SESSION Y GUARDADO EN BBDD**
+   instanciamos mongodb-session para que se conecte con nuestra bbdd, tener en cuenta que nuestra uri a mongo atlas es: `mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/shop-mongoose?retryWrites=true&w=majority` la última parte (?retryWrites=true&w=majority) hay que obviarla.
+
+   ```javascript 
+    const MONGODB_URI ="mongodb+srv://david:dmv1104@node-app.j1vce.mongodb.net/shop-mongoose";
+
+    const store = new MongoDBStore({
+      uri: MONGODB_URI,
+      collection: "sessions",
+    });
+ 
+    ```
+    Una vez hecho esto para poder guardar la session en la bbdd debemos pasarle al middleware, con el q generamos la session, un nuevo argmento 
+
+    ```javascript 
+    app.use(
+      session({
+        secret: "my secret",
+        resave: false,
+        saveUninitialized: false,
+        store: store,
+      })
+    );
+    ```
+Una vez hecho esto cuando conectemos con el servidor se nos generará una session y cuando almacenemos info en la session, por ejemplo cuando le damos a loggin que guardamos una variable isLogged en req.session se nos genera la cookie y se guarda en la bbdd. 
+
+![not found](img/img-52.png)
+
+En el controller auth al hacer posLogin para logearnos podemos buscar un user y guaradarlo en la variable session del request:
+
+```javascript 
+module.exports.postLogin = (req, res, next) => {
+  User.findById("6049388ff1f3dae6be7e56a8")
+    .then((user) => {
+      req.session.isLoggedIn = true;
+      req.session.user = user;
+      res.redirect("/");
+    })
+    .catch((err) => console.log(err));
+};  
 ```
-añadiendo algo
-añadiendo algo
+
+### **ELIMINAR UNA SESSION**
+
+1. Añadimos un botton de logout en el header
+
+```html
+<li class="main-header__item">
+  <form action="/logout" method="POST">
+    <button type="submit">Logout</button>
+  </form>
+</li>
+  
+```
+2. añadimos en el controller de auth el postLogout
+
+```javascript 
+module.exports.postLogout = (req, res, next) => {
+  req.session.destroy((err) => {
+    console.log(err);
+    res.redirect("/");
+  });
+}; 
+```
+
+el método destroy de session le podemos pasar un callback para hacer algo después de eñiminar la session, nuestro caso volver a `/ `.
+
+Si queremos asegurarnos que la session se crea correctamente podemos llamar a al método `save()` 
+
+```javascript 
+req.session.save(error=>{
+  console.log(error);
+  res.redirect('/')
+}) 
+```
