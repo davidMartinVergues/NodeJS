@@ -3,7 +3,10 @@ Icon=/home/david/.local/share/icons/node-js-icon-29.png
 
 [Dolphin]
 PreviewsShown=false
-Timestamp=2021,2,7,2,52,25
+Timestamp=2021,4,27,22,27,59.183
 Version=4
 ViewMode=1
 VisibleRoles=CustomizedDetails,Details_text,Details_size,Details_modificationtime
+
+[Settings]
+HiddenFilesShown=true
