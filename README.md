@@ -2656,18 +2656,17 @@ CON KDE-NEON Y UBUNTU ME DA PROBLEMAS MYSQL ASÍ Q MEJOR INSTALARÉ MARIADB
 source : https://downloads.mariadb.org/mariadb/repositories/#distro=Ubuntu&distro_release=focal--ubuntu_focal&mirror=netcologne&version=10.6
 
 Here are the commands to run to install MariaDB 10.6 from the MariaDB repository on your Ubuntu system:
-
+```
 sudo apt-get install software-properties-common
 sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
 sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] https://mirror.netcologne.de/mariadb/repo/10.6/ubuntu focal main'
+
+```
 
 Once the key is imported and the repository added you can install MariaDB 10.6 from the MariaDB repository with:
 
 1. sudo apt update
 2. sudo apt install mariadb-server
-3. sudo apt update
-4. sudo apt install mariadb-server
-5. sudo mysql_secure_installation
 
 ---
 
