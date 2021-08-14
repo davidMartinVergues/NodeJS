@@ -635,6 +635,51 @@ curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
+La mejor manera de instalar nodeJS es usando `nvm` (node version manager), cuando instalemos node se instalará utomáticamente npm (node package manager)
+
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | zsh        
+
+# si estoy usando bash
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+
+```
+
+cierro la terminal y lo vuelvo a abrir
+
+para listar las versiones disponibles 
+
+```
+nvm list-remote
+```
+
+para instalar la última version de node LTS
+
+```
+nvm install --lts
+# si quiero una versión en concreto de la lista
+nvm install 10.05.0
+```
+si queremos usar una versión diferente (premviamente debemos instalarla): 
+
+```
+nvm use 13.6.0
+```
+
+Para listar las versiones instaladas 
+```
+nvm ls
+```
+
+
+Para refrescar el archvo de configuración de zsh
+
+```
+source ~/.zshrc
+```
+
+
 ## Creando un servidor con NodeJS
 
 Por defecto Node incluye una serie de módulos, los llamados core modules, algunos ejemplos son:
