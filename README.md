@@ -1064,7 +1064,7 @@ Y tendremos nuestro proyecto listo
 En este archivo hay una sección de scripts, en la cual podemos definir scripts propios.
 
 1. start  
-   Este es el nombre de un script predefinido así que se ejecuta directamente **npm start** Nos permite ejecutar un comando para inicializar nuestro proyecto. Esto se utiliza cuando alguien externo quiere ejecutar nuestro proyecto y no sabe el punto de partida se suele poner "npm start" para que se ejecute.
+   Este es el nombre de un script predefinido así que se ejecuta directamente **npm start** Nos permite ejecutar un comando para inicializar nuestro proyecto. Esto se utiliza cuando alguien externo quiere ejecutar nuestro proyecto y no sabe el punto de partida se suele poner "npm start" para que se ejecute. Lo podemos correr directamente en la consola pq el script con nombre `start` está soportado por node, si nos inventamos un nombre pej `callbacks` lo corremos así `npm run callbacks` o podemos construir un script como `start:callbacks` pues corremos como `npm run start:callbcks`
 
 Puede que al ejecutar **npm start** si no tenemos instalado nodemon de antemano nos de error, así que mejor instalar nodemon y después ejecutar npm start
 
@@ -1076,7 +1076,8 @@ Puede que al ejecutar **npm start** si no tenemos instalado nodemon de antemano 
     "main": "app.js",
     "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "node app.js"
+      "start": "node app.js",
+      "start:callbacks":"src/asincronismo/callbacks.js" // no está en el proyecto
     },
     "author": "David Martin",
     "license": "ISC"
