@@ -687,7 +687,7 @@ npm -v
 ```
 si queremos actualizar npm a la última versión
 ```
-npm install -g npm@latest
+sudo npm install -g npm@latest
 ```
 ## Creando un servidor con NodeJS
 
