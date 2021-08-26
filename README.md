@@ -26,7 +26,9 @@
     - [Promises](#promises)
 - [T-1 NodeJs Basics](#t-1-nodejs-basics)
   - [Instalat nodeJS](#instalat-nodejs)
-  - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
+  - [Creando un servidor con 
+  
+  ](#creando-un-servidor-con-nodejs)
   - [Creación del servidor](#creación-del-servidor)
     - [**request object**](#request-object)
       - [**response object**](#response-object)
@@ -678,8 +680,15 @@ Para refrescar el archvo de configuración de zsh
 ```
 source ~/.zshrc
 ```
+podemos saber la versión de npm 
 
-
+```
+npm -v
+```
+si queremos actualizar npm a la última versión
+```
+npm install -g npm@latest
+```
 ## Creando un servidor con NodeJS
 
 Por defecto Node incluye una serie de módulos, los llamados core modules, algunos ejemplos son:
