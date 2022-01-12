@@ -689,6 +689,33 @@ si queremos actualizar npm a la última versión
 ```
 sudo npm install -g npm@latest
 ```
+otros comandos de nvm son 
+
+```
+// check version
+node -v || node --version
+```
+
+```
+// list installed versions of node (via nvm)
+nvm ls
+```
+
+```
+// install specific version of node
+nvm install 6.9.2
+```
+
+```
+// set default version of node
+nvm alias default 6.9.2
+```
+
+```
+// switch version of node
+nvm use 6.9.1
+```
+
 ## Creando un servidor con NodeJS
 
 Por defecto Node incluye una serie de módulos, los llamados core modules, algunos ejemplos son:
