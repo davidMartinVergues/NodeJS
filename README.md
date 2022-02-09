@@ -2728,7 +2728,7 @@ Se compone de:
 ## SQL
 
 ### Instalando MySQL - KDE neon
-
+d
 CON KDE-NEON Y UBUNTU ME DA PROBLEMAS MYSQL ASÍ Q MEJOR INSTALARÉ MARIADB
 
 ---
