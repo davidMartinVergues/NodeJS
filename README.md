@@ -25,10 +25,202 @@
     - [Código síncrono vs asíncrono](#código-síncrono-vs-asíncrono)
     - [Promises](#promises)
 - [T-1 NodeJs Basics](#t-1-nodejs-basics)
-  - [Instalat nodeJS](#instalat-nodejs)
-  - [Creando un servidor con 
+  - [Definición de Node](#definición-de-node)
+    - [Bases de Node](#bases-de-node)
+    - [Event loop - asincronía](#event-loop---asincronía)
+      - [CÓMO FUNCIONA](#cómo-funciona)
+      - [Problemas del monohilo](#problemas-del-monohilo)
+  - [Configurar variables de entorno en nodeJS](#configurar-variables-de-entorno-en-nodejs)
+  - [Herramientas para nodeJS](#herramientas-para-nodejs)
+    - [Nodemon](#nodemon)
+    - [pm2](#pm2)
+  - [Manejar asincronía en nodeJS](#manejar-asincronía-en-nodejs)
+    - [Callbacks](#callbacks)
+  - [Instalar nodeJS](#instalar-nodejs)
+  - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
+  - [Creación del servidor](#creación-del-servidor)
+    - [**request object**](#request-object)
+      - [**response object**](#response-object)
+      - [Routing request](#routing-request)
+    - [Redirectign request & creating a file](#redirectign-request--creating-a-file)
+      - [Obtener los datos del body de una request **Streams & Buffers**](#obtener-los-datos-del-body-de-una-request-streams--buffers)
+      - [Streams, buffers, pipes and files](#streams-buffers-pipes-and-files)
+    - [Lifecycle de un programa NodeJS](#lifecycle-de-un-programa-nodejs)
+      - [The Event loop deeper](#the-event-loop-deeper)
+  - [Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-módulos-de-nodejs)
+- [T2 work flow y debugging](#t2-work-flow-y-debugging)
+  - [Entendiendo NPM node package manager scripts](#entendiendo-npm-node-package-manager-scripts)
+    - [Instalando paquetes de terceros](#instalando-paquetes-de-terceros)
+      - [Paquetes útiles](#paquetes-útiles)
+  - [Errors and debugging](#errors-and-debugging)
+- [T3 ExpressJS](#t3-expressjs)
+  - [Que es expressJS y para qué se utiliza](#que-es-expressjs-y-para-qué-se-utiliza)
+  - [Usando express](#usando-express)
+    - [Middleware](#middleware)
+      - [use](#use)
+      - [listen()](#listen)
+    - [Manejando rutas](#manejando-rutas)
+    - [Parsing incoming request](#parsing-incoming-request)
+    - [usando el router de express](#usando-el-router-de-express)
+    - [generar 404 error page](#generar-404-error-page)
+    - [Filtrar los PATHS](#filtrar-los-paths)
+    - [Servir páginas HTML](#servir-páginas-html)
+      - [Formas de acceder al path](#formas-de-acceder-al-path)
+        - [process.cwd()](#processcwd)
+        - [require.main.filename](#requiremainfilename)
+        - [dirname](#dirname)
+    - [Servir archivos estáticos](#servir-archivos-estáticos)
+- [T4 - Trabajando con contenido dinámico y motor de plantillas](#t4---trabajando-con-contenido-dinámico-y-motor-de-plantillas)
+  - [Motor de plantillas](#motor-de-plantillas)
+    - [Instalación de las plantillas](#instalación-de-las-plantillas)
+      - [view engine](#view-engine)
+      - [views](#views)
+    - [PUG](#pug)
+      - [Añadiendo contenido dinámico a la plantilla de pug](#añadiendo-contenido-dinámico-a-la-plantilla-de-pug)
+      - [Añadiendo Layouts](#añadiendo-layouts)
+      - [Añadir clases css de manera dinámica](#añadir-clases-css-de-manera-dinámica)
+    - [HandleBars](#handlebars)
+      - [Usando layouts con handlebars](#usando-layouts-con-handlebars)
+    - [EJS](#ejs)
+- [T-5 Patrón Modelo vista controlador - MVC -](#t-5-patrón-modelo-vista-controlador---mvc--)
+- [T-6 Enhancing app](#t-6-enhancing-app)
+- [T-7 Dynamic routes and advanced models](#t-7-dynamic-routes-and-advanced-models)
+- [T-8 Proyecto-1](#t-8-proyecto-1)
+  - [Funciones a tener en cuenta](#funciones-a-tener-en-cuenta)
+  - [callbacks - aclaración -](#callbacks---aclaración--)
+  - [Proyecto para poner en práctica todo lo aprendido hasta el momento.](#proyecto-para-poner-en-práctica-todo-lo-aprendido-hasta-el-momento)
+- [T-9 BBDD y NodeJS](#t-9-bbdd-y-nodejs)
+  - [SQL](#sql)
+  - [noSQL](#nosql)
+  - [SQL](#sql-1)
+    - [Instalando MySQL - KDE neon](#instalando-mysql---kde-neon)
+    - [INSTALAR MariaDB](#instalar-mariadb)
+      - [Configuraciones MARIADB](#configuraciones-mariadb)
+    - [creación de un nuevo usuario mysql](#creación-de-un-nuevo-usuario-mysql)
+    - [INSTALAR **Dbeaver** - GUI TOOL](#instalar-dbeaver---gui-tool)
+    - [INSTALAR mysql](#instalar-mysql)
+    - [Errores msql](#errores-msql)
+    - [Desinstalar mysql](#desinstalar-mysql)
+    - [Usando workbench](#usando-workbench)
+    - [Conectar nuestra app a la base de datos SQL](#conectar-nuestra-app-a-la-base-de-datos-sql)
+    - [Adaptando nuestra app a la conexión con bbdd](#adaptando-nuestra-app-a-la-conexión-con-bbdd)
+- [T-10 Sequelize](#t-10-sequelize)
+  - [conectar sequelize a nuestra bbdd](#conectar-sequelize-a-nuestra-bbdd)
+  - [crear modelo con sequelize](#crear-modelo-con-sequelize)
+    - [Creación de product model](#creación-de-product-model)
+    - [Creación de User model](#creación-de-user-model)
+    - [usando el modelo de sequelize](#usando-el-modelo-de-sequelize)
+  - [Reescribiendo los controladores](#reescribiendo-los-controladores)
+    - [admin controller](#admin-controller)
+      - [Crear un nuevo producto](#crear-un-nuevo-producto)
+      - [obtener todos los productos de la bbdd](#obtener-todos-los-productos-de-la-bbdd)
+      - [obtener un producto por su primary_key](#obtener-un-producto-por-su-primary_key)
+      - [update a product](#update-a-product)
+      - [delete a product](#delete-a-product)
+  - [relaciones o asociaciones con sequelize](#relaciones-o-asociaciones-con-sequelize)
+    - [Opciones de los métodos](#opciones-de-los-métodos)
+      - [onDelete and onUpdate](#ondelete-and-onupdate)
+      - [Customizing the foreign key](#customizing-the-foreign-key)
+      - [Asociación obligatoria u opcional](#asociación-obligatoria-u-opcional)
+    - [one-to-one](#one-to-one)
+    - [one-to-Many](#one-to-many)
+    - [Many-to-Many](#many-to-many)
+  - [creación de un user (simple)](#creación-de-un-user-simple)
+  - [Trabajando en el modelo de cart](#trabajando-en-el-modelo-de-cart)
+  - [Eager Loading](#eager-loading)
+- [T-11 Usando MongoDB](#t-11-usando-mongodb)
+  - [Instalamos MongoDB compass](#instalamos-mongodb-compass)
+  - [Conectar con mongodb Atlas](#conectar-con-mongodb-atlas)
+  - [Rehaciendo los modelos](#rehaciendo-los-modelos)
+    - [product model](#product-model)
+      - [Guardar un nuevo item](#guardar-un-nuevo-item)
+      - [encontrar un elemento por ID](#encontrar-un-elemento-por-id)
+      - [Modificar un item](#modificar-un-item)
+      - [eliminar un item](#eliminar-un-item)
+    - [Creando un modelo para users](#creando-un-modelo-para-users)
+    - [Cart model](#cart-model)
+    - [order model](#order-model)
+- [T-12 Usando Mongoose](#t-12-usando-mongoose)
+  - [Que es mongoose?](#que-es-mongoose)
+  - [Instalar mongoose](#instalar-mongoose)
+  - [Trabajando con mongoose](#trabajando-con-mongoose)
+    - [Conectar con nuestra bbdd](#conectar-con-nuestra-bbdd)
+    - [Product model](#product-model-1)
+      - [CRUD con mongoose](#crud-con-mongoose)
+        - [Create](#create)
+        - [Read](#read)
+        - [Update](#update)
+        - [Delete](#delete)
+    - [User model](#user-model)
+    - [Establecer relaciones con mongoose](#establecer-relaciones-con-mongoose)
+    - [Obtener datos de modelos relacionados](#obtener-datos-de-modelos-relacionados)
+      - [select()](#select)
+      - [populate()](#populate)
+    - [Trabajando en el cart](#trabajando-en-el-cart)
+      - [Añadir productos al cart](#añadir-productos-al-cart)
+      - [Pintar productos del cart](#pintar-productos-del-cart)
+      - [Eliminar productos del cart](#eliminar-productos-del-cart)
+    - [order model](#order-model-1)
+      - [creando una orden](#creando-una-orden)
+      - [obtener las orders](#obtener-las-orders)
+- [T13 - Sessions and cookies](#t13---sessions-and-cookies)
+  - [creando una cookie](#creando-una-cookie)
+  - [creando sessiones](#creando-sessiones)
+    - [**IMPLEMENTACIÓN DE UNA SESSION**](#implementación-de-una-session)
+    - [**GUARDANDO LA SESSION EN LA BBDD**](#guardando-la-session-en-la-bbdd)
+    - [**ELIMINAR UNA SESSION**](#eliminar-una-session)
   
   ](#creando-un-servidor-con-nodejs)
+  - [Creación del servidor](#creación-del-servidor)
+    - [**request object**](#request-object)
+      - [**response object**](#response-object)
+      - [Routing request](#routing-request)
+    - [Redirectign request & creating a file](#redirectign-request--creating-a-file)
+      - [Obtener los datos del body de una request **Streams & Buffers**](#obtener-los-datos-del-body-de-una-request-streams--buffers)
+      - [Streams, buffers, pipes and files](#streams-buffers-pipes-and-files)
+    - [Lifecycle de un programa NodeJS](#lifecycle-de-un-programa-nodejs)
+      - [The Event loop deeper](#the-event-loop-deeper)
+  - [Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-módulos-de-nodejs)
+- [NodeJS Course](#nodejs-course)
+  - [by Maximillian Academind](#by-maximillian-academind)
+- [Introducción](#introducción)
+  - [Como funciona la web](#como-funciona-la-web)
+  - [Que es NodeJS](#que-es-nodejs)
+  - [Que podemos hacer cono node](#que-podemos-hacer-cono-node)
+- [T-0 JavaScript Refresh](#t-0-javascript-refresh)
+  - [Sintaxi de arrow function](#sintaxi-de-arrow-function)
+  - [Uso de la keyword this y utilidad de ()](#uso-de-la-keyword-this-y-utilidad-de-)
+  - [Objects properties methods](#objects-properties-methods)
+  - [Arrays y sus métodos](#arrays-y-sus-métodos)
+    - [Métodos](#métodos)
+      - [map()](#map)
+      - [slice()](#slice)
+      - [splice()](#splice)
+      - [filter()](#filter)
+      - [foreach()](#foreach)
+      - [push pop shift unshift](#push-pop-shift-unshift)
+      - [find and findIndex](#find-and-findindex)
+  - [new Operators](#new-operators)
+    - [spread](#spread)
+    - [rest](#rest)
+  - [Destructuring](#destructuring)
+  - [Async code & Promises](#async-code--promises)
+    - [Código síncrono vs asíncrono](#código-síncrono-vs-asíncrono)
+    - [Promises](#promises)
+- [T-1 NodeJs Basics](#t-1-nodejs-basics)
+  - [Definición de Node](#definición-de-node)
+    - [Bases de Node](#bases-de-node)
+    - [Event loop - asincronía](#event-loop---asincronía)
+      - [CÓMO FUNCIONA](#cómo-funciona)
+      - [Problemas del monohilo](#problemas-del-monohilo)
+  - [Configurar variables de entorno en nodeJS](#configurar-variables-de-entorno-en-nodejs)
+  - [Herramientas para nodeJS](#herramientas-para-nodejs)
+    - [Nodemon](#nodemon)
+    - [pm2](#pm2)
+  - [Manejar asincronía en nodeJS](#manejar-asincronía-en-nodejs)
+    - [Callbacks](#callbacks)
+  - [Instalar nodeJS](#instalar-nodejs)
+  - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
   - [Creación del servidor](#creación-del-servidor)
     - [**request object**](#request-object)
       - [**response object**](#response-object)
@@ -628,7 +820,118 @@ promise
 
 # T-1 NodeJs Basics
 
-## Instalat nodeJS
+## Definición de Node 
+
+Es un entorno de ejecución para javascript fuera del navegador. Esto permite tener servidores escritos en JS y por lo tanto que funcionen de manera asíncrona. 
+
+### Bases de Node
+
+- Concurrencia 
+  
+Es un lengaje monohilo pero todas las entradas y salidas son asíncronas, esto se consigue gracias al event loop. Es un único proceso pero que funciona de manera asíncrona. 
+Esto nos permitirá tener muchas conexiones por ejemplo acceso y lectura de archivos, a bbdd, ...
+
+- Corre sobre el motor V8
+
+Entorno de ejecución de JS creado por Google y escrito en C++. Este convierte el código JS a código máquina en lugar de interpretarlo. 
+
+Al compilarlo nos permite primero darnos cuenta de errores de sintaxi (mayor robustez) y al estar escrito en C++ hace que sea muy rápido. 
+
+- Funciona a base de módulos 
+
+Todo lo que no es sintaxi de programación son módulos (trozos de código que podemos reutilizar). Muchos módulos vienen por defecto al instalar nodeJS. Aunque tb podemos crear 
+nuestros propios módulos.
+
+- Está orientado a eventos 
+
+Hay un event loop que está funcionando continuamente y está esperando a que se disparen esos eventos para procesarlos. Que esté orientado a eventos nos permite programar de una manera reactiva, es decir, cuando sucede algo(se crea un nuevo archivo) que se ejecute una parte del código en concreto. 
+
+### Event loop - asincronía 
+
+
+El event loop es un proceso con un bucle que se ejecuta constantemente y gestiona de manera asíncrona todos los eventos de nuestra aplicación. Esto significa que cuando llega una petición entra en el bucle se gestiona pero permite la entrada de otros eventos, haciendo a node muy concurrente. 
+
+#### CÓMO FUNCIONA 
+
+1. Todo el código de nuestra app genera un evento (una función, request, click event,...) 
+2. esos eventos se encolan en la **event queue**
+3. desde el event queue los pasa al **event loop** y los gestiona, si son instrucciones rápidas las resuelve si son costosas lo pasa al **thread pool**
+4. en el thread pool tenemos todas las operaciones lentas como leer archivos, conexión a bbdd,...
+5. el thread pool para cada una de estas operaciones levanta un nuevo hilo para procesarla cuando termina, genera un nuevo evento q es capturado por el event loop 
+
+![not found](img/1.png)
+
+Para escribir código de este modo tenemos que utilizar callbacks, promesas y async await. Según el caso utilizaremos una estrategia u otra. 
+
+#### Problemas del monohilo 
+
+El event loop genera una serie de problemas a nivel de seguridad, de gestión de errores,...
+
+Cuando creamos un programa en node, porej un hola mundo, se abre un proceso se compila a código máquina se ejecuta y se termina/cierra el hilo. Tenemos la opción de mantener el event loop siempre a la escucha por ejemplo con un setInterval. 
+
+Aquí podremos ver lo malo de q sea monohilo pq si generamos un error en el código y no está bien gestionado detendrá toda la ejecución del programa
+
+```javascript
+ let i = 0;
+
+setInterval(() => {
+  console.log(i);
+  i++;
+
+  if (i === 5) {
+    i += z; // z is not define
+  }
+}, 1000);
+ 
+```
+
+## Configurar variables de entorno en nodeJS 
+
+Cuando tenemos variables que dependerán de un valor externo como por ejempli un token para una API, o passwords, nombres de usuarios,... son casos en los q no deben estar en el código por lo que tenemos que meter estos datos desde fuera del programa. Para ello existen las variables de entorno.
+
+PAra poder acceder a variables de entorno usamos `process.env.VARIABLE`
+
+```javascript
+nombre = process.env.NOMBRE || "si nombre";
+
+console.log(`hola ${nombre}`);
+
+```
+
+## Herramientas para nodeJS 
+
+### Nodemon 
+
+```
+npm install -g nodemon 
+```
+Nos permitirá ejecutar la aplicación y si cambiamos algo en el código se vuelve a relanzar automáticamente. Mejor usar en desarrollo. 
+
+```
+nodemon myapp.js 
+```
+
+### pm2 
+
+Parecida a nodemon pero mucho más potente. Usar solo en **producción** pq nos da:
+
+- gestión de logs 
+- monitoring 
+- container integration 
+- behavior config 
+- startup scripts
+
+```
+npm install -g pm2
+```
+
+## Manejar asincronía en nodeJS 
+
+### Callbacks 
+
+
+
+## Instalar nodeJS
 
 Se instalará node y npm
 
