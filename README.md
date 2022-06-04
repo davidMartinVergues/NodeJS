@@ -36,6 +36,24 @@
     - [pm2](#pm2)
   - [Manejar asincronía en nodeJS](#manejar-asincronía-en-nodejs)
     - [Callbacks](#callbacks)
+      - [Callback hells](#callback-hells)
+    - [Promesas](#promesas)
+    - [Async/await](#asyncawait)
+  - [Modulos del Core de nodeJS](#modulos-del-core-de-nodejs)
+    - [Globals](#globals)
+    - [File System - fs](#file-system---fs)
+      - [readFile](#readfile)
+      - [writeFile](#writefile)
+      - [unlink](#unlink)
+    - [Console](#console)
+    - [HTTP](#http)
+    - [OS](#os)
+    - [Process](#process)
+    - [Try/Catch](#trycatch)
+  - [Procesos hijos](#procesos-hijos)
+    - [Ejecutar/compilar modulos de C++](#ejecutarcompilar-modulos-de-c)
+  - [NPM](#npm)
+  - [Creando nuestro propio módulo](#creando-nuestro-propio-módulo)
   - [Instalar nodeJS](#instalar-nodejs)
   - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
   - [Creación del servidor](#creación-del-servidor)
@@ -52,6 +70,8 @@
   - [Entendiendo NPM node package manager scripts](#entendiendo-npm-node-package-manager-scripts)
     - [Instalando paquetes de terceros](#instalando-paquetes-de-terceros)
       - [Paquetes útiles](#paquetes-útiles)
+        - [bcrypt](#bcrypt)
+        - [NODEMON](#nodemon-1)
   - [Errors and debugging](#errors-and-debugging)
 - [T3 ExpressJS](#t3-expressjs)
   - [Que es expressJS y para qué se utiliza](#que-es-expressjs-y-para-qué-se-utiliza)
@@ -170,7 +190,7 @@
     - [**GUARDANDO LA SESSION EN LA BBDD**](#guardando-la-session-en-la-bbdd)
     - [**ELIMINAR UNA SESSION**](#eliminar-una-session)
   
-  ](#creando-un-servidor-con-nodejs)
+  [creando un servidor con nodejs](#creando-un-servidor-con-nodejs)
   - [Creación del servidor](#creación-del-servidor)
     - [**request object**](#request-object)
       - [**response object**](#response-object)
@@ -219,6 +239,24 @@
     - [pm2](#pm2)
   - [Manejar asincronía en nodeJS](#manejar-asincronía-en-nodejs)
     - [Callbacks](#callbacks)
+      - [Callback hells](#callback-hells)
+    - [Promesas](#promesas)
+    - [Async/await](#asyncawait)
+  - [Modulos del Core de nodeJS](#modulos-del-core-de-nodejs)
+    - [Globals](#globals)
+    - [File System - fs](#file-system---fs)
+      - [readFile](#readfile)
+      - [writeFile](#writefile)
+      - [unlink](#unlink)
+    - [Console](#console)
+    - [HTTP](#http)
+    - [OS](#os)
+    - [Process](#process)
+    - [Try/Catch](#trycatch)
+  - [Procesos hijos](#procesos-hijos)
+    - [Ejecutar/compilar modulos de C++](#ejecutarcompilar-modulos-de-c)
+  - [NPM](#npm)
+  - [Creando nuestro propio módulo](#creando-nuestro-propio-módulo)
   - [Instalar nodeJS](#instalar-nodejs)
   - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
   - [Creación del servidor](#creación-del-servidor)
@@ -235,6 +273,8 @@
   - [Entendiendo NPM node package manager scripts](#entendiendo-npm-node-package-manager-scripts)
     - [Instalando paquetes de terceros](#instalando-paquetes-de-terceros)
       - [Paquetes útiles](#paquetes-útiles)
+        - [bcrypt](#bcrypt)
+        - [NODEMON](#nodemon-1)
   - [Errors and debugging](#errors-and-debugging)
 - [T3 ExpressJS](#t3-expressjs)
   - [Que es expressJS y para qué se utiliza](#que-es-expressjs-y-para-qué-se-utiliza)
@@ -929,6 +969,739 @@ npm install -g pm2
 
 ### Callbacks 
 
+Node por defecto es asíncrono por lo que si ejecutamos el siguiente código: 
+
+```javascript
+function hola(nombre, cb) {
+  setTimeout(() => {
+    console.log("hola " + nombre);
+    cb(nombre);
+  }, 1500);
+}
+
+function adios(nombre, cb) {
+  setTimeout(() => {
+    console.log("adios " + nombre);
+    cb();
+  }, 1000);
+}
+
+console.log("iniciando proceso");
+hola('david',()=>{})
+adios('david',()=>{})
+
+// iniciando proceso...
+// adios david
+// hola david
+
+
+```
+como es asinc, x lo tanto el programa no se detiene a completar las funciones y hola tarda más q adios tendríamos el resultado de adios antes q hola, pq hola tarda 1500 ms y adiós 1000ms. CUando tenemos funciones que no sabemos cuanto tardarán en ejecutarse como por ejemplo conexión a bbdd o escritura en ficheros tenemos que controlar bien cuando se ejecutan. Para controlar esta asincronía del lenguaje surgen los callbacks.
+
+Un callback es cuando pasamos una función como argumento de otra función, la clave aquí es q la función externa "decide" cuando se ejecuta la función pasada (callback).
+
+Con el callback controlamos cúando se ejecutan las funciones, hasta que una función no termina no se ejecuta la siguiente.
+
+```javascript
+console.log("iniciando proceso");
+
+hola("David", (nombre) => {
+  adios(nombre, () => {
+    console.log("terminando proceso...");
+  });
+});
+
+ 
+```
+
+#### Callback hells 
+
+Gestionar así las llamadas puede generar el llamado callback hell q es cuando encadenamos multiples llamadas dependiendo unas de otras. 
+
+```javascript
+ console.log("iniciando proceso");
+hola("David", (nombre) => {
+  hablar(() => {
+    hablar(() => {
+      hablar(() => {
+        adios(nombre, () => {
+          console.log("terminando proceso...");
+        });
+      });
+    });
+  });
+}); 
+```
+una manera de evitar esto es utilizar funciones recursivas.  El código quedaría así 
+
+```javascript
+
+// añadimos una nueva función conversación 
+ function conversacion(nombre, iteraciones, cb) {
+  if (iteraciones > 0) {
+    hablar(() => {
+      conversacion(nombre, --iteraciones, cb);
+    });
+  } else {
+    adios(nombre, cb);
+  }
+}
+
+//--
+
+hola("david", (nombre) => {
+  conversacion(nombre, 3, () => {
+    console.log("proceso terminado");
+  });
+}); 
+```
+
+### Promesas 
+
+Para evitar el callbackHell se crea las promises. La clave de las promesas es que tienen un estado, pueden estar **resuletas**, **pendientos** o **fallar** y pueden ser anidadas.
+
+Cuando creamos una función como una promesa debemos devolver uno **promise**, 
+
+```javascript
+ function hola(nombre) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      console.log("hola " + nombre);
+      resolve(nombre);
+    }, 1500);
+  });
+}
+
+console.log("iniciando el proceso....");
+hola("david").then((nombre) => {
+  console.log(`${nombre} -> terminado el proceso`);
+});
+
+/* 
+iniciando el proceso....
+hola david
+david -> terminado el proceso
+*/
+ 
+```
+
+podemos anidar promesas y pasar el resultado de una al siguiente `then`:
+
+```javascript
+ hola("david")
+  .then((nombre) => {
+    return adios(nombre);
+  })
+  .then((nombre) => {
+    console.log(`${nombre} -> terminado el proceso`);
+  });
+ /*
+ hola david
+adios david
+david -> terminado el proceso
+ */
+```
+pero lo podemos hacer más sencillo, podemos pasarle directamente la función al `then`
+
+```javascript
+hola("david")
+  .then(adios)
+  .then((nombre) => {
+    console.log(`${nombre} -> terminado el proceso`);
+  }); 
+```
+podemos anidar varias promesas y modificando la función hablar.
+
+```javascript
+function hablar(nombre) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      console.log("bla bla bla");
+      resolve(nombre);
+    }, 1000);
+  });
+}
+
+
+hola("david")
+  .then(hablar)
+  .then(hablar)
+  .then(hablar)
+  .then(adios)
+  .then((nombre) => {
+    console.log(`${nombre} -> terminado el proceso`);
+  });
+ 
+```
+
+Todo esto está muy bien pero si en alguna de las promesas se genera un error hay q tratarlo para que no detenga el proceso. Para ello al final de la cadena de promesas pondremos un **catch**
+
+```javascript
+function adios(nombre) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      console.log("adios " + nombre);
+      //resolve(nombre);
+      reject("se ha generado un error en una promesa");
+    }, 1000);
+  });
+}
+
+ hola("david")
+  .then(hablar)
+  .then(adios)
+  .then((nombre) => {
+    console.log(`${nombre} -> terminado el proceso`);
+  })
+  .catch((err) => {
+    console.error("error has ocurred");
+    console.error(err);
+  });
+ 
+```
+
+### Async/await 
+
+Es una nueva sintaxi para controlar la asincronía, asegurarnos que ciertas funciones se ejecutensecuencialmente pq el resultado de una será el input de la otra. 
+
+Con esta sintaxi podemos definir explicitamente una función como asíncrona y poder esperar a q esa función termine. Como es asíncrona no bloquea el hilo principal, ya que puede seguir escuchando nuevas peticiones.
+
+primero debemos declarar una función como asíncrona 
+
+```javascript
+async function adios(nombre) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      console.log("adios " + nombre);
+      resolve(nombre);
+    }, 1000);
+  });
+} 
+```
+para ejecutar esta función con el await debe estar dentro de otra función asíncrona
+
+```javascript
+async function main() {
+  let nombre = await hola("david");
+  await hablar();
+  await hablar();
+  await adios(nombre);
+}
+
+main(); 
+```
+
+## Modulos del Core de nodeJS 
+
+### Globals 
+
+Son los módulos que ya vienen instalados en el core de node. Todos los módulos globales se encuentran en la variable `global`. Global es un alias de `this`
+
+```javascript
+console.log(global) 
+```
+Por ejemplo setInterval se encuentra dentro de este objeto global y por lo tanto podemos acceder directamente 
+
+```javascript
+setInterval(() => {
+      console.log("hola");
+      
+    }, 1000); 
+```
+
+Todas las funciones globales tienen una función q detiene su ejecución `clear` 
+
+```javascript
+let i = 1;
+
+let intervalo = setInterval(() => {
+
+  if (i == 3) {
+    clearInterval(intervalo);
+  }
+  console.log("hola");
+  i++;
+}, 1000);
+```
+hay otra función q se llaman `inmediate` que lo q hacen es indicar que esa función se ejecute lo primero en nuestro código. 
+
+```javascript
+setImmediate(() => {
+  console.log("helo");
+});
+
+```
+se incluye dentro de global:
+
+- process => `console.log(process)` toda la info del proceso no solo las variables de entorno.
+- `__dirname` => en qué directorio se encuentra el archivo dnd se ejecuta la variable 
+- `__filename` => nos da la ruta absoluta dnd se encuentra el archivo (/../../tu_archivo.js) 
+
+No es recomendable pero podemos crear variables globales 
+
+```javascript
+global.miVariable = 'tu variable' 
+```
+### File System - fs 
+
+Nos permite acceder a archivos de nuestro sistema. Como este módulo viene en el core de node no necesitamos instalar nada, lo importamos con requiere. 
+
+```javascript
+const fs = require('fs') 
+```
+
+Los métodos de este módulo son todos ellos asíncronos. 
+
+
+#### readFile
+
+```javascript
+const fs = require("fs");
+
+// leer archivos
+function leer(path, cb) {
+  fs.readFile(path, (err, data) => {
+    cb(data);
+  });
+}
+//  Buffer 68 6f 6c 61 2c 20 63 c3 b3 6d 6f 20 65 73 74 61 73 3f 0a 74 65 6e 67 6f 20 76 61 72 69 61 73 20 6c c3 ad 6e 65 61 73>
+```
+así directamente la función readFile nos devuelve un buffer. Para poderlo leer debemos convertirlo a string. 
+
+```javascript
+const fs = require("fs");
+
+// leer archivos
+function leer(path, cb) {
+  fs.readFile(path, (err, data) => {
+    cb(data.toString());
+  });
+}
+leer(__dirname + "/test.txt", (data) => console.log(data));
+leer(__dirname + "/test.txt", console.log); // para simplificar la sintaxi
+ 
+```
+#### writeFile
+
+```javascript
+function escribir(path, data, cb) {
+  fs.writeFile(path, data, (err) => {
+    if (err) {
+      console.log("file not created " + err);
+    } else {
+      console.log("file created");
+    }
+  });
+}
+
+escribir(__dirname + "/test2.txt", "soy un archivo nuevo", console.log); 
+```
+
+#### unlink
+
+```javascript
+ function borrar(path, cb) {
+  fs.unlink(path, cb);
+}
+
+borrar(__dirname + "/test2.txt", console.log); 
+```
+
+### Console 
+
+Tenemos varios métodos según lo que queramos pintar en plantalla. Tenemos 
+
+```javascript
+console.log('algo')
+console.info('some info')
+console.error('errors')
+console.warn('warnings')
+console.debug('warnings')
+```
+podemos mostrar datos en forma de tabla. 
+
+```javascript
+ let miTabla = [
+  {
+    nombre: "david",
+    apellido: "martin",
+  },
+  {
+    nombre: "david2",
+    apellido: "martin2",
+  },
+];
+
+console.table(miTabla); 
+
+/*
+┌─────────┬──────────┬───────────┐
+│ (index) │  nombre  │ apellido  │
+├─────────┼──────────┼───────────┤
+│    0    │ 'david'  │ 'martin'  │
+│    1    │ 'david2' │ 'martin2' │
+└─────────┴──────────┴───────────┘
+*/
+```
+tenemos tb el `group` que nos pinta por pantalla mensajes identados
+
+```javascript
+
+function funcion1() {
+  console.group("funcion 1");
+  console.log("cosas d ela func 1");
+  funcion2();
+  console.log("seguimos con funcion 1");
+  console.groupEnd("funcion 1");
+}
+
+function funcion2() {
+  console.group("funcion 2");
+  console.log("cosas d ela func 2");
+  console.groupEnd("funcion 2");
+}
+
+funcion1();
+
+/*
+funcion 1
+  cosas d ela func 1
+  funcion 2
+    cosas d ela func 2
+  seguimos con funcion 1
+*/
+```
+
+### HTTP 
+
+Este módulo nos permite crear un servidor o conectarnos con servidores externos. 
+
+```javascript
+ const http = require("http");
+
+const router = (req, res) => {
+  console.log("nueva peticion");
+
+  switch (req.url) {
+    case "/hola":
+      res.writeHead(201, { "content-type": "text/plain; charset=utf-8" });
+      res.write("hello from node! ");
+      res.end();
+    default:
+      res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+      res.write("no sé qué quieres");
+      res.end();
+  }
+};
+
+const port = 3000,
+
+server = http.createServer(router).listen(port);
+console.log(`escuchando en el ${port}`);
+```
+
+### OS  
+
+Permite acceder a toda la información que nos aporta el sistema operativo desde qué sistema de archivos usamos, cuanta RAM tenemos, lo núcleos, etc... todo esto con el módulo OS 
+
+```javascript
+const os = require("os");
+
+console.log(os.arch());
+console.log(os.platform());
+
+console.log(os.cpus());
+console.log(os.cpus().length);
+
+console.log(os.constants);
+
+console.log(os.freemem()); // memoria disponible en kas
+console.log(os.totalmem()); // total de memoria de la máquina
+
+console.log(os.homedir());
+console.log(os.tmpdir());
+
+console.log(os.hostname());
+console.log(os.networkInterfaces()); //interfaces de red  
+```
+### Process 
+
+Cómo podemos acceder a nuestro proceso usando el módulo `os`
+
+```javascript
+process.on("beforeExit", () => {
+  // el proceso está fuera del eventloop
+  console.log("el proceso terminará próximamente");
+});
+
+process.on("exit", () => {
+  console.log("ale, el proceso terminó");
+});
+
+process.on("uncaughtException", (err, origin) => {
+  console.error("se nos olvidó capturar el error");
+  console.error(err.message);
+});
+
+//process.on("uncaughtRejection"); // para promesas rechazadas sin catch
+
+bcbc(); 
+```
+
+### Try/Catch
+
+Un error en nodeJs detiene nuestro hilo principal así que para evitar eso capturaremos el error con un try/catch. 
+
+```javascript
+function seRompre() {
+  return 3 + z;
+}
+
+try {
+  seRompre();
+} catch (error) {
+  console.error(error.message);
+}
+
+console.log("mi programa continua"); 
+```
+
+Cuando se produce un error, éstos se propagan hacia arriba a las siguientes funciones hasta ver si ese error es capturado por eso cuando hacemos lo siguiente podemos capturar el error:
+
+```javascript
+
+function seRompre() {
+  return 3 + z;
+}
+  
+function otraFuncion() {
+  seRompre();
+}
+
+try {
+  otraFuncion();// no rompe directamente esta función pero aún así captura el error
+} catch (error) {
+  console.error(error.message);
+}
+
+console.log("mi programa continua");
+  
+```
+
+La cosa es muy diferente cuando tratamos funciones asíncronas, hay q recordar q las funciones asíncronas no se gestionan en el hilo del event loop si no q se pasan al thread pool, por eso no se captura el error
+
+```javascript
+function seRompreAsincrona() {
+  setTimeout(() => {
+    return 3 + z;
+  }, 1000);
+}
+
+try {
+  seRompreAsincrona();
+} catch (error) {
+  console.error(error.message);
+}
+
+console.log("mi programa continua");
+ 
+```
+
+En esas situaciones es mejor hacer el try/catch dentro de la función asíncrona.
+
+```javascript
+
+function seRompreAsincrona(cb) {
+  setTimeout(() => {
+    try {
+      return 3 + z;
+    } catch (err) {
+      cb(err);
+    }
+  }, 1000);
+}
+
+try {
+  seRompreAsincrona((err) => {
+    console.error(err.message);
+    console.log("un error!!!!!");
+  });
+} catch (error) {
+  console.error(error.message);
+}
+
+console.log("mi programa continua");
+```
+
+## Procesos hijos
+
+Node a parte de ejecutar sus propios procesos, puede ejecutar otros procesos en el sistema (correr procesos hijo). Con el módulo `child_process` podemos levantar otros procesos (ejecutar otros programas) como un script de python,... 
+
+```python
+import json
+
+def myFunc():
+    print(json.dumps({'name':'David'}))
+
+myFunc()
+
+# json.dumps() function converts a Python object into a json string.
+
+```
+
+
+```javascript
+const { exec } = require("child_process"); // ecmascript 6 sintaxy
+//const exec = require("child_process").exec; 
+
+exec(
+  "python3 /home/david/programming/NodeJS/code/T1-NODE_BASICS/1.8-proceso-hijo/myScript.py",
+  (err, stdout, stderr) => {
+    if (err) {
+      console.log(err);
+      return false;
+    }
+
+    let data = JSON.parse(stdout);
+    
+    console.log(data);
+    
+    console.log(data.name);
+  }
+);
+
+/*
+{ name: 'David' }
+David
+*/
+
+```
+Si a parte de ejecutar el proceso queremos tener un poco más de control sobre él usaremos spawn, podemos pasarle argumentos.
+
+```python
+import json,sys
+
+def myFunc(name):
+    print(json.dumps({'name':name}))
+
+myFunc(sys.argv[1]) 
+```
+
+```javascript
+const { exec, spawn } = require("child_process");
+
+const pyProg = spawn("python", ["myScript.py", "david"]); // le paso variables al script
+
+
+console.log(pyProg.pid); //podemos ver el id del proceso
+console.log(pyProg.connected); //
+
+//podemos escuchar el stdout cuando se dé el evento de 'data' y visualizarla
+pyProg.stdout.on("data", function (data) {
+  console.log(JSON.parse(data));
+});
+```
+Hay que tener en cuenta que **spawn** devuelve los datos como un buffer así q normalmente deberemos utilizar `data.toString()`
+
+
+
+1. proceso hijo creado por spawn()
+   - no genera un shell para ejecutar el comando
+   - crea un **stream** de los datos devueltos por el proceso secundario (el flujo de datos es constante)
+   - no tiene límite de tamaño de transferencia de datos
+
+
+2. proceso hijo creado por exec()
+   - genera un shell en el que se ejecuta el comando pasado
+   - almacena en búfer los datos (espera hasta que el proceso se cierra y transfiere los datos en un **chunk**)
+   - la transferencia máxima de datos hasta Node.js v.12.x fue de 200 kb (de forma predeterminada), pero desde Node.js v.12x se incrementó a 1 MB (de forma predeterminada)
+
+### Ejecutar/compilar modulos de C++ 
+
+Para poder compilar módulos nativos escritos en C++ instalamos node-gyp.
+
+1. Instala `node-gyp`. Hay que hacerlo de forma global. Para eso, ejecuta:
+
+    ```npm i -g node-gyp```
+
+    _Dependiendo del sistema de archivos, y los permisos, puede que tengas que usar sudo en linux y mac, o ejecutar como administrador en windows_
+
+2. Crea tu archivo fuente. Un ejemplo lo puedes encontrar en [la documentación de node](https://nodejs.org/api/addons.html#addons_hello_world)
+3. Crea un `binding.gyp` en la raiz del módulo.
+4. En la carpeta raiz del módulo, ejecuta:
+
+    ```node-gyp configure```
+
+5. Se habrá generado un directorio build.
+6. En la carpeta raiz del módulo, ejecuta:
+
+    ```node-gyp build```
+
+7. El módulo se compilará. y podrás importarlo en javascript. Puedes revisar que exista el archivo `build/Release/addon.node` _(es un binario, así que no podrás abrirlo)_
+8. Para usarlo, crea un archivo js. Para importarlo:
+
+    ```const addon = require('./build/Release/addon');```
+
+    y para usarlo:
+
+    ```addon.hola()```
+
+    debería imprimir `mundo`
+
+
+## NPM 
+
+
+
+## Creando nuestro propio módulo  
+
+[Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-módulos-de-nodejs)  
+[Entendiendo NPM node package manager scripts](#entendiendo-npm-node-package-manager-scripts)  
+[Instalando paquetes de terceros](#instalando-paquetes-de-terceros)  
+[Paquetes útiles](#paquetes-útiles)  
+
+
+Con ES6 hay una nueva sintaxi para los módulos pero para poderla utilizar los archivos deben tener extensión `.mjs`. 
+
+
+```javascript
+
+//  esto es el archivo del módulo.mjs
+
+
+function greet(name) {
+  console.log(`hola señor ${name}`);
+}
+
+export default {
+  greet,
+  prop1: "esto es una propiedad",
+};
+
+/*
+
+export defualt greet
+
+*/
+
+```
+
+```javascript
+// en el index_es6.mjs 
+
+
+import modulo_es6 from "./modulo/modulo-es6.mjs";
+
+console.log(modulo_es6);
+modulo_es6.greet("david");
+/*
+
+{ greet: [Function: greet], prop1: 'esto es una propiedad' }
+hola señor david
+
+
+*/
+```
 
 
 ## Instalar nodeJS
@@ -1017,6 +1790,60 @@ nvm alias default 6.9.2
 ```
 // switch version of node
 nvm use 6.9.1
+```
+
+cuando hago un source ~/.zshrc me sale este mensaje 
+    
+```
+N/A: version "N/A -> N/A" is not yet installed.
+
+You need to run "nvm install N/A" to install it before using it.
+```
+
+vemos como el default está a puntando a N/A
+
+default -> lts/* (-> N/A)
+
+```
+~ ❯ source ~/.zshrc
+    
+N/A: version "N/A -> N/A" is not yet installed.
+
+You need to run "nvm install N/A" to install it before using it.
+    
+~ ❯ nvm ls
+    
+    v12.22.12
+    v14.19.1
+    v16.14.2
+
+default -> lts/* (-> N/A)
+node -> stable (-> v16.14.2) (default)
+stable -> 16.14 (-> v16.14.2) (default)
+iojs -> N/A (default)
+unstable -> N/A (default)
+nvm_list_aliases:36: no matches found: /home/guibos/.nvm/alias/lts/*
+    
+~ ❯ nvm alias default v12.22.12
+  default -> v12.22.12
+    
+~ ❯ nvm ls                     
+        v12.22.12
+        v14.19.1
+        v16.14.2
+default -> v12.22.12
+node -> stable (-> v16.14.2) (default)
+stable -> 16.14 (-> v16.14.2) (default)
+iojs -> N/A (default)
+unstable -> N/A (default)
+nvm_list_aliases:36: no matches found: /home/guibos/.nvm/alias/lts/*
+    
+~ ❯ node -v
+    zsh: command not found: node
+    
+~ ❯ source ~/.zshrc            
+~ ❯ node -v
+    v12.22.12
 ```
 
 ## Creando un servidor con NodeJS
@@ -1281,10 +2108,12 @@ VOLVER A MIRAR EL VIDEO 14
 ## Usando el sistema de módulos de NodeJS
 
 En nodeJS es muy común separar nuestro código en diferentes archivos y luego exportarlos para poderlos usar desde otros archvos y así tener nuestro código más ordenado.  
-Podemos crear un nuevo archivo llamado **routes.js** que contendrá los pasos a seguir según la url que le solicitemos al servidor, esto es la función anónima que le pasamos como argumento a **http.createServer()**. Así podemos dejar un archivo con la creación del servidor y un archivo routes dnd encontremoslas urls de éste.
+Podemos crear un nuevo archivo llamado **routes.js** que contendrá los pasos a seguir según la url que le solicitemos al servidor, esto es la función anónima que le pasamos como argumento a **http.createServer()**. Así podemos dejar un archivo con la creación del servidor y un archivo routes dnd encontraremos las urls de éste.
 Nuestro punto de partida será el servidor (app.js) y este requerirá el código del archivo routes, para ello desde el archio routes asignamos nuestra función **(req,res)=>{}** a una constamte llamada **requestHandler** para luego poderla exportar.
 
 ```javascript
+// archivo dnd está escrito es routes
+
 const requestHandler = (req, res) => {
   const url = req.url;
   const method = req.method;
@@ -1373,7 +2202,7 @@ Es un gestor de paquetes para NodeJS que se instala automáticamente cuando inst
 Podemos usar npm para empezar un nuevo proyecto de NodeJS. En el directorio del proyecto tecleamos en la terminal:
 
 ```
-  npm init
+npm init
 ```
 
 Esto nos guiará por un asistente para que completemos información sobre nuestro proyecto. Esto generará un archivo **package.json** (archivo de configuración de nuestro proyecto).
@@ -1456,41 +2285,79 @@ npm install -g nombrePackage
 
 #### Paquetes útiles
 
-1. ##### nodemon
-   - Nos permite reiniciar nuestro servidor cuando modificamos el código. Para instalarlo
+##### bcrypt
+
+Muy útil para cifrar y desencriptar datos por ejemplo passwords. 
 
 ```
-  npm install nodemon --save-dev
+npm install bcrypt
 ```
-
-      Podemos crear una archivo, nodemon.json, en la raiz del proyecto para configurar que ignore algunos archivos
 
 ```javascript
-  {
-    "ignore": ["*.json"]
-  }
+ const bcrypt = require("bcrypt");
+
+async function create_hash(password) {
+  return new Promise((resolve, reject) => {
+    bcrypt.hash(password, 5, (err, hash) => {
+      resolve(hash);
+    });
+  });
+}
+
+async function check_hash(password, hash) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, hash, (err, res) => {
+      resolve(res);
+    });
+  });
+}
+
+async function main(password) {
+  let password_encrypted = await create_hash(password);
+  let result = await check_hash(password, password_encrypted);
+  console.log(result);
+}
+
+main("1234Segura!"); 
 ```
 
-        Así solo lo instalamos de manera local (solo nuestro proyecto). Nos crea en nuestro proyecto una carpeta **node_modules** donde se instalan estos paquetes.
-        Para usarlo tenemos que ejecutar el proyecto mediante nodemon no usando node
+##### NODEMON
+   
+- Nos permite reiniciar nuestro servidor cuando modificamos el código. Para instalarlo
+
+```
+npm install nodemon --save-dev
+```
+
+Podemos crear una archivo, nodemon.json, en la raiz del proyecto para configurar que ignore algunos archivos
 
 ```javascript
-  {
-    "name": "2.1-node_server",
-    "version": "1.0.0",
-    "description": "",
-    "main": "app.js",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
+{
+  "ignore": ["*.json"]
+}
+```
+
+Así solo lo instalamos de manera local (solo nuestro proyecto). Nos crea en nuestro proyecto una carpeta **node_modules** donde se instalan estos paquetes.
+Para usarlo tenemos que ejecutar el proyecto mediante nodemon no usando node
+
+```javascript
+{
+  "name": "2.1-node_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
 /*=>*/  "start": "nodemon app.js" // <==
-    },
-    "author": "David Martin",
-    "license": "ISC",
-    "devDependencies": {
-      "nodemon": "^2.0.6"
-    }
+  },
+  "author": "David Martin",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
   }
+}
 ```
+
 
 ## Errors and debugging
 
@@ -2297,7 +3164,7 @@ Recordar que para pasar datos por post podemos usar el `req.body` o meter la inf
 
 ## callbacks - aclaración -
 
-Es cuando pasamos una función como argumento de otra función, la clave aquí es q la función externa "decide" cuando se eecuta la función pasada (callback). Ponemos de ejemplo la funión de lectura y escritura en n archivo
+Es cuando pasamos una función como argumento de otra función, la clave aquí es q la función externa "decide" cuando se ejecuta la función pasada (callback). Ponemos de ejemplo la funión de lectura y escritura en n archivo
 
 ```javascript
 const getProductsFromFile = (cb) => {
@@ -2733,51 +3600,51 @@ Primero lee el archivo:
          - Creo una clase producto que me permitirá gestionar los items, crear productos y guardarlos en un archivo tipo JSON, con `this.id = Math.random();` le doy un id a cada producto. Como no voy a hacer operaciones con ese id lo transformo en string y así la comparación será más fácil pq cuando pase el id del producto por la url (cuando quiera editar/borrar el producto) será del tipo string ya que todos los datos codificados en la url quedan covertidos a tipo string.
 
            - ```javascript
-             //-------IMPORTs
-             const fs = require("fs"),
-               path = require("path");
+              //-------IMPORTs
+              const fs = require("fs"),
+                path = require("path");
 
-             const path_to_bbdd = path.join(
-               process.cwd(),
-               "data",
-               "product_bbdd.json"
-             );
+              const path_to_bbdd = path.join(
+                process.cwd(),
+                "data",
+                "product_bbdd.json"
+              );
 
-             //--- CLASS
-             module.exports.ProductClass = class Product {
-               constructor(title, price, imgUrl, description) {
-                 this.title = title;
-                 this.price = price;
-                 this.imgUrl = imgUrl;
-                 this.description = description;
-               }
+              //--- CLASS
+              module.exports.ProductClass = class Product {
+                constructor(title, price, imgUrl, description) {
+                  this.title = title;
+                  this.price = price;
+                  this.imgUrl = imgUrl;
+                  this.description = description;
+                }
 
-               save() {
-                 Product.getAllProducts((products_from_file) => {
-                   this.id = Math.random().toString();
-                   products_from_file.push(this);
-                   fs.writeFile(
-                     path_to_bbdd,
-                     JSON.stringify(products_from_file),
-                     (error) => {
-                       if (error) {
-                         console.log(error);
-                       }
-                     }
-                   );
-                 });
-               }
+                save() {
+                  Product.getAllProducts((products_from_file) => {
+                    this.id = Math.random().toString();
+                    products_from_file.push(this);
+                    fs.writeFile(
+                      path_to_bbdd,
+                      JSON.stringify(products_from_file),
+                      (error) => {
+                        if (error) {
+                          console.log(error);
+                        }
+                      }
+                    );
+                  });
+                }
 
-               static getAllProducts(cb) {
-                 fs.readFile(path_to_bbdd, (err, data) => {
-                   if (err) {
-                     cb([]);
-                   } else {
-                     cb(JSON.parse(data));
-                   }
-                 });
-               }
-             };
+                static getAllProducts(cb) {
+                  fs.readFile(path_to_bbdd, (err, data) => {
+                    if (err) {
+                      cb([]);
+                    } else {
+                      cb(JSON.parse(data));
+                    }
+                  });
+                }
+              };
              ```
 
       2. Tenemos que modificar el `shop.controller` para mostrar en la página principal los productos del archivo json, pero como la función de `readFile` es asíncrona intenta renderizar la vista antes de tener los datos eso no ocasiona un error para evitarlo el método para obtener los productos le pasemas un callback, y será esa función callback la que renderizará la vista
@@ -3285,12 +4152,12 @@ Recordemos que no trabajaremos con callbacks sino con promesas. Será una promes
 
    1. El modelo ProductClass
       - ```javascript
-        //----import pool object
-          const bd = require("../util/database");
-        //-----
-        static fetchAll() {
-          return  bd.execute('SELECT * FROM products');
-        }
+          //----import pool object
+            const bd = require("../util/database");
+          //-----
+          static fetchAll() {
+            return  bd.execute('SELECT * FROM products');
+          }
         ```
    2. El controlador shop
 
@@ -5606,7 +6473,7 @@ module.exports.postLogout = (req, res, next) => {
 };
 ```
 
-el método destroy de session le podemos pasar un callback para hacer algo después de eñiminar la session, nuestro caso volver a `/ `.
+el método destroy de session le podemos pasar un callback para hacer algo después de eliminar la session, nuestro caso volver a `/ `.
 
 Si queremos asegurarnos que la session se crea correctamente podemos llamar a al método `save()`
 

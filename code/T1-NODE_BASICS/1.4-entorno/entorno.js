@@ -1,3 +1,3 @@
-nombre = process.env.NOMBRE || "si nombre";
+nombre = process.env.NOMBRE || "sin nombre";
 
 console.log(`hola ${nombre}`);
