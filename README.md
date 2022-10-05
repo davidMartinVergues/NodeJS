@@ -54,6 +54,17 @@
     - [Ejecutar/compilar modulos de C++](#ejecutarcompilar-modulos-de-c)
   - [NPM](#npm)
   - [Creando nuestro propio módulo](#creando-nuestro-propio-módulo)
+  - [Datos almacenados vs en memoria](#datos-almacenados-vs-en-memoria)
+    - [Buffers](#buffers)
+    - [Streams](#streams)
+      - [Stream de lectura](#stream-de-lectura)
+      - [Los streams de escritura](#los-streams-de-escritura)
+  - [Trucos node](#trucos-node)
+    - [Rendimiento de una app de node](#rendimiento-de-una-app-de-node)
+    - [Debugging](#debugging)
+    - [Error first callbacks](#error-first-callbacks)
+  - [Automatización de procesos con node](#automatización-de-procesos-con-node)
+  - [Crear aplicaciones con NodeJS - Electron](#crear-aplicaciones-con-nodejs---electron)
   - [Instalar nodeJS](#instalar-nodejs)
   - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
   - [Creación del servidor](#creación-del-servidor)
@@ -70,6 +81,8 @@
   - [Entendiendo NPM node package manager scripts](#entendiendo-npm-node-package-manager-scripts)
     - [Instalando paquetes de terceros](#instalando-paquetes-de-terceros)
       - [Paquetes útiles](#paquetes-útiles)
+        - [sharp](#sharp)
+        - [moment](#moment)
         - [bcrypt](#bcrypt)
         - [NODEMON](#nodemon-1)
   - [Errors and debugging](#errors-and-debugging)
@@ -257,6 +270,17 @@
     - [Ejecutar/compilar modulos de C++](#ejecutarcompilar-modulos-de-c)
   - [NPM](#npm)
   - [Creando nuestro propio módulo](#creando-nuestro-propio-módulo)
+  - [Datos almacenados vs en memoria](#datos-almacenados-vs-en-memoria)
+    - [Buffers](#buffers)
+    - [Streams](#streams)
+      - [Stream de lectura](#stream-de-lectura)
+      - [Los streams de escritura](#los-streams-de-escritura)
+  - [Trucos node](#trucos-node)
+    - [Rendimiento de una app de node](#rendimiento-de-una-app-de-node)
+    - [Debugging](#debugging)
+    - [Error first callbacks](#error-first-callbacks)
+  - [Automatización de procesos con node](#automatización-de-procesos-con-node)
+  - [Crear aplicaciones con NodeJS - Electron](#crear-aplicaciones-con-nodejs---electron)
   - [Instalar nodeJS](#instalar-nodejs)
   - [Creando un servidor con NodeJS](#creando-un-servidor-con-nodejs)
   - [Creación del servidor](#creación-del-servidor)
@@ -273,6 +297,8 @@
   - [Entendiendo NPM node package manager scripts](#entendiendo-npm-node-package-manager-scripts)
     - [Instalando paquetes de terceros](#instalando-paquetes-de-terceros)
       - [Paquetes útiles](#paquetes-útiles)
+        - [sharp](#sharp)
+        - [moment](#moment)
         - [bcrypt](#bcrypt)
         - [NODEMON](#nodemon-1)
   - [Errors and debugging](#errors-and-debugging)
@@ -1058,6 +1084,8 @@ hola("david", (nombre) => {
 
 ### Promesas 
 
+Todas las peticiones asíncronas devuelven una promesa!
+
 Para evitar el callbackHell se crea las promises. La clave de las promesas es que tienen un estado, pueden estar **resuletas**, **pendientos** o **fallar** y pueden ser anidadas.
 
 Cuando creamos una función como una promesa debemos devolver uno **promise**, 
@@ -1162,9 +1190,43 @@ function adios(nombre) {
 
 ### Async/await 
 
-Es una nueva sintaxi para controlar la asincronía, asegurarnos que ciertas funciones se ejecutensecuencialmente pq el resultado de una será el input de la otra. 
+Es una nueva sintaxi para controlar la asincronía, asegurarnos que ciertas funciones se ejecuten secuencialmente pq el resultado de una será el input de la otra. 
 
-Con esta sintaxi podemos definir explicitamente una función como asíncrona y poder esperar a q esa función termine. Como es asíncrona no bloquea el hilo principal, ya que puede seguir escuchando nuevas peticiones.
+Con esta sintaxi podemos definir explicitamente una función como asíncrona y poder esperar a q esa función termine. Como es asíncrona no bloquea el hilo principal, ya que puede seguir escuchando nuevas peticiones. Dentro de esta función asíncrona podremos usar la palabra reservada `await` para gestionar funciones q devuelven promesas y hasta q esa promesa no se resuleve no sigue la ejecución del código.
+
+```javascript
+
+async function leerResponse(){
+
+  let response = await fetch('https://api.github.com/users/codigofacilito')
+  let json = await response.json()
+  console.log(json)
+}
+
+leerResponse();
+```
+Usamos dos awaits pq cada una de las llamadaas son funciones q devuelven una promesa (son peticiones asíncronas)
+
+En realidad async/await por detrás trabaja por promesas. Si queremos gestionar errores en las llamadas con async/await tenemos q incluir los await en bloques try/catch
+
+```javascript
+async function leerResponse() {
+
+    try {
+
+        let response = await fetch("https://api.github.com/users/codigofacilito");
+        let json = await response.json()
+        console.log(json)
+
+    } catch (err) {
+        console.log('errorrrrrrrrrrrrrrr');
+        console.log(err);
+    }
+}
+leerResponse();
+
+```
+
 
 primero debemos declarar una función como asíncrona 
 
@@ -1190,6 +1252,10 @@ async function main() {
 
 main(); 
 ```
+
+Otro ejemplo de async/await 
+
+
 
 ## Modulos del Core de nodeJS 
 
@@ -1651,8 +1717,6 @@ Para poder compilar módulos nativos escritos en C++ instalamos node-gyp.
 
 ## NPM 
 
-
-
 ## Creando nuestro propio módulo  
 
 [Usando el sistema de módulos de NodeJS](#usando-el-sistema-de-módulos-de-nodejs)  
@@ -1702,6 +1766,325 @@ hola señor david
 
 */
 ```
+## Datos almacenados vs en memoria
+
+Hay datos que se manejan al vuelo (en RAM) y esto da una alta velocidad en el momento de acceder a estos datos. Sin embargo cuando grabamos en disco es un proceso muy lento. 
+
+Por ejemplo si queremos editar una imagen muy pesada en lugar de estar escribiendo en disco y leyendo y repetir el proceso, lo que lo haría muy lento se utiliza la memoria RAM para ir realizando las distintas acciones y cuando hayamos terminado se escribe finalmente en disco. Para escribir esos datos en RAM y pasar la info entre las distintas funciones utilizamos los buffers y streams.
+
+### Buffers 
+
+Los buffers no son más que datos crudos, en binario, que van de un punto A -> B. Por ejemplo con el módulo `fs` cuando leemos un fichero esos datos están en forma de buffer.
+
+Para crear un buffer 
+
+```javascript
+let buffer = Buffer.alloc(4); // guardamos un byte en memoria
+
+console.log(buffer);
+//genera un buffer vacio pero con 4 espacios de memoria
+// <Buffer 00 00 00 00> 
+
+```
+
+Si queremos pasarle datos no usaremos `.alloc()`, que solo reserva un espacio en memoria, si no usaremos `.from()`.
+
+```javascript
+buffer = Buffer.from([1, 2, 3, 4, 5, 6])
+console.log(buffer);
+//<Buffer 01 02 03 04 05 06>
+```
+También podemos guardamos texto.
+
+```javascript
+buffer = Buffer.from('Hola mundo!')
+console.log(buffer);
+//<Buffer 48 6f 6c 61 20 6d 75 6e 64 6f 21>
+console.log(buffer.toString());
+//Hola mundo!
+
+```
+
+Trabajar con buffers nos permite trabajar cn los datos a nivel más bajo(binario) así q aquí no intervienen los tipos por eso es importante saber que quien envía los datos y los recibe debe saber qué tipo de dato contiene el buffer para poderlos decodificar.
+
+También nos permite trabajar con el buffer posición a posición, por paquetes de bytes, así podemos cambiar parte de la información. 
+
+```javascript
+let abcedario = Buffer.alloc(26);
+
+abcedario.forEach((element, index) => {
+
+    abcedario[index] = index + 97;
+})
+
+console.log(abcedario.toString());//abcdefghijklmnopqrstuvwxyz
+```
+
+Un buffer no suele venir solo si no que suele venir de un stream.
+
+
+### Streams
+
+Son el paso de datos entre un punto A -> B. Tenemos 3 tipos de streams:
+
+1. de lectura, se lee info del punto A y se la pasa a punto B
+2. de escritura, tienes un stream de destino y le vas metiendo datos
+3. stream bidireccional, son streams tanto de lectura como escritura.
+
+En el paquete `fs` tenemos la opción de crear un stream de lectura para leer archivos muy grandes, este stream nos permite leer el archivo a trozos (chunks).
+
+#### Stream de lectura
+
+```javascript
+
+const fs = require('fs')
+
+
+let data = "";
+
+
+let readableStream = fs.createReadStream(__dirname + '/input.txt')
+
+readableStream.on('data', chunk => {
+    console.log(chunk);
+})
+//<Buffer 4c 6f 72 65 6d 20 69 70 73 75 6d 20 64 6f 6c 6f 72 20 73 69 74 2c 20 61 6d 65 74 20 63 6f 6e 73 65 63 74 65 74 75 72 20 61 64 69 70 69 73 69 63 69 6e ... 4592 more bytes>
+```
+Por el stream nos viene un buffer, pero como sabemos que ese buffer contiene texto podemos establecer la condificación del stream en UTF-8 para q entienda los caracteres.
+
+```javascript
+
+const fs = require('fs')
+
+let data = "";
+
+let readableStream = fs.createReadStream(__dirname + '/input.txt')
+
+
+// para poder leer texto con tildes, ñ , etc
+readableStream.setEncoding('UTF-8') 
+
+// escuchamnos el evento data  del stream, a medida q van llegando datos los vamos capturando
+readableStream.on('data', chunk => {
+
+    data += chunk
+    console.log(chunk);
+})
+
+// evento end cuando termina el stream nos devuelve la data completa.
+readableStream.on('end', () => {
+
+    console.log(data);
+
+})
+
+```
+
+#### Los streams de escritura
+
+```javascript
+
+const fs = require('fs')
+const stream = require('stream')
+const util = require('util')
+
+
+let data = "";
+
+
+let readableStream = fs.createReadStream(__dirname + '/input.txt')
+
+readableStream.setEncoding('UTF-8') // para poder leer texto con tildes, ñ 
+
+// escuchamnos el evento data  del stream, a medida q van llegando datos los vamos capturando
+readableStream.on('data', chunk => {
+
+    data += chunk
+    //console.log(chunk);
+})
+
+// evento end cuando termina el stream nos devuelve la data completa.
+readableStream.on('end', () => {
+
+    console.log(data);
+
+})
+
+// stream de salida 
+
+const Transform = stream.Transform;
+
+function Mayus() {
+
+    Transform.call(this)
+
+}
+
+util.inherits(Mayus, Transform)
+
+Mayus.prototype._transform = function (chunk, codif, cb) {
+    chunkMayus = chunk.toString().toUpperCase()
+    this.push(chunkMayus)
+    cb()
+}
+
+let mayus = new Mayus()
+
+readableStream
+    .pipe(mayus)
+    .pipe(process.stdout)
+```
+
+## Trucos node
+### Rendimiento de una app de node 
+
+Para averiguar qué parte d enuestro código está relentizando nuestra app podemos utilizar `console.time('nombre')` y `console.timeEnd('nombre')` Si encerramos nuestro código entre estas dos líneas podremos saber cuanto tarde en ejecutarse 
+
+```javascript
+
+let suma = 0
+
+console.time('bucle')
+
+for (let index = 0; index < 100000000; index++) {
+    suma++;
+
+}
+
+console.timeEnd('bucle')
+```
+
+### Debugging 
+
+para ejecutar una app de node en debugging mode y poderlo debuggear en chrome hacemos:.
+
+```
+node --inspect debugger.js
+
+```
+y en chrome entramos en la url `chrome://inspect`, ahí veremos el archivo q estamos debugeando, si clicamos en inspect nos abrirá una consola y en sources debemos cargar nuestra carpeta dnd tenemos la app de node.
+
+### Error first callbacks
+
+Es una convención de q todos los módulos q tiren de callbacks el primer argumento que recibe la función es el error. 
+
+Así es como generaríamos una función con callbacks y como primer parámetro venga el error
+
+```javascript
+
+function asincrona(cb) {
+    setTimeout(() => {
+
+        try {
+            let a = 3 + z
+            cb(null, a)
+        } catch (e) {
+            cb(e, null)
+        }
+
+    }, 1000);
+}
+
+asincrona((err, dato) => {
+    if (err) {
+        console.log('tenemos error');
+        console.log(err);
+        return false
+    }
+
+    console.log('todo bien ', dato);
+})
+```
+
+RECORDEMOS QUE NO PODEMOS ARROJAR EL ERROR CON UN `thorw` teniendo funciones asíncronas por eso para gestionar errores en callbacks usamos la primera aproximación. No funciona xq el try/catch no puede recoger el error arrojado por el callback pq éste se ejecuta en otro hilo
+
+```javascript
+function asincrona(cb) {
+    setTimeout(() => {
+
+        try {
+            let a = 3 + z
+            cb(null, a)
+        } catch (e) {
+            cb(e, null)
+        }
+
+    }, 1000);
+}
+
+try {
+
+    asincrona((err, dato) => {
+        if (err) {
+
+            throw err; // ESTO NO FUNCIONA
+        }
+
+        console.log('todo bien ', dato);
+    })
+
+
+} catch (e) {
+    console.err('hay un error');
+    console.err(e);
+}
+
+
+```
+
+## Automatización de procesos con node 
+
+Hay distintas herramientas de automatización de procesos como GULP, Grunt (sirven para todo front/back-end). También está webpack pero es más común en frontend.
+
+Nosotros usaremos Gulp. 
+
+Para ello necesitaremos instalar `gulp`. 
+
+```
+npm i gulp gulp-server-livereload
+```
+
+Para poder empezar con gulp tenemos q crear un archivo `gulpfile.js` en la raíz de la app (al lado de package.json).
+
+```javascript
+const gulp = require('gulp');
+const server = require('gulp-server-livereload')
+
+gulp.task('build', (cb) => {
+
+    console.log('construyendo la app');
+
+    setTimeout(cb, 1200);
+
+})
+
+gulp.task('serve', cb => {
+    gulp.src('www')
+        .pipe(server({
+            livereload: false,
+            open: true,
+        }));
+})
+
+gulp.task('default', gulp.series('build', 'serve'))
+
+```
+y en el package.json añadimos los cripts correspondientes
+
+La última task es default así q solo haciendo `gulp`se activa. Para correr estos scripts hay q hacerlo como siempre `npm run start`.
+
+
+```javascript
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp build",
+    "serve": "gulp serve",
+    "start": "gulp"
+  },
+
+```
+
+## Crear aplicaciones con NodeJS - Electron
 
 
 ## Instalar nodeJS
@@ -2108,6 +2491,7 @@ VOLVER A MIRAR EL VIDEO 14
 ## Usando el sistema de módulos de NodeJS
 
 En nodeJS es muy común separar nuestro código en diferentes archivos y luego exportarlos para poderlos usar desde otros archvos y así tener nuestro código más ordenado.  
+
 Podemos crear un nuevo archivo llamado **routes.js** que contendrá los pasos a seguir según la url que le solicitemos al servidor, esto es la función anónima que le pasamos como argumento a **http.createServer()**. Así podemos dejar un archivo con la creación del servidor y un archivo routes dnd encontraremos las urls de éste.
 Nuestro punto de partida será el servidor (app.js) y este requerirá el código del archivo routes, para ello desde el archio routes asignamos nuestra función **(req,res)=>{}** a una constamte llamada **requestHandler** para luego poderla exportar.
 
@@ -2285,6 +2669,74 @@ npm install -g nombrePackage
 
 #### Paquetes útiles
 
+
+##### sharp
+
+Esta librería nos permite trabajar con imágenes.
+
+```javascript
+
+const sharp = require('sharp')
+
+
+sharp('utiles.png')
+    .resize(80)
+    .grayscale()
+    .toFile('resize-img.png')
+
+
+```
+
+##### moment 
+
+Esta librería nos permite trabajar con fechas. 
+
+```javascript
+const moment = require('moment')
+
+let ahora = moment();
+
+console.log(ahora.toString());
+
+// como formatear la fecha
+console.log(ahora.format('DD/MM/yyyy - HH:mm'));
+
+// startOf() cuanto tiempo ha pasado desde la hora en la q estamos es decir los  MINUTOS 
+console.log(ahora.startOf('hour').fromNow());
+// startOf() cuanto tiempo ha pasado desde el inicio del día es decir la Hora actual.
+console.log(ahora.startOf('day').fromNow());
+
+// endtOf() cuanto tiempo falta para finalizar el día
+console.log(ahora.endOf('day').fromNow());
+
+// calendar 
+console.log(ahora.subtract(10, 'days').calendar(null, { sameElse: 'LLLL' }));
+console.log(ahora.subtract(3, 'days').calendar(null, { sameElse: 'DD/MM/YYYY' }));
+console.log(ahora.subtract(1, 'days').calendar(null, { sameElse: 'DD/MM/YYYY' }));
+console.log(ahora.calendar(null, { sameElse: 'DD/MM/YYYY' }));
+console.log(ahora.add(1, 'days').calendar(null, { sameElse: 'DD/MM/YYYY' }));
+console.log(ahora.add(3, 'days').calendar(null, { sameElse: 'DD/MM/YYYY' }));
+console.log(ahora.add(10, 'days').calendar(null, { sameElse: 'DD/MM/YYYY' }));
+
+// multiple locale support
+
+console.log(moment.locale());// en
+;         // en
+moment().format('LT');   // 7:17 PM
+moment().format('LTS');  // 7:17:56 PM
+moment().format('L');    // 06/04/2022
+moment().format('l');    // 6/4/2022
+moment().format('LL');   // June 4, 2022
+moment().format('ll');   // Jun 4, 2022
+moment().format('LLL');  // June 4, 2022 7:17 PM
+moment().format('lll');  // Jun 4, 2022 7:17 PM
+moment().format('LLLL'); // Saturday, June 4, 2022 7:17 PM
+moment().format('llll'); // // Sat, Jun 4, 2022 7:24 PM
+
+
+```
+
+
 ##### bcrypt
 
 Muy útil para cifrar y desencriptar datos por ejemplo passwords. 
@@ -2320,6 +2772,8 @@ async function main(password) {
 
 main("1234Segura!"); 
 ```
+
+
 
 ##### NODEMON
    
@@ -6483,3 +6937,7 @@ req.session.save((error) => {
   res.redirect("/");
 });
 ```
+
+
+
+

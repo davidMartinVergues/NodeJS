@@ -1,17 +1,16 @@
 {
-  "name": "1.13-modulos_utiles",
+  "name": "1.17-electron",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.0.1",
-    "moment": "^2.29.3",
-    "sharp": "^0.30.6"
+    "electron": "^19.0.4"
   }
 }

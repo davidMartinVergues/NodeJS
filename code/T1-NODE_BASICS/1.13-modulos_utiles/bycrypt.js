@@ -18,8 +18,9 @@ async function check_hash(password, hash) {
 
 async function main(password) {
   let password_encrypted = await create_hash(password);
-  let result = await check_hash(password, password_encrypted);
+  //etse password ahora se puede guardar en la bbdd por ejemplo
+  let result = await check_hash('password', password_encrypted);
   console.log(result);
 }
 
-main("1234Segura!");
+main("1234Segura");
